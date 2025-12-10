@@ -1,735 +1,88 @@
 
-export enum ViewState {
-  DASHBOARD = 'DASHBOARD',
-  INTEGRATIONS = 'INTEGRATIONS',
-  TAX_WIZARD = 'TAX_WIZARD',
-  DOCUMENTS = 'DOCUMENTS',
-  HISTORY = 'HISTORY',
-  SETTINGS = 'SETTINGS',
-  SCENARIOS = 'SCENARIOS',
-  ASSETS = 'ASSETS',
-  CONTRACTORS = 'CONTRACTORS',
-  REPORTS = 'REPORTS',
-  BUDGETS = 'BUDGETS',
-  EXPORT = 'EXPORT',
-  CRYPTO_HUB = 'CRYPTO_HUB',
-  YAPILY_CONNECT = 'YAPILY_CONNECT',
-  B2B_NETWORK = 'B2B_NETWORK',
-  TREASURY = 'TREASURY',
-  PRICING = 'PRICING',
-  PROJECTS = 'PROJECTS',
-  CARDS = 'CARDS',
-  PAYROLL = 'PAYROLL',
-  WAREHOUSE = 'WAREHOUSE',
-  VEHICLES = 'VEHICLES',
-  ECOMMERCE = 'ECOMMERCE',
-  INTERNATIONAL = 'INTERNATIONAL',
-  AUDIT_DEFENDER = 'AUDIT_DEFENDER',
-  MARKET_INTEL = 'MARKET_INTEL'
+export enum ApiProvider {
+    SALT_EDGE = 'Salt Edge',
+    TINK = 'Tink',
+    TRUELAYER = 'TrueLayer',
+    GOCARDLESS = 'GoCardless',
+    RAILSR = 'Railsr',
+    MODERN_TREASURY = 'Modern Treasury',
+    BYBIT = 'Bybit',
+    MEXC = 'MEXC',
+    MORALIS = 'Moralis',
+    NANSEN = 'Nansen',
+    COINAPI = 'CoinAPI',
+    GOLDRUSH = 'GoldRush',
+    ALCHEMY = 'Alchemy',
+    QUICKNODE = 'QuickNode',
+    SUMSUB = 'SumSub',
+    CIVIC = 'Civic',
+    DOCUSIGN = 'DocuSign',
+    CEIDG = 'CEIDG (Gov)',
+    STRATEG = 'STRATEG (GUS)',
+    TRANSTAT = 'TRANSTAT (Intrastat)',
+    SMUP = 'SMUP (Usługi Publiczne)',
+    DBW = 'DBW (Wspólna Baza)',
+    SDP = 'SDP (System Danych Podatkowych)',
+    SEGMENT = 'Segment',
+    XTB = 'XTB (xStation)',
+    INTERACTIVE_BROKERS = 'IBKR'
 }
 
-export enum TaxFormType {
-  PIT_36 = 'PIT-36',
-  PIT_37 = 'PIT-37',
-  PIT_38 = 'PIT-38',
+export interface ApiVaultStatus {
+    provider: ApiProvider | string;
+    isConnected: boolean;
+    lastChecked: string;
+    featuresUnlocked: string[];
 }
 
-export enum TaxStatus {
-  DRAFT = 'DRAFT',
-  CALCULATED = 'CALCULATED',
-  SIGNED = 'SIGNED',
-  SUBMITTED = 'SUBMITTED',
-  PAID = 'PAID',
-}
-
-export interface ZusBreakdown {
-  socialTotal: number;
-  healthInsurance: number;
-  laborFund: number;
-  totalDue: number;
-  deductibleFromTaxBase: number;
-  deductibleFromTax: number;
-}
-
-export interface TaxBreakdown {
-  revenue: number;
-  costs: number;
-  income: number;
-  taxBase: number;
-  taxFreeAmount: number;
-  taxRate: number;
-  healthInsurance: number;
-  taxDue: number;
-  zus?: ZusBreakdown;
-  details: {
-    thresholdExceeded: boolean;
-    firstBracketAmount: number;
-    secondBracketAmount: number;
-  };
-}
-
-export interface VatSummary {
-  outputVat: number;
-  inputVat: number;
-  vatDue: number;
-}
-
-export interface BankAccount {
-  id: string;
-  providerName: string;
-  accountNumber: string;
-  balance: number;
-  currency: string;
-  lastSync: string;
-  type: 'BUSINESS' | 'SAVINGS' | 'MULTI_CURRENCY' | 'RAILSR_VIRTUAL';
-  colorTheme: string;
-  logo?: string;
-  isVirtual?: boolean;
-  aggregator?: 'SALT_EDGE' | 'TINK' | 'TRUELAYER';
-}
-
-export interface CryptoWallet {
-  id: string;
-  provider: 'Moralis' | 'Nansen' | 'Alchemy' | 'QuickNode';
-  address: string;
-  chain: string;
-  assetCount: number;
-  riskScore?: number;
-}
-
-export interface TaxReturn {
-  id: string;
-  year: number;
-  type: TaxFormType;
-  income: number;
-  taxDue: number;
-  breakdown?: TaxBreakdown;
-  status: TaxStatus;
-  submissionDate?: string;
-  upoId?: string;
-}
-
-export interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  category: 'INCOME' | 'EXPENSE' | 'TAX';
-  bankId?: string;
-  merchantLogo?: string;
-}
-
-export enum CostCategory {
-  OPERATIONAL_100 = 'OPERATIONAL_100',
-  FUEL_75 = 'FUEL_75',
-  REPRESENTATION_0 = 'REPRESENTATION_0',
-  EQUIPMENT = 'EQUIPMENT',
-}
-
-export interface InvoiceItem {
-  name: string;
-  quantity: number;
-  unitPriceNet: number;
-  totalNet: number;
-  vatRate: number;
-}
-
-export interface Invoice {
-  id: string;
-  ksefNumber: string;
-  contractor: string;
-  nip: string;
-  date: string;
-  currency: string;
-  exchangeRate?: number;
-  amountNet: number;
-  amountVat: number;
-  amountGross: number;
-  type: 'SALES' | 'PURCHASE';
-  status: 'PROCESSED' | 'PENDING' | 'DRAFT_XML' | 'SENT_TO_MF';
-  costCategory?: CostCategory;
-  items?: InvoiceItem[];
-  ksefValidationStatus?: 'VALID' | 'INVALID' | 'UNKNOWN';
-  isNuffiNetwork?: boolean;
-  remindersSent?: number;
-  aiAuditScore?: number;
-  aiAuditNotes?: string;
-  projectId?: string;
-  docuSignStatus?: 'SENT' | 'SIGNED' | 'NONE';
-}
-
-export interface RecurringInvoice {
-    id: string;
-    templateName: string;
-    contractor: Contractor;
-    frequency: 'MONTHLY' | 'WEEKLY' | 'QUARTERLY';
-    nextIssueDate: string;
-    amountNet: number;
-    active: boolean;
-}
-
-export interface RecurringSuggestion {
-    contractorName: string;
-    nip: string;
-    detectedFrequency: 'MONTHLY';
-    confidence: number;
-    potentialSavingsTime: string;
-}
-
-export interface NbpTable {
-    tableNo: string;
-    effectiveDate: string;
-    rate: number;
-    currency: string;
-}
-
-export type IntegrationStatus = 'IDLE' | 'CONNECTING' | 'AUTHENTICATING' | 'FETCHING' | 'SUCCESS' | 'ERROR';
-
-export interface TaxOffice {
-  code: string;
-  name: string;
-  nameShort?: string;
-}
-
-export enum TaxationForm {
-  GENERAL_SCALE = 'Zasady Ogólne (Skala)',
-  FLAT_RATE = 'Podatek Liniowy (19%)',
-  LUMP_SUM = 'Ryczałt Ewidencjonowany',
-}
-
-export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  pesel: string;
-  nip: string;
-  email: string;
-  taxOfficeCode: string;
-  taxationForm: TaxationForm;
-  cryptoStrategy: 'FIFO' | 'LIFO' | 'HIFO';
-  companyName?: string;
-  companyAddress?: string;
-  kycStatus: 'VERIFIED' | 'PENDING' | 'NONE';
-}
-
-export interface ExpenseBreakdown {
-  category: string;
-  amount: number;
-  color: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  timestamp: Date;
-}
-
-export type NotificationType = 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING';
-
-export interface NotificationAction {
-    label: string;
-    actionType: 'NAVIGATE' | 'ACTION';
-    target?: ViewState;
-}
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  timestamp?: string;
-  read?: boolean;
-  action?: NotificationAction;
-}
-
-export type SearchResultType = 'INVOICE' | 'CONTRACTOR' | 'ASSET' | 'VIEW' | 'ACTION' | 'PROJECT';
-
-export interface SearchResult {
-    id: string;
-    type: SearchResultType;
-    title: string;
-    subtitle: string;
-    targetView?: ViewState;
-    metadata?: any;
-}
-
-export interface SimulationParams {
-  amountGross: number;
-  vatRate: number;
-  category: CostCategory;
-  taxationForm: TaxationForm;
-}
-
-export interface SimulationResult {
-  amountNet: number;
-  vatTotal: number;
-  vatDeductible: number;
-  vatNonDeductible: number;
-  pitCostBasis: number;
-  pitDeductibleAmount: number;
-  pitTaxShield: number;
-  totalSavings: number;
-  realCost: number;
-  percentSaved: number;
-}
-
-export enum AssetCategory {
-  COMPUTER = 'Komputery (30%)',
-  PHONE = 'Telefony (20%)',
-  CAR = 'Samochody (20%)',
-  FURNITURE = 'Meble (20%)',
-  SOFTWARE = 'WNiP (50%)',
-  OTHER = 'Inne (10%)'
-}
-
-export interface AmortizationSchedule {
-  year: number;
-  month: number;
-  writeOffAmount: number;
-  remainingValue: number;
-  accumulated: number;
-}
-
-export interface Asset {
-  id: string;
-  name: string;
-  category: AssetCategory;
-  purchaseDate: string;
-  initialValue: number;
-  currentValue: number;
-  amortizationRate: number;
-  status: 'ACTIVE' | 'FULLY_AMORTIZED' | 'SOLD';
-  schedule: AmortizationSchedule[];
-}
-
-export interface CashFlowPoint {
-  date: string;
-  balance: number;
-  type: 'HISTORICAL' | 'PROJECTED';
-}
-
-export interface ContractorRisk {
-  dependency: 'LOW' | 'MEDIUM' | 'HIGH';
-  whiteListStatus: 'VERIFIED' | 'WARNING' | 'UNKNOWN';
-}
-
-export interface Contractor {
-  id: string;
-  name: string;
-  nip: string;
-  totalSales: number;
-  totalPurchases: number;
-  invoiceCount: number;
-  lastInteraction: string;
-  risk: ContractorRisk;
-  bankAccount?: string;
-  isNuffiUser?: boolean;
-}
-
-export type EventType = 'ZUS' | 'VAT' | 'PIT' | 'OTHER';
-
-export interface CalendarEvent {
-  id: string;
-  date: string;
-  title: string;
-  amount: number;
-  type: EventType;
-  status: 'PENDING' | 'PAID' | 'OVERDUE';
-}
-
-export interface FinancialReportLine {
-  label: string;
-  value: number;
-  type: 'REVENUE' | 'COST' | 'PROFIT' | 'TAX' | 'CALCULATION';
-  indent: number;
-  isBold?: boolean;
-  highlight?: boolean;
-}
-
-export interface FinancialReport {
-  period: string;
-  generatedAt: string;
-  lines: FinancialReportLine[];
-}
-
-export type BudgetStatus = 'SAFE' | 'WARNING' | 'EXCEEDED';
-
-export interface Budget {
-    id: string;
-    category: string;
-    limit: number;
-    spent: number;
-    forecast: number;
-    status: BudgetStatus;
-    percentUsed: number;
-}
-
-export interface AuditEntry {
-  id: string;
-  date: string;
-  action: string;
-  ip: string;
-  device: string;
-  status: 'SUCCESS' | 'WARNING' | 'FAILURE';
-}
-
-export enum ExportFormat {
-  JPK_V7 = 'JPK_V7 (XML)',
-  KPIR_PDF = 'KPiR (PDF)',
-  KPIR_CSV = 'KPiR (Excel/CSV)',
-  ASSETS_PDF = 'Ewidencja ŚT (PDF)'
-}
-
-export enum CryptoExchange {
-  BINANCE = 'BINANCE',
-  COINBASE = 'COINBASE',
-  KRAKEN = 'KRAKEN',
-  BYBIT = 'BYBIT',
-  MEXC = 'MEXC',
-  OKX = 'OKX'
-}
-
-export enum CryptoTransactionType {
-  SPOT_BUY = 'SPOT_BUY',
-  SPOT_SELL = 'SPOT_SELL',
-  FUTURES_PNL = 'FUTURES_PNL',
-  FUNDING_FEE = 'FUNDING_FEE',
-  STAKING_REWARD = 'STAKING_REWARD'
-}
-
-export interface CryptoTransaction {
-  id: string;
-  exchange: CryptoExchange;
-  timestamp: string;
-  type: CryptoTransactionType;
-  pair?: string;
-  amount: number;
-  price: number;
-  totalFiat: number;
-  feeFiat: number;
-  realizedPnL?: number;
-}
-
-export interface CryptoTaxReport {
-  year: number;
-  strategy: 'FIFO' | 'LIFO';
-  spotIncome: number;
-  spotCost: number;
-  spotIncomeTaxBase: number;
-  futuresIncome: number;
-  futuresCost: number;
-  futuresIncomeTaxBase: number;
-  totalTaxDue: number;
-  transactionsProcessed: number;
-}
-
-export interface DeFiReward {
-    id: string;
-    protocol: string;
-    token: string;
-    amount: number;
-    valuePln: number;
-    date: string;
-    type: 'STAKING' | 'AIRDROP' | 'LIQUIDITY_MINING';
-}
-
-export interface TaxHarvestingOpp {
-    asset: string;
-    unrealizedLoss: number;
-    currentValue: number;
-    potentialTaxSavings: number;
-}
-
-export interface NFTAsset {
-    id: string;
-    collection: string;
-    name: string;
-    imageUrl: string;
-    boughtAt: number;
-    floorPrice: number;
-    pnl: number;
-    chain: 'ETH' | 'SOL' | 'MATIC';
-    provider?: 'Moralis' | 'Alchemy';
-}
-
-export interface CryptoAnalytics {
-    totalPnl: number;
-    winRate: number;
-    bestTrade: { pair: string; pnl: number };
-    worstTrade: { pair: string; pnl: number };
-    volume: number;
-    tradesCount: number;
-}
-
-export interface WalletRiskProfile {
-    address: string;
-    score: number;
-    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-    issues: string[];
-    provider?: 'Nansen' | 'GoldRush';
-}
-
-export interface ImpermanentLossResult {
-    initialValue: number;
-    holdValue: number;
-    poolValue: number;
-    impermanentLoss: number;
-    impermanentLossPercent: number;
-}
-
-export interface GoldRushTx {
-    txHash: string;
-    blockSignedAt: string;
-    blockHeight: number;
-    gasSpent: number;
-    gasQuote: number;
-    successful: boolean;
-    fromAddress: string;
-    toAddress: string;
-    value: string;
-    prettyValue: string;
-    logoUrl: string;
-}
-
-export interface WalletDna {
-    address: string;
-    labels: string[];
-    netWorthUsd: number;
-    topHoldings: { token: string; pct: number }[];
-    ageDays: number;
-    volume30d: number;
-}
-
-export interface StreamEvent {
-    id: string;
-    type: 'TX_IN' | 'TX_OUT' | 'NFT_TRANSFER';
-    summary: string;
-    timestamp: string;
-    value: string;
-    chain: string;
-}
-
-export interface NftCollectionStat {
-    id: string;
-    name: string;
-    image: string;
-    floorPrice: number;
-    volume24h: number;
-    change24h: number;
-    smartMoneyBuys: number;
-}
-
-export interface TokenGodMode {
-    symbol: string;
-    smartMoney: SmartMoneyFlow;
-    topBalances: { address: string; label: string; balance: number; pct: number }[];
-}
-
-export interface SmartMoneyFlow {
-    timeframe: '24h' | '7d';
-    inflow: number;
-    outflow: number;
-    netFlow: number;
-    smartBuyers: number;
-    smartSellers: number;
-}
-
-export interface TokenAllowance {
-    id: string;
-    token: string;
-    spender: string;
-    spenderLabel?: string;
-    allowance: string;
-    risk: 'HIGH' | 'MEDIUM' | 'LOW';
-    lastUpdated: string;
-}
-
-export type TaxEventType = 'DIVIDEND' | 'CAPITAL_GAIN' | 'INTEREST' | 'UNKNOWN';
-
-export interface TaxEvent {
+export interface OssTransaction {
     id: string;
     date: string;
-    description: string;
-    amount: number;
-    detectedType: TaxEventType;
-    confidence: number;
-    source: string;
-}
-
-export interface TransferRequest {
-  fromAccountId: string;
-  recipientName: string;
-  recipientIban: string;
-  amount: number;
-  title: string;
-  type: 'DOMESTIC' | 'TAX' | 'INSTANT' | 'RAILSR' | 'SEPA' | 'SWIFT';
-  currency?: string;
-}
-
-export interface BulkPaymentBatch {
-    id: string;
-    totalAmount: number;
-    count: number;
-    status: 'PENDING' | 'AUTHORIZED' | 'COMPLETED';
-    recipients: string[];
-}
-
-export interface VrpConfig {
-    id: string;
-    beneficiary: string;
-    maxAmountPerPeriod: number;
-    period: 'MONTHLY' | 'WEEKLY';
-    active: boolean;
-}
-
-export interface DirectDebitMandate {
-    id: string;
-    creditor: string;
-    reference: string;
-    status: 'ACTIVE' | 'PENDING' | 'CANCELLED';
-    lastPaymentDate?: string;
-    lastAmount?: number;
-    provider: 'GOCARDLESS';
-}
-
-export interface FinancialHealthScore {
-    score: number;
-    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
-    affordabilityRating: 'A' | 'B' | 'C' | 'D';
-    monthlyDisposableIncome: number;
-    debtToIncomeRatio: number;
-}
-
-export interface AccountVerification {
-    iban: string;
-    nameProvided: string;
-    matchStatus: 'MATCH' | 'CLOSE_MATCH' | 'NO_MATCH';
-    confidenceScore: number;
-}
-
-export interface PaymentLink {
-    id: string;
-    url: string;
-    qrCodeUrl?: string;
-    amount: number;
-    currency: string;
-    description: string;
-    status: 'ACTIVE' | 'PAID' | 'EXPIRED';
-    createdAt: string;
-    recipientName: string;
-}
-
-export interface WatchlistAddress {
-    id: string;
-    address: string;
-    label: string;
-    netWorthUsd: number;
-    change24h: number;
-    topToken: string;
-    alertsEnabled: boolean;
+    countryCode: string;
+    amountEur: number;
+    vatRate?: number;
+    vatAmountEur?: number;
+    source: 'SHOPIFY' | 'ALLEGRO' | 'MANUAL';
 }
 
 export enum SubscriptionPlan {
-  FREE = 'FREE',
-  PRO = 'PRO',
-  ENTERPRISE = 'ENTERPRISE'
+    FREE = 'FREE',
+    PRO = 'PRO',
+    ENTERPRISE = 'ENTERPRISE'
 }
 
-export interface AuthState {
-  isAuthenticated: boolean;
-  token: string | null;
-  plan: SubscriptionPlan;
+export enum TaxationForm {
+    GENERAL_SCALE = 'GENERAL_SCALE',
+    FLAT_RATE = 'FLAT_RATE',
+    LUMP_SUM = 'LUMP_SUM'
 }
 
-export interface GusHistoryEntry {
-    date: string;
-    description: string;
-}
-
-export interface GusData {
-  name: string;
-  nip: string;
-  regon: string;
-  krs?: string;
-  address: string;
-  street?: string;
-  propertyNumber?: string;
-  apartmentNumber?: string;
-  city: string;
-  zipCode: string;
-  startDate: string;
-  pkd: string;
-  pkdDesc?: string;
-  vatStatus?: 'ACTIVE' | 'EXEMPT' | 'SUSPENDED';
-  legalForm?: 'JDG' | 'KRS_SP_Z_OO' | 'KRS_SA' | 'KRS_SP_KOM' | 'CIVIL';
-  representatives?: string[];
-  shareCapital?: number;
-  lastUpdateDate?: string;
-  history?: GusHistoryEntry[];
-}
-
-export interface WhiteListStatus {
+export interface UserProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
     nip: string;
-    iban: string;
-    status: 'VALID' | 'INVALID' | 'UNKNOWN';
-    checkDate: string;
-    requestId: string;
+    pesel: string;
+    taxOfficeCode: string;
+    taxationForm: TaxationForm;
+    cryptoStrategy: 'FIFO' | 'LIFO' | 'HIFO';
+    kycStatus: 'VERIFIED' | 'PENDING' | 'REJECTED';
+    companyName: string;
+    companyAddress: string;
 }
 
-export interface CeidgCompany {
+export interface TaxOffice {
+    code: string;
     name: string;
-    nip: string;
-    regon: string;
-    address: string;
-    status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED';
-    verifiedIban?: string;
-    isNuffiUser: boolean;
 }
 
-export type ReminderType = 'SOFT' | 'HARD' | 'LEGAL';
-
-export interface ReminderLog {
-    invoiceId: string;
-    type: ReminderType;
+export interface AuditEntry {
+    id: string;
+    action: string;
     date: string;
-    method: 'EMAIL' | 'PUSH' | 'SMS';
-}
-
-export interface ExchangeRate {
-    pair: string;
-    bid: number;
-    ask: number;
-    mid: number;
-    changePercent: number;
-    timestamp: string;
-}
-
-export interface FxPosition {
-    id: string;
-    pair: string;
-    type: 'LONG' | 'SHORT';
-    amount: number;
-    avgRate: number;
-    unrealizedPnL: number;
-    valuePln: number;
-}
-
-export interface TreasuryAlert {
-    id: string;
-    type: 'PROFIT' | 'LOSS';
-    message: string;
-    timestamp: string;
-}
-
-export interface LedgerEntry {
-    id: string;
-    direction: 'DEBIT' | 'CREDIT';
-    amount: number;
-    currency: string;
-    status: 'POSTED' | 'PENDING';
-    metadata: Record<string, string>;
-    date: string;
-    provider: 'MODERN_TREASURY';
+    ip: string;
+    device: string;
+    status: 'SUCCESS' | 'FAILURE';
 }
 
 export type UserRole = 'ADMIN' | 'ACCOUNTANT' | 'ANALYST' | 'VIEWER';
@@ -742,70 +95,549 @@ export interface TeamMember {
     role: UserRole;
     status: 'ACTIVE' | 'PENDING' | 'LOCKED';
     lastActive: string;
-    avatar?: string;
 }
 
-export type ProjectStatus = 'ACTIVE' | 'COMPLETED' | 'ARCHIVED' | 'PLANNED';
+export enum CryptoExchange {
+    BINANCE = 'BINANCE',
+    KRAKEN = 'KRAKEN',
+    COINBASE = 'COINBASE',
+    KUCOIN = 'KUCOIN',
+    BYBIT = 'BYBIT',
+    MEXC = 'MEXC',
+    OKX = 'OKX',
+    BITGET = 'BITGET'
+}
+
+export enum CryptoTransactionType {
+    SPOT_BUY = 'SPOT_BUY',
+    SPOT_SELL = 'SPOT_SELL',
+    FUTURES_PNL = 'FUTURES_PNL',
+    FUNDING_FEE = 'FUNDING_FEE',
+    DEPOSIT = 'DEPOSIT',
+    WITHDRAWAL = 'WITHDRAWAL',
+    STAKING_REWARD = 'STAKING_REWARD',
+    DEFI_SWAP = 'DEFI_SWAP',
+    LIQUIDITY_ADD = 'LIQUIDITY_ADD',
+    LIQUIDITY_REMOVE = 'LIQUIDITY_REMOVE',
+    BRIDGE_SEND = 'BRIDGE_SEND',
+    BRIDGE_RECEIVE = 'BRIDGE_RECEIVE'
+}
+
+export interface CryptoTransaction {
+    id: string;
+    exchange: CryptoExchange;
+    timestamp: string;
+    type: CryptoTransactionType;
+    pair: string;
+    amount: number;
+    price: number;
+    totalFiat: number;
+    feeFiat: number;
+    realizedPnL?: number;
+    txHash?: string;
+    protocol?: string;
+    confidenceScore?: number;
+}
+
+export interface BankAccount {
+    id: string;
+    providerName: string;
+    accountNumber: string;
+    balance: number;
+    currency: string;
+    lastSync: string;
+    type: 'BUSINESS' | 'PERSONAL' | 'SAVINGS' | 'MULTI_CURRENCY';
+    colorTheme: string;
+    logo: string;
+    aggregator: string;
+    isVirtual?: boolean;
+}
+
+export interface Transaction {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    category: string;
+    bankId: string;
+}
+
+export interface DirectDebitMandate {
+    id: string;
+    creditorName: string;
+    status: 'ACTIVE' | 'INACTIVE';
+    lastPaymentDate: string;
+    lastPaymentAmount: number;
+}
+
+export interface TransferRequest {
+    fromAccountId: string;
+    amount: number;
+    recipientName: string;
+    recipientIban: string;
+    title: string;
+    type: 'DOMESTIC' | 'SEPA' | 'SWIFT';
+    currency: string;
+}
+
+export interface BulkPaymentBatch {
+    id: string;
+    totalAmount: number;
+    count: number;
+    status: 'AUTHORIZED' | 'PENDING' | 'REJECTED';
+}
+
+export interface VrpConfig {
+    id?: string;
+    beneficiary: string;
+    maxAmountPerPeriod: number;
+    period: 'MONTHLY' | 'WEEKLY';
+    active: boolean;
+}
+
+export interface FinancialHealthScore {
+    score: number;
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+    affordabilityRating: string;
+    monthlyDisposableIncome: number;
+    debtToIncomeRatio: number;
+}
+
+export interface AccountVerification {
+    matchStatus: 'MATCH' | 'NO_MATCH' | 'CLOSE_MATCH';
+    confidenceScore: number;
+}
+
+export interface PaymentLink {
+    id: string;
+    amount: number;
+    currency: string;
+    url: string;
+    status: 'PENDING' | 'PAID';
+}
+
+export interface WatchlistAddress {
+    address: string;
+    label: string;
+    chain: string;
+}
+
+export interface NftCollectionStat {
+    name: string;
+    floorPrice: number;
+    volume24h: number;
+    change24h: number;
+}
+
+export interface TokenGodMode {
+    symbol: string;
+    smartMoneyHoldings: number;
+    exchangeInflow: number;
+    exchangeOutflow: number;
+}
+
+export interface TokenAllowance {
+    token: string;
+    spender: string;
+    allowance: string; 
+    risk: 'HIGH' | 'LOW';
+}
+
+export interface StreamEvent {
+    id: string;
+    type: string;
+    data: any;
+}
+
+export interface WalletDna {
+    tags: string[];
+    ageDays: number;
+    activityScore: number;
+}
+
+export interface IndustryStat {
+    sector: string;
+    avgRevenue: number;
+    avgCost: number;
+}
+
+export interface MacroIndicator {
+    name: string;
+    value: number;
+    unit: string;
+    trend: 'UP' | 'DOWN' | 'STABLE';
+    date: string;
+}
+
+export interface LedgerEntry {
+    id: string;
+    date: string;
+    provider: string;
+    amount: number;
+    currency: string;
+    status: string;
+    direction: 'DEBIT' | 'CREDIT';
+    metadata: any;
+}
+
+export interface GoldRushTx {
+    hash: string;
+    from: string;
+    to: string;
+    value: string;
+    blockNumber: number;
+}
+
+export interface ExpenseBreakdown {
+    category: string;
+    amount: number;
+    percentage: number;
+}
+
+export interface CashFlowPoint {
+    date: string;
+    balance: number;
+    type: 'ACTUAL' | 'PROJECTED';
+}
+
+export enum AssetCategory {
+    COMPUTER = 'Komputery i elektronika',
+    PHONE = 'Telefony',
+    CAR = 'Samochody',
+    FURNITURE = 'Meble i wyposażenie',
+    SOFTWARE = 'Wartości niematerialne i prawne',
+    OTHER = 'Inne'
+}
+
+export interface AmortizationSchedule {
+    year: number;
+    month: number;
+    writeOffAmount: number;
+    remainingValue: number;
+    accumulated: number;
+}
+
+export interface Asset {
+    id: string;
+    name: string;
+    category: AssetCategory;
+    purchaseDate: string;
+    initialValue: number;
+    currentValue: number;
+    amortizationRate: number;
+    schedule: AmortizationSchedule[];
+}
+
+export interface Contractor {
+    id: string;
+    name: string;
+    nip: string;
+    totalSales: number;
+    totalPurchases: number;
+    invoiceCount: number;
+    lastInteraction: string;
+    isNuffiUser: boolean;
+    risk: {
+        whiteListStatus: 'VERIFIED' | 'UNKNOWN' | 'FAILED';
+        dependency: 'LOW' | 'MEDIUM' | 'HIGH';
+    }
+}
+
+export interface FinancialReport {
+    period: string;
+    lines: {
+        label: string;
+        value: number;
+        type: 'REVENUE' | 'COST' | 'PROFIT' | 'TAX';
+        indent: number;
+        isBold?: boolean;
+        highlight?: boolean;
+    }[];
+}
+
+export interface CalendarEvent {
+    id: string;
+    date: string;
+    title: string;
+    amount: number;
+    type: 'ZUS' | 'VAT' | 'PIT' | 'OTHER';
+    status: 'PENDING' | 'PAID';
+}
+
+export interface Budget {
+    id: string;
+    category: string;
+    limit: number;
+    spent: number;
+    forecast: number;
+    status: 'SAFE' | 'WARNING' | 'EXCEEDED';
+    percentUsed: number;
+}
+
+export enum ExportFormat {
+    JPK_V7 = 'JPK_V7',
+    JPK_FA = 'JPK_FA',
+    KPIR_PDF = 'KPIR_PDF',
+    KPIR_CSV = 'KPIR_CSV',
+    XML = 'XML'
+}
+
+export enum ViewState {
+    DASHBOARD = 'DASHBOARD',
+    INTEGRATIONS = 'INTEGRATIONS',
+    TAX_WIZARD = 'TAX_WIZARD',
+    DOCUMENTS = 'DOCUMENTS',
+    HISTORY = 'HISTORY',
+    SETTINGS = 'SETTINGS',
+    SCENARIOS = 'SCENARIOS',
+    ASSETS = 'ASSETS',
+    CONTRACTORS = 'CONTRACTORS',
+    REPORTS = 'REPORTS',
+    BUDGETS = 'BUDGETS',
+    EXPORT = 'EXPORT',
+    CRYPTO_HUB = 'CRYPTO_HUB',
+    YAPILY_CONNECT = 'YAPILY_CONNECT',
+    B2B_NETWORK = 'B2B_NETWORK',
+    TREASURY = 'TREASURY',
+    PROJECTS = 'PROJECTS',
+    CARDS = 'CARDS',
+    PAYROLL = 'PAYROLL',
+    WAREHOUSE = 'WAREHOUSE',
+    VEHICLES = 'VEHICLES',
+    ECOMMERCE = 'ECOMMERCE',
+    INTERNATIONAL = 'INTERNATIONAL',
+    AUDIT_DEFENDER = 'AUDIT_DEFENDER',
+    MARKET_INTEL = 'MARKET_INTEL',
+    PRICING = 'PRICING',
+    ESG = 'ESG',
+    WEALTH = 'WEALTH',
+    CONTRACTS = 'CONTRACTS',
+    MARKETPLACE = 'MARKETPLACE',
+    FORENSICS = 'FORENSICS',
+    TAX_ENGINE = 'TAX_ENGINE',
+    PREDICTIVE_TAX = 'PREDICTIVE_TAX',
+    REAL_ESTATE = 'REAL_ESTATE',
+    LOANS = 'LOANS',
+    GLOBAL_TAX = 'GLOBAL_TAX',
+    TAX_OPTIMIZER = 'TAX_OPTIMIZER'
+}
+
+export interface SearchResult {
+    id: string;
+    type: 'INVOICE' | 'CONTRACTOR' | 'ASSET' | 'VIEW' | 'OTHER';
+    title: string;
+    subtitle: string;
+    targetView?: ViewState;
+}
+
+export type NotificationType = 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+
+export interface Notification {
+    id: string;
+    type: NotificationType;
+    title: string;
+    message: string;
+    read: boolean;
+    timestamp: string;
+    action?: {
+        label: string;
+        actionType: 'NAVIGATE' | 'LINK';
+        target: any;
+    };
+}
+
+export interface CryptoWallet {
+    id: string;
+    provider: string;
+    address: string;
+    chain: string;
+    assetCount: number;
+    riskScore: number;
+}
+
+export interface DeFiReward {
+    protocol: string;
+    amount: number;
+    asset: string;
+    valueUsd: number;
+}
+
+export interface TaxHarvestingOpp {
+    asset: string;
+    lossAmount: number;
+    currentPrice: number;
+    purchasePrice: number;
+}
+
+export interface NFTAsset {
+    collection: string;
+    tokenId: string;
+    name: string;
+    imageUrl?: string;
+    floorPrice: number;
+}
+
+export interface CryptoAnalytics {
+    totalPnl: number;
+    winRate: number;
+    volume: number;
+    tradesCount: number;
+    
+}
+
+export interface WalletRiskProfile {
+    score: number;
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
+export interface OssCountryReport {
+    countryCode: string;
+    countryName: string;
+    standardRate: number;
+    totalNetEur: number;
+    totalVatEur: number;
+}
+
+export interface IntrastatThreshold {
+    type: 'IMPORT' | 'EXPORT';
+    limit: number;
+    currentValue: number;
+    status: 'SAFE' | 'WARNING' | 'EXCEEDED';
+}
+
+export interface AuditRiskFactor {
+    id: string;
+    category: 'VAT' | 'COSTS' | 'INCOME' | 'OTHER';
+    title: string;
+    description: string;
+    severity: 'LOW' | 'MEDIUM' | 'HIGH';
+    detected: boolean;
+}
+
+export interface AuditPackage {
+    id: string;
+    hash: string;
+    status: 'READY' | 'PROCESSING';
+}
+
+export interface MarketComparison {
+    metric: string;
+    myValue: number;
+    marketValue: number;
+    difference: number;
+    status: 'BETTER' | 'WORSE' | 'EQUAL';
+}
+
+export interface InvoiceItem {
+    name: string;
+    quantity: number;
+    unitPriceNet: number;
+    totalNet: number;
+    vatRate: number;
+    minLevel?: number;
+    lastMoved?: string;
+}
+
+export enum CostCategory {
+    OPERATIONAL_100 = 'OPERATIONAL_100',
+    FUEL_75 = 'FUEL_75',
+    REPRESENTATION_0 = 'REPRESENTATION_0',
+    OTHER = 'OTHER'
+}
+
+export interface Invoice {
+    id: string;
+    ksefNumber: string;
+    contractor: string;
+    nip: string;
+    date: string;
+    amountNet: number;
+    amountVat: number;
+    amountGross: number;
+    type: 'SALES' | 'PURCHASE';
+    status: 'PROCESSED' | 'PENDING' | 'DRAFT_XML';
+    currency: string;
+    exchangeRate?: number;
+    costCategory?: CostCategory;
+    aiAuditScore?: number;
+    aiAuditNotes?: string;
+    items?: InvoiceItem[];
+    docuSignStatus?: 'SENT' | 'SIGNED' | 'NONE';
+}
+
+export interface RecurringInvoice {
+    id: string;
+    templateName: string;
+    contractor: Contractor;
+    frequency: 'MONTHLY' | 'WEEKLY' | 'YEARLY';
+    nextIssueDate: string;
+    amountNet: number;
+    active: boolean;
+}
+
+export interface RecurringSuggestion {
+    contractorName: string;
+    nip: string;
+    detectedFrequency: string;
+    confidence: number;
+    potentialSavingsTime: string;
+}
+
+export interface NbpTable {
+    tableNo: string;
+    effectiveDate: string;
+    rate: number;
+    currency: string;
+}
 
 export interface Project {
     id: string;
     name: string;
     client: string;
-    status: ProjectStatus;
+    status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
     budget: number;
     spent: number;
     revenue: number;
     startDate: string;
-    deadline?: string;
     tags: string[];
     profitMargin: number;
 }
-
-export type CardType = 'VIRTUAL' | 'PHYSICAL' | 'ONE_TIME';
-export type CardStatus = 'ACTIVE' | 'FROZEN' | 'CANCELLED';
 
 export interface VirtualCard {
     id: string;
     last4: string;
     holderName: string;
     expiry: string;
-    type: CardType;
-    status: CardStatus;
+    type: 'VIRTUAL' | 'PHYSICAL';
+    status: 'ACTIVE' | 'FROZEN' | 'CANCELLED';
     limitMonthly: number;
     spentMonthly: number;
     brand: 'VISA' | 'MASTERCARD';
     color: string;
-    assignedUser?: string;
 }
-
-export type ContractType = 'UOP' | 'B2B' | 'UZ';
-export type EmploymentStatus = 'ACTIVE' | 'L4' | 'HOLIDAY' | 'TERMINATED';
 
 export interface Employee {
     id: string;
     firstName: string;
     lastName: string;
     position: string;
-    contractType: ContractType;
     salaryAmount: number;
-    status: EmploymentStatus;
+    contractType: 'UOP' | 'B2B' | 'UZ' | 'UOD';
+    status: 'ACTIVE' | 'INACTIVE';
     joinDate: string;
-    avatar?: string;
-    taxReliefUnder26: boolean;
 }
 
 export interface PayrollEntry {
     employeeId: string;
     employeeName: string;
-    contractType: ContractType;
+    contractType: string;
     salaryGross: number;
     employerCostTotal: number;
+    salaryNet: number;
     zusEmployer: number;
     zusEmployee: number;
     healthInsurance: number;
     pitAdvance: number;
-    salaryNet: number;
-    status: 'DRAFT' | 'PAID';
 }
 
 export interface Product {
@@ -822,176 +654,395 @@ export interface Product {
     lastMoved: string;
 }
 
-export type WarehouseDocType = 'PZ' | 'WZ' | 'MM' | 'PW' | 'RW';
-
 export interface WarehouseDocument {
     id: string;
     number: string;
-    type: WarehouseDocType;
     date: string;
-    contractorName: string;
-    itemsCount: number;
+    type: 'PZ' | 'WZ' | 'MM' | 'INW';
+    contractorName?: string;
     totalValueNet: number;
-    status: 'DRAFT' | 'APPROVED';
 }
-
-export interface InventoryStat {
-    totalValue: number;
-    lowStockCount: number;
-    turnoverRate: number;
-}
-
-export type VehicleType = 'CAR' | 'TRUCK' | 'MOTORCYCLE';
-export type VatDeductionType = 'FULL_100' | 'MIXED_50';
 
 export interface Vehicle {
     id: string;
     name: string;
     licensePlate: string;
-    type: VehicleType;
-    vatDeduction: VatDeductionType;
+    type: 'CAR' | 'TRUCK' | 'VAN';
+    vatDeduction: 'FULL_100' | 'MIXED_50';
     mileageCurrent: number;
     insuranceExpiry: string;
     inspectionExpiry: string;
-    image?: string;
 }
-
-export interface MileageLog {
-    id: string;
-    vehicleId: string;
-    date: string;
-    startLocation: string;
-    endLocation: string;
-    distance: number;
-    purpose: string;
-    driver: string;
-}
-
-export type EcommercePlatformType = 'ALLEGRO' | 'SHOPIFY' | 'WOOCOMMERCE';
-
-export interface EcommercePlatform {
-    id: string;
-    type: EcommercePlatformType;
-    name: string;
-    status: 'CONNECTED' | 'ERROR';
-    lastSync: string;
-}
-
-export type OrderStatus = 'PAID' | 'PENDING' | 'SHIPPED' | 'REFUNDED';
 
 export interface Order {
     id: string;
-    platformId: string;
+    platformId: 'allegro' | 'shopify' | 'other';
     platformOrderId: string;
     date: string;
     customer: string;
     totalGross: number;
     commissionFee: number;
-    status: OrderStatus;
+    status: 'PAID' | 'SHIPPED' | 'CANCELLED' | 'PENDING';
     fiscalized: boolean;
 }
 
-export enum ApiProvider {
-    SALT_EDGE = 'Salt Edge',
-    TINK = 'Tink',
-    TRUELAYER = 'TrueLayer',
-    GOCARDLESS = 'GoCardless',
-    RAILSR = 'Railsr',
-    MODERN_TREASURY = 'Modern Treasury',
-    BYBIT = 'Bybit',
-    MORALIS = 'Moralis',
-    NANSEN = 'Nansen',
-    COINAPI = 'CoinAPI',
-    GOLDRUSH = 'GoldRush',
-    ALCHEMY = 'Alchemy',
-    QUICKNODE = 'QuickNode',
-    SUMSUB = 'SumSub',
-    CIVIC = 'Civic',
-    DOCUSIGN = 'DocuSign',
-    CEIDG = 'CEIDG (Gov)',
-    STRATEG = 'STRATEG (GUS)',
-    TRANSTAT = 'TRANSTAT (Intrastat)',
-    SMUP = 'SMUP (Usługi Publiczne)',
-    DBW = 'DBW (Wspólna Baza)',
-    SDP = 'SDP (System Danych Podatkowych)',
-    SEGMENT = 'Segment'
+export interface GusData {
+    name: string;
+    address?: string;
+    street?: string;
+    propertyNumber?: string;
+    apartmentNumber?: string;
+    city: string;
+    zipCode: string;
+    nip: string;
+    regon: string;
+    startDate?: string;
+    pkd?: string;
+    pkdDesc?: string;
+    vatStatus?: string;
+    legalForm?: string;
+    representatives?: string[];
+    shareCapital?: number;
+    krs?: string;
+    history?: { date: string; description: string }[];
 }
 
-export interface ApiVaultStatus {
-    provider: ApiProvider;
-    isConnected: boolean;
-    lastChecked: string;
-    featuresUnlocked: string[];
+export interface WhiteListStatus {
+    status: 'VALID' | 'INVALID' | 'UNKNOWN';
+    requestId: string;
 }
 
-export interface OssTransaction {
+export interface CeidgCompany {
+    name: string;
+    nip: string;
+    regon: string;
+    address: string;
+    status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED';
+    verifiedIban?: string;
+    isNuffiUser: boolean;
+}
+
+export interface ExchangeRate {
+    pair: string;
+    mid: number;
+    bid: number;
+    ask: number;
+    changePercent: number;
+    timestamp: string;
+}
+
+export interface FxPosition {
     id: string;
-    date: string;
-    countryCode: string;
-    amountEur: number;
-    vatRate: number;
-    vatAmountEur: number;
-    source: 'SHOPIFY' | 'ALLEGRO' | 'MANUAL';
+    pair: string;
+    type: 'LONG' | 'SHORT';
+    amount: number;
+    avgRate: number;
+    valuePln: number;
+    unrealizedPnL: number;
 }
 
-export interface OssCountryReport {
-    countryCode: string;
-    countryName: string;
-    standardRate: number;
-    totalNetEur: number;
-    totalVatEur: number;
-    transactionCount: number;
+export enum TaxFormType {
+    PIT_37 = 'PIT-37',
+    PIT_36 = 'PIT-36',
+    PIT_38 = 'PIT-38',
+    CIT_8 = 'CIT-8'
 }
 
-export interface IntrastatThreshold {
-    type: 'IMPORT' | 'EXPORT';
-    currentValue: number;
-    limit: number;
-    status: 'SAFE' | 'WARNING' | 'EXCEEDED';
-    deadline: string;
+export enum TaxStatus {
+    CALCULATED = 'CALCULATED',
+    SIGNED = 'SIGNED',
+    SUBMITTED = 'SUBMITTED',
+    PAID = 'PAID'
 }
 
-export type AuditRiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
-
-export interface AuditRiskFactor {
-    id: string;
-    category: 'REVENUE' | 'COSTS' | 'VAT' | 'COMPLIANCE';
-    title: string;
-    description: string;
-    severity: AuditRiskLevel;
-    detected: boolean;
+export interface ZusBreakdown {
+    socialTotal: number;
+    healthInsurance: number;
+    laborFund: number;
+    totalDue: number;
+    deductibleFromTaxBase: number;
+    deductibleFromTax: number;
 }
 
-export interface AuditPackage {
+export interface TaxBreakdown {
+    revenue: number;
+    costs: number;
+    income: number;
+    taxBase: number;
+    taxFreeAmount: number;
+    taxRate: number;
+    healthInsurance: number;
+    taxDue: number;
+    zus?: ZusBreakdown;
+    details: {
+        thresholdExceeded: boolean;
+        firstBracketAmount: number;
+        secondBracketAmount: number;
+    };
+}
+
+export interface TaxReturn {
     id: string;
     year: number;
-    generatedAt: string;
-    filesIncluded: string[];
-    hash: string;
-    status: 'READY' | 'GENERATING';
+    type: TaxFormType;
+    income: number;
+    taxDue: number;
+    status: TaxStatus;
+    submissionDate?: string;
+    upoId?: string;
+    breakdown?: TaxBreakdown;
 }
 
-export interface IndustryStat {
-    sector: string;
-    avgRevenue: number;
-    avgCost: number;
-    avgSalary: number;
-    growthYoY: number;
+export interface ChatMessage {
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    text: string;
+    timestamp: Date;
+}
+
+export interface SimulationParams {
+    amountGross: number;
+    vatRate: number;
+    category: CostCategory;
+    taxationForm: TaxationForm;
+}
+
+export interface SimulationResult {
+    amountNet: number;
+    vatTotal: number;
+    vatDeductible: number;
+    vatNonDeductible: number;
+    pitCostBasis: number;
+    pitDeductibleAmount: number;
+    pitTaxShield: number;
+    totalSavings: number;
+    realCost: number;
+    percentSaved: number;
+}
+
+export type IntegrationStatus = 'IDLE' | 'CONNECTING' | 'AUTHENTICATING' | 'FETCHING' | 'SUCCESS' | 'FAILURE';
+
+export interface VatSummary {
+    outputVat: number;
+    inputVat: number;
+    vatDue: number;
+}
+
+export interface ImpermanentLossResult {
+    initialValue: number;
+    holdValue: number;
+    poolValue: number;
+    impermanentLoss: number;
+    impermanentLossPercent: number;
+}
+
+export interface CryptoTaxReport {
+    year: number;
+    strategy: string;
+    spotIncome: number;
+    spotCost: number;
+    spotIncomeTaxBase: number;
+    futuresIncome: number;
+    futuresCost: number;
+    futuresIncomeTaxBase: number;
+    totalTaxDue: number;
+    transactionsProcessed: number;
+}
+
+// ESG & Wealth Types
+export interface EsgScore {
+    totalCo2Tons: number;
+    breakdown: {
+        transport: number;
+        energy: number;
+        servers: number;
+        other: number;
+    };
+    treesNeeded: number;
+    trend: 'UP' | 'DOWN';
+}
+
+export interface StockAsset {
+    symbol: string;
+    name: string;
+    type: 'STOCK' | 'ETF' | 'COMMODITY';
+    quantity: number;
+    avgPrice: number;
+    currentPrice: number;
+    currency: string;
+    valuePln: number;
+    pnl: number;
+    pnlPercent: number;
+}
+
+// Contract & Marketplace Types
+export interface Contract {
+    id: string;
+    name: string;
+    party: string;
+    type: 'B2B' | 'NDA' | 'EMPLOYMENT' | 'LEASE' | 'OTHER';
+    startDate: string;
+    endDate?: string;
+    value?: number;
+    currency: string;
+    status: 'ACTIVE' | 'EXPIRING' | 'EXPIRED' | 'TERMINATED';
+    noticePeriod: string;
+    autoRenewal: boolean;
+    tags: string[];
+}
+
+export interface MarketplaceItem {
+    id: string;
+    category: 'FINANCE' | 'INSURANCE' | 'OFFICE' | 'SERVICES';
+    title: string;
+    provider: string;
+    description: string;
+    price: string;
+    icon: string;
+    recommended?: boolean;
+}
+
+// FORENSICS & TAX ENGINE TYPES
+export interface ForensicIssue {
+    id: string;
+    type: 'WASH_SALE' | 'MISSING_COST_BASIS' | 'SCAM_TOKEN' | 'DANGLING_TX' | 'UNMATCHED_TRANSFER';
+    severity: 'HIGH' | 'MEDIUM' | 'LOW';
+    description: string;
+    affectedAssets: string[];
+    confidence: number;
+    date: string;
+}
+
+export interface ForensicsSummary {
+    totalIssues: number;
+    riskScore: number; // 0-100 (100 = very risky)
+    issues: ForensicIssue[];
+    confidenceDistribution: {
+        high: number; // >90% sure
+        medium: number; // >70% sure
+        low: number; // <70% sure
+    };
+}
+
+export interface TaxEngineConfig {
+    strategy: 'FIFO' | 'LIFO' | 'HIFO' | 'SPEC_ID' | 'AVG_COST';
+    isRealTime: boolean;
+    includeDeFi: boolean;
+    includeNFTs: boolean;
+    country: string;
+    engineVersion: string; // e.g. "Rust v1.4.2"
+}
+
+export interface TaxEngineStatus {
+    status: 'ONLINE' | 'OFFLINE' | 'SYNCING';
+    lastSync: string;
+    transactionsProcessed: number;
+    processingSpeed: number; // tx/sec
+    uptime: number;
+}
+
+export interface DeFiProtocol {
+    name: string;
+    chain: string;
+    type: 'DEX' | 'LENDING' | 'YIELD';
+    tvl: number;
+    userBalanceUsd: number;
+    unclaimedRewardsUsd: number;
+}
+
+// PREDICTIVE AI TYPES
+export interface TaxPrediction {
+    month: string;
+    estimatedRevenue: number;
+    estimatedCost: number;
+    estimatedTax: number;
+    type: 'ACTUAL' | 'PREDICTED';
+    confidenceInterval?: [number, number]; // Low, High
+}
+
+export interface LegislativeAlert {
+    id: string;
+    title: string;
+    impact: 'HIGH' | 'MEDIUM' | 'LOW';
+    description: string;
+    effectiveDate: string;
     source: string;
 }
 
-export interface MacroIndicator {
-    name: string;
-    value: number;
-    unit: string;
-    trend: 'UP' | 'DOWN' | 'STABLE';
-    date: string;
+export interface ScenarioConfig {
+    revenueGrowth: number; // %
+    costIncrease: number; // %
+    inflation: number; // %
 }
 
-export interface MarketComparison {
-    metric: string;
-    myValue: number;
-    marketValue: number;
-    difference: number;
-    status: 'BETTER' | 'WORSE' | 'NEUTRAL';
+// REAL ESTATE & LOANS TYPES
+export interface RealEstateProperty {
+    id: string;
+    name: string;
+    type: 'APARTMENT' | 'OFFICE' | 'LAND';
+    address: string;
+    purchaseValue: number;
+    currentValue: number;
+    rentalIncomeMonthly: number;
+    occupancyStatus: 'RENTED' | 'VACANT';
+    taxation: 'LUMP_SUM' | 'SCALE';
+    roi: number;
+    image?: string;
+}
+
+export interface Loan {
+    id: string;
+    name: string;
+    type: 'MORTGAGE' | 'LEASING' | 'CASH_LOAN';
+    bank: string;
+    totalAmount: number;
+    remainingAmount: number;
+    nextInstallmentDate: string;
+    nextInstallmentAmount: number;
+    interestRate: number;
+    currency: string;
+    endDate: string;
+}
+
+// GLOBAL / CROSS BORDER TAX TYPES
+export interface CountryTaxProfile {
+    countryCode: string; // ISO 2-char
+    name: string;
+    flag: string; // emoji or url
+    taxRateCorporate: number;
+    taxRatePersonal: number[]; // Brackets
+    hasDttWithPl: boolean; // Double Tax Treaty
+    dttMethod: 'EXEMPTION_WITH_PROGRESSION' | 'PROPORTIONAL_DEDUCTION' | 'NONE'; // Metoda unikania
+}
+
+export interface ForeignIncome {
+    country: string;
+    amountForeignCurrency: number;
+    currency: string;
+    taxPaidForeignCurrency: number;
+    type: 'EMPLOYMENT' | 'DIVIDENDS' | 'CAPITAL_GAINS';
+}
+
+export interface CrossBorderResult {
+    plTaxBase: number;
+    foreignTaxBasePln: number;
+    plTaxDue: number;
+    foreignTaxPaidPln: number;
+    effectiveRate: number;
+    taxCreditUsed: number;
+    additionalPaymentPl: number; // Dopłata w Polsce
+    methodUsed: string;
+}
+
+// TAX OPTIMIZER (AUTO-HEDGING) TYPES
+export interface TaxOptimizationOpportunity {
+    id: string;
+    asset: string;
+    currentPrice: number;
+    purchasePrice: number;
+    unrealizedLoss: number;
+    quantity: number;
+    type: 'CRYPTO' | 'STOCK';
+    strategy: 'HARVEST_LOSS' | 'WASH_SALE_AVOIDANCE' | 'DONATION';
+    potentialTaxSavings: number;
 }

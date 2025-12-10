@@ -13,3 +13,4 @@ python-dotenv==1.0.1
 openai==1.10.0
 web3==6.15.0
 stripe==8.1.0
+ccxt==4.2.19

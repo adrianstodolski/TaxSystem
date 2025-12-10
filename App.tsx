@@ -27,11 +27,23 @@ import { Ecommerce } from './components/Ecommerce';
 import { InternationalTax } from './components/InternationalTax';
 import { TaxAuditDefender } from './components/TaxAuditDefender';
 import { MarketIntel } from './components/MarketIntel';
+import { ESG } from './components/ESG';
+import { Wealth } from './components/Wealth';
+import { Contracts } from './components/Contracts';
+import { Marketplace } from './components/Marketplace';
 import { Auth } from './components/Auth';
 import { Pricing } from './components/Pricing';
 import { Toaster } from './components/ui/Toast';
 import { GlobalSearch } from './components/GlobalSearch';
 import { NotificationCenter } from './components/NotificationCenter';
+import { WelcomeModal } from './components/WelcomeModal';
+import { Forensics } from './components/Forensics';
+import { TaxEngine } from './components/TaxEngine';
+import { PredictiveTax } from './components/PredictiveTax';
+import { RealEstate } from './components/RealEstate';
+import { Loans } from './components/Loans';
+import { GlobalTax } from './components/GlobalTax';
+import { TaxOptimizer } from './components/TaxOptimizer';
 import { ViewState, SubscriptionPlan, UserProfile } from './types';
 import { NuffiService } from './services/api';
 
@@ -39,8 +51,8 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>(SubscriptionPlan.FREE);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // Analytics Tracking
   useEffect(() => {
@@ -53,13 +65,14 @@ export default function App() {
       setIsAuthenticated(true);
       setCurrentPlan(plan);
       setCurrentUser(user);
+      setShowWelcome(true); // Show welcome modal on login
       NuffiService.trackEvent('LOGIN', { method: 'EMAIL', plan });
   };
 
   const renderContent = () => {
     switch (currentView) {
       case ViewState.DASHBOARD:
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentView} />;
       case ViewState.INTEGRATIONS:
         return <Integrations />;
       case ViewState.TAX_WIZARD:
@@ -108,10 +121,32 @@ export default function App() {
         return <TaxAuditDefender />;
       case ViewState.MARKET_INTEL:
         return <MarketIntel />;
+      case ViewState.ESG:
+        return <ESG />;
+      case ViewState.WEALTH:
+        return <Wealth />;
+      case ViewState.CONTRACTS:
+        return <Contracts />;
+      case ViewState.MARKETPLACE:
+        return <Marketplace />;
+      case ViewState.FORENSICS:
+        return <Forensics />;
+      case ViewState.TAX_ENGINE:
+        return <TaxEngine />;
+      case ViewState.PREDICTIVE_TAX:
+        return <PredictiveTax />;
+      case ViewState.REAL_ESTATE:
+        return <RealEstate />;
+      case ViewState.LOANS:
+        return <Loans />;
+      case ViewState.GLOBAL_TAX:
+        return <GlobalTax />;
+      case ViewState.TAX_OPTIMIZER:
+        return <TaxOptimizer />;
       case ViewState.PRICING:
         return <Pricing />;
       default:
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentView} />;
     }
   };
 
@@ -174,6 +209,7 @@ export default function App() {
       {/* Global Widgets */}
       <AIChat />
       <Toaster />
+      <WelcomeModal isOpen={showWelcome} onClose={() => setShowWelcome(false)} />
     </div>
   );
 }

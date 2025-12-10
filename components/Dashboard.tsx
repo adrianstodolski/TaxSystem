@@ -1,9 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, FileText, PieChart as PieChartIcon, Zap, Wallet, ArrowRight, ShieldCheck, Scale, Globe, BarChart2 } from 'lucide-react';
+import { TrendingUp, FileText, PieChart as PieChartIcon, Zap, Wallet, ArrowRight, ShieldCheck, Scale, Globe, BarChart2, MessageSquare, ScrollText, Store, Leaf, Sparkles, Telescope, Home, Landmark, Magnet } from 'lucide-react';
 import { NuffiService } from '../services/api';
-import { Transaction, ExpenseBreakdown, VatSummary, CashFlowPoint, Budget, AuditRiskFactor, MarketComparison } from '../types';
+import { Transaction, ExpenseBreakdown, VatSummary, CashFlowPoint, Budget, AuditRiskFactor, MarketComparison, ViewState } from '../types';
+
+interface DashboardProps {
+  onNavigate: (view: ViewState) => void;
+}
 
 const data = [
   { name: 'Sty', income: 45000, tax: 2400 },
@@ -15,7 +19,7 @@ const data = [
   { name: 'Lip', income: 59000, tax: 4300 },
 ];
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [vatSummary, setVatSummary] = useState<VatSummary | null>(null);
   const [cashFlow, setCashFlow] = useState<CashFlowPoint[]>([]);
@@ -46,9 +50,13 @@ export const Dashboard: React.FC = () => {
     loadData();
   }, []);
 
-  const totalBudgetLimit = budgets.reduce((acc, b) => acc + b.limit, 0);
-  const totalBudgetSpent = budgets.reduce((acc, b) => acc + b.spent, 0);
-  
+  const triggerAIAnalysis = () => {
+      const event = new CustomEvent('nuffi:chat-prompt', {
+          detail: { prompt: "Na podstawie widocznych danych na pulpicie, jak mogę zoptymalizować podatki w tym miesiącu? Przeanalizuj stosunek przychodów do kosztów i zasugeruj działania." }
+      });
+      window.dispatchEvent(event);
+  };
+
   const highRisks = auditRisks.filter(r => r.severity === 'HIGH').length;
 
   return (
@@ -63,6 +71,66 @@ export const Dashboard: React.FC = () => {
             <h3 className="text-3xl font-bold text-slate-900 font-mono">165,420.00 <span className="text-lg text-slate-400">PLN</span></h3>
         </div>
       </header>
+
+      {/* NEW MODULES SHORTCUTS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <button 
+            onClick={() => onNavigate(ViewState.PREDICTIVE_TAX)}
+            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all text-left group relative overflow-hidden"
+          >
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Telescope size={64} className="text-indigo-600" />
+              </div>
+              <div className="bg-indigo-50 w-10 h-10 rounded-lg flex items-center justify-center text-indigo-600 mb-3 group-hover:scale-110 transition-transform">
+                  <Telescope size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm">Predictive Tax AI</h3>
+              <p className="text-xs text-slate-500 mt-1">Prognozy i zmiany w prawie.</p>
+              <span className="absolute top-2 right-2 bg-indigo-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">AI</span>
+          </button>
+
+          <button 
+            onClick={() => onNavigate(ViewState.TAX_OPTIMIZER)}
+            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all text-left group relative overflow-hidden"
+          >
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Magnet size={64} className="text-orange-600" />
+              </div>
+              <div className="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-3 group-hover:scale-110 transition-transform">
+                  <Magnet size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm">Tax Optimizer (Hedge)</h3>
+              <p className="text-xs text-slate-500 mt-1">Realizacja strat i optymalizacja.</p>
+          </button>
+
+          <button 
+            onClick={() => onNavigate(ViewState.WEALTH)}
+            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all text-left group relative overflow-hidden"
+          >
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <TrendingUp size={64} className="text-emerald-600" />
+              </div>
+              <div className="bg-emerald-50 w-10 h-10 rounded-lg flex items-center justify-center text-emerald-600 mb-3 group-hover:scale-110 transition-transform">
+                  <TrendingUp size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm">Wealth (Inwestycje)</h3>
+              <p className="text-xs text-slate-500 mt-1">Portfel Akcji, ETF i Surowców.</p>
+          </button>
+
+          <button 
+            onClick={() => onNavigate(ViewState.LOANS)}
+            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all text-left group relative overflow-hidden"
+          >
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Landmark size={64} className="text-purple-600" />
+              </div>
+              <div className="bg-purple-50 w-10 h-10 rounded-lg flex items-center justify-center text-purple-600 mb-3 group-hover:scale-110 transition-transform">
+                  <Landmark size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm">Kredyty i Leasing</h3>
+              <p className="text-xs text-slate-500 mt-1">Tarcza odsetkowa i harmonogramy.</p>
+          </button>
+      </div>
 
       {/* Hero Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -116,7 +184,12 @@ export const Dashboard: React.FC = () => {
             <div className="w-full bg-indigo-200 h-1.5 rounded-full mt-3 overflow-hidden">
                 <div className="bg-indigo-600 h-full rounded-full w-[65%]" title="65% optymalizacji wykorzystane"></div>
             </div>
-            <p className="text-[10px] text-indigo-600 mt-2 font-medium">Pozostało 35% potencjału optymalizacji kosztów.</p>
+            <button 
+                onClick={triggerAIAnalysis}
+                className="mt-3 flex items-center gap-1 text-[10px] bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded font-bold transition-colors shadow-sm"
+            >
+                <MessageSquare size={10} /> Analizuj z AI
+            </button>
           </div>
         </div>
 
@@ -220,7 +293,7 @@ export const Dashboard: React.FC = () => {
                 </span>
             </div>
         </div>
-      </div>
+    </div>
 
       {/* BOTTOM SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

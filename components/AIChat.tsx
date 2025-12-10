@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2 } from 'lucide-react';
 import { ChatMessage } from '../types';
@@ -7,11 +6,31 @@ import { NuffiService } from '../services/api';
 export const AIChat: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: '1', role: 'assistant', text: 'Cześć! Jestem Twoim asystentem podatkowym Nuffi. Jak mogę Ci dzisiaj pomóc?', timestamp: new Date() }
+    { id: '1', role: 'assistant', text: 'Cześć! Jestem Twoim asystentem podatkowym Nuffi. Jak mogę Ci dzisiaj pomóc z podatkami lub księgowością?', timestamp: new Date() }
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Global Event Listeners for Chat Control
+  useEffect(() => {
+      const handleOpenChat = () => setIsOpen(true);
+      const handleChatPrompt = (e: any) => {
+          setIsOpen(true);
+          const prompt = e.detail?.prompt;
+          if (prompt) {
+              handleSend(prompt);
+          }
+      };
+
+      window.addEventListener('nuffi:open-chat', handleOpenChat);
+      window.addEventListener('nuffi:chat-prompt', handleChatPrompt);
+
+      return () => {
+          window.removeEventListener('nuffi:open-chat', handleOpenChat);
+          window.removeEventListener('nuffi:chat-prompt', handleChatPrompt);
+      };
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,13 +40,14 @@ export const AIChat: React.FC = () => {
     scrollToBottom();
   }, [messages, isTyping, isOpen]);
 
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
+  const handleSend = async (textOverride?: string) => {
+    const textToSend = textOverride || inputText;
+    if (!textToSend.trim()) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      text: inputText,
+      text: textToSend,
       timestamp: new Date()
     };
 
@@ -36,7 +56,10 @@ export const AIChat: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const responseText = await NuffiService.sendAIChatMessage(userMsg.text);
+      // Pass the current conversation history (excluding the new message initially) to maintain context
+      const historyContext = messages.map(m => ({ ...m })); // Shallow copy
+      const responseText = await NuffiService.sendAIChatMessage(userMsg.text, historyContext);
+      
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -71,7 +94,7 @@ export const AIChat: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 animate-in slide-in-from-bottom-10 duration-300 max-h-[600px]">
+    <div className="fixed bottom-6 right-6 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 animate-in slide-in-from-bottom-10 duration-300 max-h-[600px] h-[600px]">
       {/* Header */}
       <div className="bg-indigo-600 text-white p-4 rounded-t-2xl flex justify-between items-center shadow-md">
         <div className="flex items-center gap-2">
@@ -82,7 +105,7 @@ export const AIChat: React.FC = () => {
             <h3 className="font-bold text-sm">Nuffi AI Assistant</h3>
             <p className="text-[10px] text-indigo-200 flex items-center gap-1">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-              Online
+              Powered by Gemini 2.5
             </p>
           </div>
         </div>
@@ -97,7 +120,7 @@ export const AIChat: React.FC = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 h-[400px]">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -109,13 +132,15 @@ export const AIChat: React.FC = () => {
               {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
             </div>
             <div
-              className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+              className={`max-w-[85%] p-3 rounded-2xl text-sm ${
                 msg.role === 'user'
                   ? 'bg-indigo-600 text-white rounded-tr-none'
                   : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none shadow-sm'
               }`}
             >
-              {msg.text}
+              <div className="whitespace-pre-wrap leading-relaxed">
+                  {msg.text}
+              </div>
               <div className={`text-[10px] mt-1 text-right ${msg.role === 'user' ? 'text-indigo-200' : 'text-gray-400'}`}>
                 {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
               </div>
@@ -151,7 +176,7 @@ export const AIChat: React.FC = () => {
             className="w-full pl-4 pr-12 py-3 bg-gray-100 border border-transparent focus:bg-white focus:border-indigo-300 rounded-xl text-sm outline-none transition-all"
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!inputText.trim()}
             className="absolute right-2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-all"
           >
