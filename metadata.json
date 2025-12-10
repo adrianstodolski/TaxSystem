@@ -1,0 +1,5 @@
+{
+  "name": "Nuffi Tax Platform",
+  "description": "Automated Polish tax filing platform integrating Open Banking, Crypto, and MF e-Deklaracje.",
+  "requestFramePermissions": []
+}

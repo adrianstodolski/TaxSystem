@@ -1,0 +1,69 @@
+version: '3.8'
+
+# Definicja usług
+services:
+  # --- FRONTEND (React) ---
+  nuffi-frontend:
+    container_name: nuffi-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3099:5173" # Mapujemy port 3099 (Twój PC) na 5173 (Vite w kontenerze)
+    volumes:
+      - .:/app # Hot-reloading: zmiany w plikach lokalnych od razu widać w kontenerze
+      - /app/node_modules # Nie nadpisuj node_modules z hosta
+    environment:
+      - VITE_API_URL=http://localhost:8099
+    networks:
+      - nuffi-network
+    restart: unless-stopped
+
+  # --- BACKEND (FastAPI) ---
+  nuffi-backend:
+    container_name: nuffi-api
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8099:8000" # Mapujemy port 8099 (Twój PC) na 8000 (FastAPI)
+    volumes:
+      - ./backend:/app # Hot-reloading dla Pythona
+    env_file:
+      - .env
+    depends_on:
+      - nuffi-mongo
+    networks:
+      - nuffi-network
+    restart: unless-stopped
+
+  # --- BAZA DANYCH (MongoDB) ---
+  nuffi-mongo:
+    container_name: nuffi-mongo
+    image: mongo:6.0
+    ports:
+      - "27099:27017" # Unikalny port dla Mongo (27099)
+    volumes:
+      - nuffi_mongo_data:/data/db # Persystencja danych (żeby nie znikały po restarcie)
+    networks:
+      - nuffi-network
+    restart: unless-stopped
+
+  # --- CACHE & KOLEJKI (Redis) ---
+  nuffi-redis:
+    container_name: nuffi-redis
+    image: redis:7-alpine
+    ports:
+      - "6399:6379" # Unikalny port dla Redis (6399)
+    networks:
+      - nuffi-network
+    restart: unless-stopped
+
+# Definicja sieci (izolacja)
+networks:
+  nuffi-network:
+    driver: bridge
+
+# Definicja wolumenów (trwałe dane)
+volumes:
+  nuffi_mongo_data:
