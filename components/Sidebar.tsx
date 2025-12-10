@@ -1,16 +1,25 @@
 
 import React from 'react';
-import { LayoutDashboard, Wallet, FileText, History, Settings, ShieldCheck, FileSpreadsheet, Calculator, Box, Users, FileBarChart, PieChart, Download, Bitcoin, Radio, Star, Globe, Landmark, FolderKanban, CreditCard, Briefcase, Package, ShoppingBag, Car, Map, Scale, BarChart2, Leaf, TrendingUp, ScrollText, Store, ScanSearch, Cpu, Telescope, Home, Activity, Magnet, Receipt, BookOpen, BrainCircuit, Workflow, UploadCloud, ShieldAlert, Layers, Archive, Clock, Mail, Siren, Repeat, Radar, Gavel, MapPin, Terminal, Server, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, Wallet, FileText, History, Settings, ShieldCheck, FileSpreadsheet, Calculator, Box, Users, FileBarChart, PieChart, Download, Bitcoin, Radio, Star, Globe, Landmark, FolderKanban, CreditCard, Briefcase, Package, ShoppingBag, Car, Map, Scale, BarChart2, Leaf, TrendingUp, ScrollText, Store, ScanSearch, Cpu, Telescope, Home, Activity, Magnet, Receipt, BookOpen, BrainCircuit, Workflow, UploadCloud, ShieldAlert, Layers, Archive, Clock, Mail, Siren, Repeat, Radar, Gavel, MapPin, Terminal, Server, GraduationCap, X } from 'lucide-react';
 import { ViewState } from '../types';
 
 interface SidebarProps {
   currentView: ViewState;
   onChangeView: (view: ViewState) => void;
   plan: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, plan }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, plan, isOpen, onClose }) => {
   
+  const handleNavigation = (view: ViewState) => {
+      onChangeView(view);
+      if (window.innerWidth < 1024) { // Close on mobile after selection
+          onClose();
+      }
+  };
+
   // Section 1: Management & AI
   const mainNav = [
     { view: ViewState.DASHBOARD, icon: LayoutDashboard, label: 'Pulpit', badge: '' },
@@ -98,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
             {items.map((item) => (
                 <button
                     key={item.view}
-                    onClick={() => onChangeView(item.view)}
+                    onClick={() => handleNavigation(item.view)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative ${
                     currentView === item.view
                         ? 'bg-indigo-600/10 text-indigo-400 font-medium'
@@ -132,18 +141,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
   );
 
   return (
-    <div className="w-64 h-screen flex flex-col fixed left-0 top-0 z-50 bg-[#0B1120] text-slate-300 border-r border-slate-800 shadow-2xl font-sans">
-      <div className="p-5 flex items-center gap-3 border-b border-slate-800/50 bg-[#0F172A]">
-        <div className="bg-indigo-600 p-2 rounded-lg shadow-lg shadow-indigo-900/50">
-          <ShieldCheck size={20} className="text-white" />
+    <div 
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0B1120] text-slate-300 border-r border-slate-800 shadow-2xl font-sans transform transition-transform duration-300 ease-in-out flex flex-col ${
+            isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+    >
+      <div className="p-5 flex items-center justify-between gap-3 border-b border-slate-800/50 bg-[#0F172A]">
+        <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 p-2 rounded-lg shadow-lg shadow-indigo-900/50">
+                <ShieldCheck size={20} className="text-white" />
+            </div>
+            <div>
+                <h1 className="text-lg font-bold tracking-tight text-white font-sans">Nuffi<span className="text-indigo-500">.io</span></h1>
+                <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 tracking-wide uppercase">{plan}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                </div>
+            </div>
         </div>
-        <div>
-          <h1 className="text-lg font-bold tracking-tight text-white font-sans">Nuffi<span className="text-indigo-500">.io</span></h1>
-          <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 tracking-wide uppercase">{plan}</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-          </div>
-        </div>
+        <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white">
+            <X size={20} />
+        </button>
       </div>
 
       <div className="px-3 py-2 overflow-y-auto custom-scrollbar flex-1 pb-20">
@@ -158,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
         {/* Help Center Link */}
         <div className="mt-6 mb-2 px-3">
             <button
-                onClick={() => onChangeView(ViewState.HELP_CENTER)}
+                onClick={() => handleNavigation(ViewState.HELP_CENTER)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative border border-slate-700 hover:border-indigo-500 bg-[#0F172A] ${
                 currentView === ViewState.HELP_CENTER
                     ? 'text-indigo-400 border-indigo-500'
@@ -173,13 +191,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
 
       <div className="p-4 border-t border-slate-800/50 bg-[#0F1623] absolute bottom-0 w-full">
          <button 
-            onClick={() => onChangeView(ViewState.PRICING)}
+            onClick={() => handleNavigation(ViewState.PRICING)}
             className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-lg shadow-orange-900/20 mb-2"
         >
             <Star size={14} className="fill-white" /> Upgrade Planu
         </button>
         <button 
-            onClick={() => onChangeView(ViewState.SETTINGS)}
+            onClick={() => handleNavigation(ViewState.SETTINGS)}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                 currentView === ViewState.SETTINGS ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }`}

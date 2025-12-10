@@ -71,6 +71,7 @@ import { SystemStatus } from './components/SystemStatus'; // NEW
 import { HelpCenter } from './components/HelpCenter'; // NEW
 import { ViewState, SubscriptionPlan, UserProfile } from './types';
 import { NuffiService } from './services/api';
+import { Menu } from 'lucide-react';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -78,6 +79,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Analytics Tracking
   useEffect(() => {
@@ -244,21 +246,44 @@ export default function App() {
            }}
       ></div>
 
-      <Sidebar currentView={currentView} onChangeView={setCurrentView} plan={currentPlan} />
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+      )}
 
-      <main className="flex-1 ml-64 flex flex-col h-screen relative z-10">
+      <Sidebar 
+        currentView={currentView} 
+        onChangeView={setCurrentView} 
+        plan={currentPlan} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      <main className="flex-1 lg:ml-64 flex flex-col h-screen relative z-10 transition-all duration-300 w-full">
         {/* Top Header - Corporate Clean */}
-        <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-40 relative shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-          {/* Global Search Component */}
-          <div className="w-96">
-             <GlobalSearch onNavigate={setCurrentView} />
+        <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+          <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden text-slate-500 hover:text-slate-900 p-2 -ml-2"
+              >
+                  <Menu size={24} />
+              </button>
+              
+              {/* Global Search Component */}
+              <div className="w-full max-w-[200px] md:max-w-md">
+                 <GlobalSearch onNavigate={setCurrentView} />
+              </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6">
             {/* Notification Center */}
             <NotificationCenter onNavigate={setCurrentView} />
             
-            <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
+            <div className="flex items-center gap-3 pl-4 md:pl-6 border-l border-slate-200">
                 <div className="text-right hidden sm:block">
                     <p className="text-sm font-bold text-slate-900 tracking-tight">{currentUser?.firstName} {currentUser?.lastName}</p>
                     <p className="text-xs text-slate-500 truncate max-w-[150px] font-medium">{currentUser?.companyName || 'Brak firmy'}</p>
@@ -274,7 +299,7 @@ export default function App() {
         </header>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-auto p-8 custom-scrollbar">
+        <div className="flex-1 overflow-auto p-4 md:p-8 custom-scrollbar">
             <div className="max-w-[1600px] mx-auto pb-20">
                 {renderContent()}
             </div>
