@@ -1,4 +1,6 @@
 
+import { LucideIcon } from 'lucide-react';
+
 export enum ApiProvider {
     SALT_EDGE = 'Salt Edge',
     TINK = 'Tink',
@@ -76,6 +78,7 @@ export interface UserProfile {
 export interface TaxOffice {
     code: string;
     name: string;
+    // ... existing properties
 }
 
 export interface AuditEntry {
@@ -141,7 +144,6 @@ export interface CryptoTransaction {
     confidenceScore?: number;
 }
 
-// CORE ENGINE TYPES
 export interface TaxLot {
     id: string;
     date: string;
@@ -478,6 +480,20 @@ export enum ViewState {
     DEV_PORTAL = 'DEV_PORTAL',
     SYSTEM_STATUS = 'SYSTEM_STATUS',
     HELP_CENTER = 'HELP_CENTER'
+}
+
+export interface NavItem {
+    view: ViewState;
+    label: string;
+    icon: any; // Lucide icon component
+    badge?: string;
+}
+
+export interface NavSection {
+    id: string;
+    title: string;
+    icon: any;
+    items: NavItem[];
 }
 
 export interface SearchResult {
@@ -844,7 +860,7 @@ export interface TaxBreakdown {
         firstBracketAmount: number;
         secondBracketAmount: number;
     };
-    aiExplanation?: string; // New field for AI text
+    aiExplanation?: string;
 }
 
 export interface TaxReturn {

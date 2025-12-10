@@ -1,7 +1,16 @@
 
-import React from 'react';
-import { LayoutDashboard, Wallet, FileText, History, Settings, ShieldCheck, FileSpreadsheet, Calculator, Box, Users, FileBarChart, PieChart, Download, Bitcoin, Radio, Star, Globe, Landmark, FolderKanban, CreditCard, Briefcase, Package, ShoppingBag, Car, Map, Scale, BarChart2, Leaf, TrendingUp, ScrollText, Store, ScanSearch, Cpu, Telescope, Home, Activity, Magnet, Receipt, BookOpen, BrainCircuit, Workflow, UploadCloud, ShieldAlert, Layers, Archive, Clock, Mail, Siren, Repeat, Radar, Gavel, MapPin, Terminal, Server, GraduationCap, X } from 'lucide-react';
-import { ViewState } from '../types';
+import React, { useState } from 'react';
+import { NavSection, ViewState } from '../types';
+import { 
+    LayoutDashboard, Wallet, Layers, ShieldCheck, Cpu, Globe, 
+    CreditCard, Users, FolderKanban, Package, Car, MapPin, 
+    Briefcase, FileText, Magnet, Telescope, ShieldAlert, Archive, 
+    BookOpen, PieChart, Leaf, FileBarChart, Download, UploadCloud, 
+    Calculator, BarChart2, BrainCircuit, Terminal, Server, GraduationCap, 
+    Settings, LogOut, ChevronDown, ChevronRight, Zap,
+    RefreshCw, TrendingUp, Bitcoin, Home, Search, Radar, Wand2 as MagicWand
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   currentView: ViewState;
@@ -12,200 +21,177 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, plan, isOpen, onClose }) => {
-  
-  const handleNavigation = (view: ViewState) => {
-      onChangeView(view);
-      if (window.innerWidth < 1024) { // Close on mobile after selection
-          onClose();
+  const [expandedHub, setExpandedHub] = useState<string>('FINANCE');
+
+  const navigation: NavSection[] = [
+      {
+          id: 'INTELLIGENCE',
+          title: 'Intelligence HQ',
+          icon: BrainCircuit,
+          items: [
+              { view: ViewState.DASHBOARD, label: 'Command Center', icon: LayoutDashboard },
+              { view: ViewState.PREDICTIVE_TAX, label: 'Predictive AI', icon: Telescope, badge: 'PRO' },
+              { view: ViewState.RISK_CENTER, label: 'Risk & Compliance', icon: ShieldAlert },
+              { view: ViewState.ESG, label: 'ESG Sustainability', icon: Leaf },
+              { view: ViewState.MARKET_INTEL, label: 'Market Benchmarks', icon: BarChart2 },
+          ]
+      },
+      {
+          id: 'FINANCE',
+          title: 'Finance OS',
+          icon: Wallet,
+          items: [
+              { view: ViewState.YAPILY_CONNECT, label: 'Banking Core', icon: Wallet },
+              { view: ViewState.TREASURY, label: 'Treasury & FX', icon: Layers },
+              { view: ViewState.NUFFI_PAY, label: 'Merchant Gateway', icon: CreditCard },
+              { view: ViewState.CARDS, label: 'Corporate Cards', icon: CreditCard },
+              { view: ViewState.SUBSCRIPTIONS, label: 'Subscription Mgr', icon: RefreshCw },
+          ]
+      },
+      {
+          id: 'INVESTMENT',
+          title: 'Investment Deck',
+          icon: TrendingUp,
+          items: [
+              { view: ViewState.CRYPTO_HUB, label: 'Crypto & DeFi', icon: Bitcoin },
+              { view: ViewState.WEALTH, label: 'Stocks & ETF', icon: TrendingUp },
+              { view: ViewState.DERIVATIVES, label: 'Derivatives', icon: Layers, badge: 'NEW' },
+              { view: ViewState.BONDS, label: 'Bonds', icon: FileText },
+              { view: ViewState.REAL_ESTATE, label: 'Real Estate', icon: Home },
+              { view: ViewState.DEFI_ARCHEOLOGY, label: 'DeFi Forensics', icon: Search, badge: 'AI' },
+              { view: ViewState.WHALE_WATCHER, label: 'Whale Watcher', icon: Radar, badge: 'PRO' },
+          ]
+      },
+      {
+          id: 'ACCOUNTING',
+          title: 'Accounting Core',
+          icon: BookOpen,
+          items: [
+              { view: ViewState.TAX_ENGINE, label: 'Tax Engine (Rust)', icon: Cpu, badge: 'CORE' },
+              { view: ViewState.GENERAL_LEDGER, label: 'General Ledger', icon: BookOpen },
+              { view: ViewState.TAX_WIZARD, label: 'Tax Wizard', icon: MagicWand },
+              { view: ViewState.DOCUMENTS, label: 'Documents (KSeF)', icon: FileText },
+              { view: ViewState.TAX_OPTIMIZER, label: 'Tax Optimizer', icon: Magnet },
+              { view: ViewState.AUDIT_DEFENDER, label: 'Audit Defender', icon: ShieldCheck },
+              { view: ViewState.REPORTS, label: 'Reports BI', icon: FileBarChart },
+          ]
+      },
+      {
+          id: 'OPERATIONS',
+          title: 'Operations',
+          icon: Briefcase,
+          items: [
+              { view: ViewState.CONTRACTORS, label: 'CRM & Network', icon: Users },
+              { view: ViewState.PROJECTS, label: 'Projects', icon: FolderKanban },
+              { view: ViewState.PAYROLL, label: 'Payroll (HR)', icon: Users },
+              { view: ViewState.WAREHOUSE, label: 'Warehouse (WMS)', icon: Package },
+              { view: ViewState.VEHICLES, label: 'Fleet Mgmt', icon: Car },
+              { view: ViewState.BUSINESS_TRAVEL, label: 'Travel & Expenses', icon: MapPin },
+          ]
       }
-  };
-
-  // Section 1: Management & AI
-  const mainNav = [
-    { view: ViewState.DASHBOARD, icon: LayoutDashboard, label: 'Pulpit', badge: '' },
-    { view: ViewState.MAILBOX, icon: Mail, label: 'Skrzynka (Faktury)', badge: 'AI' },
-    { view: ViewState.TIME_TRACKER, icon: Clock, label: 'Czas Pracy (RCP)', badge: 'NEW' },
-    { view: ViewState.SMART_RULES, icon: Workflow, label: 'Smart Rules (Auto)', badge: 'BETA' },
-    { view: ViewState.SUBSCRIPTIONS, icon: Repeat, label: 'Subskrypcje', badge: 'NEW' },
   ];
-
-  // Section 2: Capital Markets (Inwestycje)
-  const marketsNav = [
-    { view: ViewState.WEALTH, icon: TrendingUp, label: 'Wealth (Akcje/ETF)', badge: 'NEW' },
-    { view: ViewState.CRYPTO_HUB, icon: Bitcoin, label: 'Crypto Hub', badge: '' },
-    { view: ViewState.DERIVATIVES, icon: Layers, label: 'Derywaty (Opcje)', badge: 'NEW' },
-    { view: ViewState.BONDS, icon: ScrollText, label: 'Obligacje', badge: 'NEW' },
-    { view: ViewState.TREASURY, icon: Activity, label: 'Skarbiec (FX/Ledger)', badge: '' },
-    { view: ViewState.WHALE_WATCHER, icon: Radar, label: 'Whale Watcher', badge: 'PRO' },
-    { view: ViewState.DEFI_ARCHEOLOGY, icon: Layers, label: 'DeFi Archeology', badge: 'LABS' },
-    { view: ViewState.TOKEN_SCANNER, icon: Siren, label: 'Token Scanner', badge: 'SEC' },
-  ];
-
-  // Section 3: Operations (Operacyjne)
-  const opsNav = [
-    { view: ViewState.DOCUMENTS, icon: FileSpreadsheet, label: 'Dokumenty (KSeF)', badge: '' },
-    { view: ViewState.YAPILY_CONNECT, icon: Radio, label: 'Bankowość', badge: '' },
-    { view: ViewState.NUFFI_PAY, icon: CreditCard, label: 'Nuffi Pay (POS)', badge: 'NEW' },
-    { view: ViewState.CONTRACTORS, icon: Users, label: 'Kontrahenci & WL', badge: '' },
-    { view: ViewState.PROJECTS, icon: FolderKanban, label: 'Projekty', badge: '' },
-    { view: ViewState.WAREHOUSE, icon: Package, label: 'Magazyn (WMS)', badge: '' },
-    { view: ViewState.VEHICLES, icon: Car, label: 'Flota', badge: '' },
-    { view: ViewState.BUSINESS_TRAVEL, icon: MapPin, label: 'Delegacje', badge: 'NEW' },
-    { view: ViewState.CASH_REGISTER, icon: Wallet, label: 'Kasa (KP/KW)', badge: 'NEW' },
-    { view: ViewState.PAYROLL, icon: Briefcase, label: 'Kadry i Płace', badge: '' },
-    { view: ViewState.ASSETS, icon: Box, label: 'Środki Trwałe', badge: '' },
-    { view: ViewState.REAL_ESTATE, icon: Home, label: 'Nieruchomości', badge: 'NEW' },
-    { view: ViewState.LOANS, icon: Landmark, label: 'Kredyty', badge: 'NEW' },
-    { view: ViewState.CONTRACTS, icon: ScrollText, label: 'Umowy (CLM)', badge: 'NEW' },
-    { view: ViewState.ECOMMERCE, icon: ShoppingBag, label: 'E-commerce', badge: '' },
-    { view: ViewState.B2B_NETWORK, icon: Globe, label: 'B2B Network', badge: '' },
-    { view: ViewState.MARKETPLACE, icon: Store, label: 'Marketplace', badge: 'NEW' },
-  ];
-
-  // Section 4: Tax & Compliance (Podatki)
-  const taxNav = [
-    { view: ViewState.TAX_WIZARD, icon: FileText, label: 'Kreator PIT/CIT', badge: '' },
-    { view: ViewState.INTERNATIONAL, icon: Map, label: 'VAT OSS & Intrastat', badge: '' },
-    { view: ViewState.GLOBAL_TAX, icon: Globe, label: 'Global Tax (UE)', badge: 'NEW' },
-    { view: ViewState.DIVIDENDS, icon: Receipt, label: 'Dywidendy & WHT', badge: 'NEW' },
-    { view: ViewState.TAX_OPTIMIZER, icon: Magnet, label: 'Optymalizator', badge: 'AI' },
-    { view: ViewState.PREDICTIVE_TAX, icon: Telescope, label: 'Predictive Tax', badge: 'PRO' },
-    { view: ViewState.TAX_ENGINE, icon: Cpu, label: 'Tax Engine Core', badge: 'RUST' },
-    { view: ViewState.RISK_CENTER, icon: ShieldAlert, label: 'Risk Center', badge: 'NEW' },
-    { view: ViewState.AUDIT_DEFENDER, icon: Scale, label: 'Tarcza (Audit)', badge: '' },
-    { view: ViewState.FORENSICS, icon: ScanSearch, label: 'Forensics', badge: 'AI' },
-    { view: ViewState.AUDIT_SNAPSHOTS, icon: Archive, label: 'Snapshots', badge: 'PRO' },
-    { view: ViewState.GENERAL_LEDGER, icon: BookOpen, label: 'Księga Główna', badge: 'NEW' },
-    { view: ViewState.DEBT_COLLECTOR, icon: Gavel, label: 'Windykacja', badge: 'NEW' },
-    { view: ViewState.CAP_TABLE, icon: PieChart, label: 'Cap Table', badge: 'NEW' },
-    { view: ViewState.ESG, icon: Leaf, label: 'ESG Reporting', badge: 'NEW' },
-    { view: ViewState.REPORTS, icon: FileBarChart, label: 'Raporty BI', badge: '' },
-    { view: ViewState.EXPORT, icon: Download, label: 'JPK & Eksport', badge: '' },
-  ];
-
-  // Tools
-  const toolsNav = [
-    { view: ViewState.IMPORT_WIZARD, icon: UploadCloud, label: 'Import Wizard', badge: 'AI' },
-    { view: ViewState.PRICE_CALCULATOR, icon: Calculator, label: 'Kalkulator Cen', badge: 'NEW' },
-    { view: ViewState.MARKET_INTEL, icon: BarChart2, label: 'Market Intel', badge: '' },
-  ];
-
-  const accountantItems = [
-      { view: ViewState.ACCOUNTANT_DASHBOARD, icon: Briefcase, label: 'Pulpit Księgowego', badge: 'PRO' },
-      { view: ViewState.AI_CLASSIFIER, icon: BrainCircuit, label: 'Nuffi AI Lab', badge: 'BETA' },
-  ];
-
-  const devItems = [
-      { view: ViewState.DEV_PORTAL, icon: Terminal, label: 'Developer Portal', badge: 'API' },
-      { view: ViewState.SYSTEM_STATUS, icon: Server, label: 'Status Systemu', badge: '' },
-  ];
-
-  const renderNavSection = (title: string, items: any[]) => (
-      <>
-        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-4 mb-2 px-3 opacity-80">{title}</div>
-        <nav className="space-y-0.5">
-            {items.map((item) => (
-                <button
-                    key={item.view}
-                    onClick={() => handleNavigation(item.view)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group relative ${
-                    currentView === item.view
-                        ? 'bg-indigo-600/10 text-indigo-400 font-medium'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                    }`}
-                >
-                    {currentView === item.view && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 bg-indigo-500 rounded-r-full"></div>
-                    )}
-                    <item.icon size={16} className={`shrink-0 transition-colors ${currentView === item.view ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                    <span className="text-[13px] truncate flex-1 text-left">{item.label}</span>
-                    {item.badge && (
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 ${
-                            item.badge === 'RUST' ? 'bg-orange-600 text-white' : 
-                            item.badge === 'PRO' ? 'bg-indigo-600 text-white' :
-                            item.badge === 'AI' ? 'bg-purple-600 text-white' :
-                            item.badge === 'NEW' ? 'bg-teal-600 text-white' :
-                            item.badge === 'LABS' ? 'bg-pink-600 text-white' :
-                            item.badge === 'SEC' ? 'bg-rose-600 text-white' :
-                            item.badge === 'BETA' ? 'bg-amber-600 text-white' :
-                            item.badge === 'API' ? 'bg-slate-500 text-white' :
-                            'bg-blue-600 text-white'
-                        }`}>
-                            {item.badge}
-                        </span>
-                    )}
-                </button>
-            ))}
-        </nav>
-      </>
-  );
 
   return (
-    <div 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0B1120] text-slate-300 border-r border-slate-800 shadow-2xl font-sans transform transition-transform duration-300 ease-in-out flex flex-col ${
-            isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
-    >
-      <div className="p-5 flex items-center justify-between gap-3 border-b border-slate-800/50 bg-[#0F172A]">
-        <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-lg shadow-lg shadow-indigo-900/50">
-                <ShieldCheck size={20} className="text-white" />
-            </div>
-            <div>
-                <h1 className="text-lg font-bold tracking-tight text-white font-sans">Nuffi<span className="text-indigo-500">.io</span></h1>
-                <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 tracking-wide uppercase">{plan}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+    <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-950 border-r border-slate-900/50 backdrop-blur-xl flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        {/* Brand Area */}
+        <div className="h-16 flex items-center px-6 border-b border-white/5">
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/20">
+                    <ShieldCheck className="text-white" size={18} />
+                </div>
+                <div>
+                    <h1 className="text-lg font-bold text-white tracking-tight font-mono">Nuffi<span className="text-indigo-500">.OS</span></h1>
                 </div>
             </div>
+            <div className="ml-auto">
+                <span className="text-[10px] font-bold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">{plan}</span>
+            </div>
         </div>
-        <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white">
-            <X size={20} />
-        </button>
-      </div>
 
-      <div className="px-3 py-2 overflow-y-auto custom-scrollbar flex-1 pb-20">
-        {renderNavSection('Zarządzanie', mainNav)}
-        {renderNavSection('Rynki Kapitałowe', marketsNav)}
-        {renderNavSection('Operacje & Majątek', opsNav)}
-        {renderNavSection('Podatki & Zgodność', taxNav)}
-        {renderNavSection('Narzędzia', toolsNav)}
-        {renderNavSection('Strefa Partnera', accountantItems)}
-        {renderNavSection('Deweloperzy', devItems)}
-        
-        {/* Help Center Link */}
-        <div className="mt-6 mb-2 px-3">
-            <button
-                onClick={() => handleNavigation(ViewState.HELP_CENTER)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative border border-slate-700 hover:border-indigo-500 bg-[#0F172A] ${
-                currentView === ViewState.HELP_CENTER
-                    ? 'text-indigo-400 border-indigo-500'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-            >
-                <GraduationCap size={18} className="shrink-0 text-indigo-500" />
-                <span className="text-[13px] font-bold truncate flex-1 text-left">Nuffi Academy</span>
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
+            <div className="space-y-1">
+                {navigation.map((section) => (
+                    <div key={section.id} className="mb-2">
+                        <button
+                            onClick={() => setExpandedHub(expandedHub === section.id ? '' : section.id)}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${expandedHub === section.id ? 'bg-white/5 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <section.icon size={18} className={`${expandedHub === section.id ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                                <span className="text-sm font-semibold tracking-wide">{section.title}</span>
+                            </div>
+                            <ChevronRight size={14} className={`transition-transform duration-200 ${expandedHub === section.id ? 'rotate-90 text-indigo-400' : 'text-slate-600'}`} />
+                        </button>
+
+                        <AnimatePresence>
+                            {expandedHub === section.id && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="pl-4 pr-1 py-2 space-y-0.5 border-l border-white/5 ml-4 mt-1">
+                                        {section.items.map((item) => (
+                                            <button
+                                                key={item.view}
+                                                onClick={() => { onChangeView(item.view); if(window.innerWidth < 1024) onClose(); }}
+                                                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all relative group ${currentView === item.view ? 'bg-indigo-600/10 text-indigo-300' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <item.icon size={16} className={`transition-colors ${currentView === item.view ? 'text-indigo-400' : 'text-slate-600 group-hover:text-slate-400'}`} />
+                                                    <span className="truncate">{item.label}</span>
+                                                </div>
+                                                {item.badge && (
+                                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                                                        item.badge === 'PRO' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 
+                                                        item.badge === 'AI' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                                        item.badge === 'CORE' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                                                        'bg-slate-700 text-slate-300 border-slate-600'
+                                                    }`}>
+                                                        {item.badge}
+                                                    </span>
+                                                )}
+                                                {currentView === item.view && (
+                                                    <motion.div layoutId="activeNav" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-500 rounded-r-full -ml-[17px]" />
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                ))}
+            </div>
+
+            {/* Dev & Tools Section */}
+            <div className="mt-6 pt-6 border-t border-white/5">
+                <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Developer Zone</p>
+                <button onClick={() => onChangeView(ViewState.DEV_PORTAL)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 ${currentView === ViewState.DEV_PORTAL ? 'bg-white/5 text-white' : ''}`}>
+                    <Terminal size={16} /> API & Keys
+                </button>
+                <button onClick={() => onChangeView(ViewState.SYSTEM_STATUS)} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 ${currentView === ViewState.SYSTEM_STATUS ? 'bg-white/5 text-white' : ''}`}>
+                    <Server size={16} /> System Status
+                </button>
+            </div>
+        </div>
+
+        {/* User Profile */}
+        <div className="p-4 border-t border-white/5 bg-slate-900/50">
+            <button onClick={() => onChangeView(ViewState.SETTINGS)} className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-white/5 transition-colors group">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-inner">
+                    JD
+                </div>
+                <div className="text-left flex-1">
+                    <p className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">Jan Doe</p>
+                    <p className="text-xs text-slate-500">CEO @ Nuffi</p>
+                </div>
+                <Settings size={16} className="text-slate-500 group-hover:text-white transition-colors" />
             </button>
         </div>
-      </div>
-
-      <div className="p-4 border-t border-slate-800/50 bg-[#0F1623] absolute bottom-0 w-full">
-         <button 
-            onClick={() => handleNavigation(ViewState.PRICING)}
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-lg shadow-orange-900/20 mb-2"
-        >
-            <Star size={14} className="fill-white" /> Upgrade Planu
-        </button>
-        <button 
-            onClick={() => handleNavigation(ViewState.SETTINGS)}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                currentView === ViewState.SETTINGS ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-        >
-          <Settings size={16} />
-          <span className="text-sm font-medium">Ustawienia</span>
-        </button>
-      </div>
     </div>
   );
 };

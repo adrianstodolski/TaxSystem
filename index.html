@@ -1,17 +1,63 @@
+
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nuffi - Inteligentne Rozliczanie Podatków</title>
+    <title>Nuffi OS | Enterprise Finance Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --bg-depth: #020617;
+        --glass-border: rgba(255, 255, 255, 0.08);
+      }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f3f4f6;
+        background-color: var(--bg-depth);
+        color: #e2e8f0;
+        overflow-x: hidden;
+      }
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      /* Custom Scrollbar for Dark Mode */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155; 
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569; 
+      }
+      .glass-panel {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
       }
     </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                850: '#151e32',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            }
+          }
+        }
+      }
+    </script>
   <script type="importmap">
 {
   "imports": {
@@ -20,6 +66,7 @@
     "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.2",
     "vite": "https://aistudiocdn.com/vite@^7.2.7",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0"
