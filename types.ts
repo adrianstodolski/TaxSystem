@@ -57,6 +57,8 @@ export enum TaxationForm {
     LUMP_SUM = 'LUMP_SUM'
 }
 
+export type CalculationMethod = 'FIFO' | 'LIFO' | 'HIFO' | 'AVCO';
+
 export interface UserProfile {
     firstName: string;
     lastName: string;
@@ -65,7 +67,7 @@ export interface UserProfile {
     pesel: string;
     taxOfficeCode: string;
     taxationForm: TaxationForm;
-    cryptoStrategy: 'FIFO' | 'LIFO' | 'HIFO';
+    cryptoStrategy: CalculationMethod;
     kycStatus: 'VERIFIED' | 'PENDING' | 'REJECTED';
     companyName: string;
     companyAddress: string;
@@ -137,6 +139,33 @@ export interface CryptoTransaction {
     txHash?: string;
     protocol?: string;
     confidenceScore?: number;
+}
+
+// CORE ENGINE TYPES
+export interface TaxLot {
+    id: string;
+    date: string;
+    amount: number;
+    costBasis: number; // Price per unit
+    remaining: number;
+    sourceTxId: string;
+}
+
+export interface EngineSnapshot {
+    date: string;
+    inventory: Record<string, TaxLot[]>; // Asset -> Lots
+    realizedGains: number;
+    unrealizedGains: number;
+    taxDue: number;
+    warnings: string[];
+}
+
+export interface InvestmentDNA {
+    fomoScore: number; // 0-100
+    panicSellRate: number; // %
+    diamondHandsScore: number; // 0-100
+    riskTolerance: 'CONSERVATIVE' | 'MODERATE' | 'DEGEN';
+    topBadHabit: string;
 }
 
 export interface BankAccount {
@@ -942,7 +971,7 @@ export interface MarketplaceItem {
 // FORENSICS & TAX ENGINE TYPES
 export interface ForensicIssue {
     id: string;
-    type: 'WASH_SALE' | 'MISSING_COST_BASIS' | 'SCAM_TOKEN' | 'DANGLING_TX' | 'UNMATCHED_TRANSFER';
+    type: 'WASH_SALE' | 'MISSING_COST_BASIS' | 'SCAM_TOKEN' | 'DANGLING_TX' | 'UNMATCHED_TRANSFER' | 'PANIC_SELL';
     severity: 'HIGH' | 'MEDIUM' | 'LOW';
     description: string;
     affectedAssets: string[];
@@ -959,10 +988,11 @@ export interface ForensicsSummary {
         medium: number; // >70% sure
         low: number; // <70% sure
     };
+    dna: InvestmentDNA;
 }
 
 export interface TaxEngineConfig {
-    strategy: 'FIFO' | 'LIFO' | 'HIFO' | 'SPEC_ID' | 'AVG_COST';
+    strategy: CalculationMethod;
     isRealTime: boolean;
     includeDeFi: boolean;
     includeNFTs: boolean;
