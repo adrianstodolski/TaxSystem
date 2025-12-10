@@ -17,7 +17,13 @@ export const Loans: React.FC = () => {
         load();
     }, []);
 
-    const formatCurrency = (val: number, curr = 'PLN') => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+    const formatCurrency = (val: number, curr = 'PLN') => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} ${curr}`;
+        }
+    };
 
     const totalDebt = loans.reduce((acc, l) => acc + l.remainingAmount, 0);
     const monthlyInstallments = loans.reduce((acc, l) => acc + l.nextInstallmentAmount, 0);

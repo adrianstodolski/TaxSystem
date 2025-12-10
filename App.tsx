@@ -44,6 +44,31 @@ import { RealEstate } from './components/RealEstate';
 import { Loans } from './components/Loans';
 import { GlobalTax } from './components/GlobalTax';
 import { TaxOptimizer } from './components/TaxOptimizer';
+import { Dividends } from './components/Dividends';
+import { GeneralLedger } from './components/GeneralLedger';
+import { AccountantDashboard } from './components/AccountantDashboard';
+import { AiClassifier } from './components/AiClassifier';
+import { NuffiPay } from './components/NuffiPay';
+import { SmartRules } from './components/SmartRules';
+import { ImportWizard } from './components/ImportWizard';
+import { RiskCenter } from './components/RiskCenter';
+import { DeFiArcheology } from './components/DeFiArcheology'; 
+import { AuditSnapshots } from './components/AuditSnapshots';
+import { TimeTracker } from './components/TimeTracker';
+import { Mailbox } from './components/Mailbox'; 
+import { PriceCalculator } from './components/PriceCalculator'; 
+import { TokenScanner } from './components/TokenScanner';
+import { Subscriptions } from './components/Subscriptions';
+import { WhaleWatcher } from './components/WhaleWatcher';
+import { DebtCollector } from './components/DebtCollector';
+import { CapTable } from './components/CapTable';
+import { BusinessTravel } from './components/BusinessTravel';
+import { CashRegister } from './components/CashRegister';
+import { Derivatives } from './components/Derivatives';
+import { Bonds } from './components/Bonds';
+import { DevPortal } from './components/DevPortal'; // NEW
+import { SystemStatus } from './components/SystemStatus'; // NEW
+import { HelpCenter } from './components/HelpCenter'; // NEW
 import { ViewState, SubscriptionPlan, UserProfile } from './types';
 import { NuffiService } from './services/api';
 
@@ -143,8 +168,58 @@ export default function App() {
         return <GlobalTax />;
       case ViewState.TAX_OPTIMIZER:
         return <TaxOptimizer />;
+      case ViewState.DIVIDENDS:
+        return <Dividends />;
+      case ViewState.GENERAL_LEDGER:
+        return <GeneralLedger />;
+      case ViewState.ACCOUNTANT_DASHBOARD:
+        return <AccountantDashboard />;
+      case ViewState.AI_CLASSIFIER:
+        return <AiClassifier />;
+      case ViewState.NUFFI_PAY:
+        return <NuffiPay />;
+      case ViewState.SMART_RULES:
+        return <SmartRules />;
+      case ViewState.IMPORT_WIZARD:
+        return <ImportWizard />;
+      case ViewState.RISK_CENTER:
+        return <RiskCenter />;
+      case ViewState.DEFI_ARCHEOLOGY:
+        return <DeFiArcheology />;
+      case ViewState.AUDIT_SNAPSHOTS:
+        return <AuditSnapshots />;
+      case ViewState.TIME_TRACKER:
+        return <TimeTracker />;
+      case ViewState.MAILBOX:
+        return <Mailbox />;
+      case ViewState.PRICE_CALCULATOR:
+        return <PriceCalculator />;
+      case ViewState.TOKEN_SCANNER:
+        return <TokenScanner />;
       case ViewState.PRICING:
         return <Pricing />;
+      case ViewState.SUBSCRIPTIONS:
+        return <Subscriptions />;
+      case ViewState.WHALE_WATCHER:
+        return <WhaleWatcher />;
+      case ViewState.DEBT_COLLECTOR:
+        return <DebtCollector />;
+      case ViewState.CAP_TABLE:
+        return <CapTable />;
+      case ViewState.BUSINESS_TRAVEL:
+        return <BusinessTravel />;
+      case ViewState.CASH_REGISTER:
+        return <CashRegister />;
+      case ViewState.DERIVATIVES:
+        return <Derivatives />;
+      case ViewState.BONDS:
+        return <Bonds />;
+      case ViewState.DEV_PORTAL: 
+        return <DevPortal />;
+      case ViewState.SYSTEM_STATUS: 
+        return <SystemStatus />;
+      case ViewState.HELP_CENTER: // NEW
+        return <HelpCenter />;
       default:
         return <Dashboard onNavigate={setCurrentView} />;
     }

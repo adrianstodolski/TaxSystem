@@ -41,7 +41,13 @@ export const GlobalTax: React.FC = () => {
         toast.success('Przeliczono', 'Symulacja PIT-ZG zakończona.');
     };
 
-    const formatCurrency = (val: number, curr = 'PLN') => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+    const formatCurrency = (val: number, curr = 'PLN') => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} ${curr}`;
+        }
+    };
 
     const currentCountry = countries.find(c => c.countryCode === selectedCountry);
 

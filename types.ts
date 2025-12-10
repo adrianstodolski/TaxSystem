@@ -214,6 +214,10 @@ export interface PaymentLink {
     currency: string;
     url: string;
     status: 'PENDING' | 'PAID';
+    description?: string;
+    customerEmail?: string;
+    methods: ('CARD' | 'BLIK' | 'CRYPTO')[];
+    createdAt: string;
 }
 
 export interface WatchlistAddress {
@@ -419,7 +423,32 @@ export enum ViewState {
     REAL_ESTATE = 'REAL_ESTATE',
     LOANS = 'LOANS',
     GLOBAL_TAX = 'GLOBAL_TAX',
-    TAX_OPTIMIZER = 'TAX_OPTIMIZER'
+    TAX_OPTIMIZER = 'TAX_OPTIMIZER',
+    DIVIDENDS = 'DIVIDENDS',
+    GENERAL_LEDGER = 'GENERAL_LEDGER',
+    ACCOUNTANT_DASHBOARD = 'ACCOUNTANT_DASHBOARD',
+    AI_CLASSIFIER = 'AI_CLASSIFIER',
+    NUFFI_PAY = 'NUFFI_PAY',
+    SMART_RULES = 'SMART_RULES',
+    IMPORT_WIZARD = 'IMPORT_WIZARD',
+    RISK_CENTER = 'RISK_CENTER',
+    DEFI_ARCHEOLOGY = 'DEFI_ARCHEOLOGY',
+    AUDIT_SNAPSHOTS = 'AUDIT_SNAPSHOTS',
+    TIME_TRACKER = 'TIME_TRACKER',
+    MAILBOX = 'MAILBOX',
+    PRICE_CALCULATOR = 'PRICE_CALCULATOR',
+    TOKEN_SCANNER = 'TOKEN_SCANNER',
+    SUBSCRIPTIONS = 'SUBSCRIPTIONS',
+    WHALE_WATCHER = 'WHALE_WATCHER',
+    DEBT_COLLECTOR = 'DEBT_COLLECTOR',
+    CAP_TABLE = 'CAP_TABLE',
+    BUSINESS_TRAVEL = 'BUSINESS_TRAVEL',
+    CASH_REGISTER = 'CASH_REGISTER',
+    DERIVATIVES = 'DERIVATIVES',
+    BONDS = 'BONDS',
+    DEV_PORTAL = 'DEV_PORTAL',
+    SYSTEM_STATUS = 'SYSTEM_STATUS',
+    HELP_CENTER = 'HELP_CENTER'
 }
 
 export interface SearchResult {
@@ -470,11 +499,18 @@ export interface TaxHarvestingOpp {
 }
 
 export interface NFTAsset {
+    id: string;
     collection: string;
     tokenId: string;
     name: string;
     imageUrl?: string;
     floorPrice: number;
+    purchasePrice: number; // Cost Basis
+    gasFee: number; // Gas spent on mint/buy
+    purchaseDate: string;
+    status: 'HELD' | 'SOLD';
+    soldPrice?: number;
+    realizedPnL?: number;
 }
 
 export interface CryptoAnalytics {
@@ -779,6 +815,7 @@ export interface TaxBreakdown {
         firstBracketAmount: number;
         secondBracketAmount: number;
     };
+    aiExplanation?: string; // New field for AI text
 }
 
 export interface TaxReturn {
@@ -1045,4 +1082,410 @@ export interface TaxOptimizationOpportunity {
     type: 'CRYPTO' | 'STOCK';
     strategy: 'HARVEST_LOSS' | 'WASH_SALE_AVOIDANCE' | 'DONATION';
     potentialTaxSavings: number;
+}
+
+// DIVIDENDS TYPES
+export interface Dividend {
+    id: string;
+    ticker: string;
+    companyName: string;
+    paymentDate: string;
+    amountGross: number; // Foreign currency
+    currency: string;
+    whtRate: number; // e.g., 0.15 for USA
+    taxPaidForeign: number;
+    taxDuePl: number; // (19% - 15%)
+    status: 'RECEIVED' | 'UPCOMING';
+    country: string;
+}
+
+// UNIFIED LEDGER (One Source of Truth)
+export interface UnifiedLedgerItem {
+    id: string;
+    date: string;
+    source: 'BANK' | 'CRYPTO' | 'INVOICE' | 'STOCK';
+    provider: string; // e.g., 'mBank', 'Binance', 'KSeF'
+    description: string;
+    amountPln: number;
+    direction: 'INCOMING' | 'OUTGOING';
+    taxCategory: 'REVENUE' | 'COST' | 'NEUTRAL' | 'TAX';
+    reconciled: boolean;
+    tags: string[];
+}
+
+// ACCOUNTANT DASHBOARD TYPES
+export interface ClientProfile {
+    id: string;
+    name: string;
+    nip: string;
+    status: 'ACTIVE' | 'PENDING' | 'SUSPENDED';
+    documentsToProcess: number;
+    vatStatus: 'OK' | 'DUE' | 'OVERDUE';
+    pitStatus: 'OK' | 'DUE' | 'OVERDUE';
+    lastActivity: string;
+    monthProgress: number; // 0-100%
+}
+
+// AI CLASSIFIER TYPES
+export interface UnclassifiedTransaction {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    currency: string;
+    confidence: number; // 0-1
+    aiSuggestion: {
+        category: string;
+        reasoning: string;
+    };
+    source: string;
+}
+
+// NUFFI PAY TYPES
+export interface MerchantTx {
+    id: string;
+    amount: number;
+    currency: string;
+    method: 'BLIK' | 'CARD' | 'CRYPTO';
+    status: 'COMPLETED' | 'PENDING' | 'FAILED';
+    customerEmail: string;
+    date: string;
+    description: string;
+}
+
+export interface MerchantStats {
+    totalVolume: number;
+    txCount: number;
+    activeLinks: number;
+    cryptoVolume: number;
+}
+
+// SMART RULES TYPES
+export interface AutomationRule {
+    id: string;
+    name: string;
+    trigger: string;
+    condition: string;
+    conditionValue: string | number;
+    action: string;
+    active: boolean;
+    lastTriggered?: string;
+}
+
+// IMPORT WIZARD TYPES
+export interface ImportJob {
+    id: string;
+    fileName: string;
+    totalRows: number;
+    preview: any[]; // Raw data
+    headers: string[];
+}
+
+export interface CsvMapping {
+    fileHeader: string;
+    systemField: 'DATE' | 'AMOUNT' | 'CURRENCY' | 'DESCRIPTION' | 'CONTRACTOR' | 'IGNORE';
+    confidence: number;
+}
+
+// RISK CENTER TYPES
+export interface RiskCategory {
+    name: string;
+    score: number; // 0-100 (100 = safe, 0 = risky)
+    status: 'SAFE' | 'WARNING' | 'CRITICAL';
+    issuesFound: number;
+}
+
+export interface RiskAssessment {
+    globalScore: number;
+    categories: RiskCategory[];
+    criticalAlerts: string[];
+}
+
+// DEFI ARCHEOLOGY TYPES
+export interface ArcheologyNode {
+    id: string;
+    type: 'WALLET' | 'CONTRACT' | 'POOL' | 'TOKEN';
+    label: string;
+    subLabel?: string;
+    x: number;
+    y: number;
+    color: string;
+}
+
+export interface ArcheologyLink {
+    source: string;
+    target: string;
+    label: string; // e.g. "Transfer 100 USDT"
+    color?: string;
+    dashed?: boolean;
+}
+
+export interface TxAnalysisResult {
+    hash: string;
+    timestamp: string;
+    nodes: ArcheologyNode[];
+    links: ArcheologyLink[];
+    taxVerdict: string;
+    complexityScore: number;
+    gasUsedEth: number;
+}
+
+// AUDIT SNAPSHOTS TYPES
+export interface TaxSnapshot {
+    id: string;
+    name: string; // e.g. "Zamknięcie Październik 2023"
+    createdAt: string;
+    createdBy: string;
+    period: string;
+    hash: string; // Integrity check
+    dataSize: string;
+    status: 'LOCKED' | 'DRAFT';
+    tags: string[];
+}
+
+// TIME TRACKER TYPES
+export interface TimeEntry {
+    id: string;
+    projectId: string;
+    projectName: string;
+    description: string;
+    startTime: string; // ISO
+    endTime?: string; // ISO
+    durationSeconds: number;
+    billable: boolean;
+    hourlyRate: number;
+    status: 'RUNNING' | 'COMPLETED' | 'BILLED';
+}
+
+// MAILBOX TYPES
+export interface EmailMessage {
+    id: string;
+    sender: string;
+    subject: string;
+    date: string;
+    preview: string;
+    hasAttachment: boolean;
+    isRead: boolean;
+    aiTags: ('INVOICE' | 'OFFER' | 'SPAM' | 'URGENT')[];
+}
+
+// TOKEN SCANNER TYPES
+export interface TokenSecurity {
+    address: string;
+    name: string;
+    symbol: string;
+    riskScore: number; // 0-100 (100 = safe)
+    issues: { type: 'HONEYPOT' | 'LIQUIDITY' | 'OWNERSHIP' | 'TAX'; severity: 'HIGH' | 'MEDIUM' | 'LOW'; description: string }[];
+    isHoneypot: boolean;
+    ownershipRenounced: boolean;
+    liquidityLocked: boolean;
+}
+
+// SUBSCRIPTION MANAGER TYPES
+export interface Subscription {
+    id: string;
+    name: string;
+    cost: number;
+    currency: string;
+    billingCycle: 'MONTHLY' | 'YEARLY';
+    nextPayment: string;
+    status: 'ACTIVE' | 'GHOST';
+    logo: string;
+    usageScore: number; // 0-100
+}
+
+// WHALE WATCHER TYPES
+export interface WhaleWallet {
+    address: string;
+    label: string; // e.g. "Justin Sun"
+    balanceUsd: number;
+    chain: string;
+    tags: string[]; // "VC", "Exchange", "Whale"
+}
+
+export interface WhaleTx {
+    id: string;
+    hash: string;
+    timestamp: string;
+    fromAddress: string;
+    fromLabel?: string;
+    toAddress: string;
+    toLabel?: string;
+    amount: number;
+    token: string;
+    valueUsd: number;
+    type: 'INFLOW' | 'OUTFLOW' | 'TRANSFER'; // Inflow to Exchange
+}
+
+// DEBT COLLECTOR TYPES
+export interface DebtCase {
+    id: string;
+    debtorName: string;
+    nip: string;
+    invoiceNumber: string;
+    amount: number;
+    dueDate: string;
+    daysOverdue: number;
+    status: 'NEW' | 'REMINDER_SENT' | 'PRE_COURT' | 'SOLD';
+    statutoryInterest: number;
+    lastActionDate?: string;
+}
+
+// CAP TABLE TYPES
+export interface Shareholder {
+    id: string;
+    name: string;
+    role: 'FOUNDER' | 'INVESTOR' | 'EMPLOYEE' | 'OPTION_POOL';
+    shares: number;
+    percentage: number;
+    investedAmount?: number;
+    joinedDate: string;
+}
+
+// BUSINESS TRAVEL TYPES
+export interface BusinessTrip {
+    id: string;
+    employeeName: string;
+    destination: string;
+    startDate: string;
+    endDate: string;
+    purpose: string;
+    status: 'PLANNED' | 'APPROVED' | 'SETTLED';
+    totalCost: number;
+    perDiem: number; // Dieta
+    transportCost: number;
+    accommodationCost: number;
+    currency: string;
+}
+
+// CASH REGISTER TYPES
+export interface CashDocument {
+    id: string;
+    number: string; // e.g. KP/1/10/2023
+    date: string;
+    type: 'KP' | 'KW';
+    contractor: string;
+    description: string;
+    amount: number;
+    currency: string;
+    balanceAfter: number;
+}
+
+// DERIVATIVES TYPES
+export interface DerivativePosition {
+    id: string;
+    symbol: string; // e.g. SPY, NVDA
+    type: 'CALL' | 'PUT' | 'FUTURE';
+    side: 'LONG' | 'SHORT';
+    strike: number;
+    expiration: string;
+    quantity: number;
+    avgPrice: number;
+    currentPrice: number; // Premium
+    underlyingPrice: number;
+    pnl: number;
+    greeks: {
+        delta: number;
+        gamma: number;
+        theta: number;
+        vega: number;
+    };
+}
+
+// BONDS TYPES
+export interface BondPosition {
+    id: string;
+    isin: string; // e.g. PL0000105305 (EDO0530)
+    name: string; // e.g. Skarbowe EDO 10-letnie
+    type: 'TREASURY' | 'CORPORATE';
+    faceValue: number;
+    quantity: number;
+    couponRate: number; // %
+    inflationIndexed: boolean;
+    maturityDate: string;
+    nextCouponDate: string;
+    nextCouponAmount: number;
+    yieldToMaturity: number;
+    currentValue: number;
+}
+
+// DEV PORTAL TYPES
+export interface UserApiKey {
+    id: string;
+    prefix: string; // e.g. 'sk_live_...'
+    name: string;
+    created: string;
+    lastUsed: string;
+    type: 'LIVE' | 'TEST';
+    permissions: ('READ' | 'WRITE')[];
+}
+
+export interface ApiUsageStats {
+    totalRequests: number;
+    errorRate: number;
+    avgLatency: number;
+    history: { date: string; requests: number; errors: number }[];
+}
+
+export interface WebhookConfig {
+    id: string;
+    url: string;
+    events: string[]; // e.g. ['invoice.paid', 'tax.calculated']
+    active: boolean;
+    secret: string;
+}
+
+// SYSTEM STATUS TYPES
+export interface SystemComponent {
+    name: string;
+    status: 'OPERATIONAL' | 'DEGRADED' | 'OUTAGE' | 'MAINTENANCE';
+    uptime: number; // 99.99%
+    description: string;
+}
+
+export interface Incident {
+    id: string;
+    title: string;
+    status: 'INVESTIGATING' | 'IDENTIFIED' | 'MONITORING' | 'RESOLVED';
+    impact: 'MINOR' | 'MAJOR' | 'CRITICAL' | 'NONE';
+    createdAt: string;
+    updatedAt: string;
+    updates: { timestamp: string; message: string }[];
+}
+
+export interface SystemStatusData {
+    globalStatus: 'OPERATIONAL' | 'ISSUES';
+    components: SystemComponent[];
+    incidents: Incident[];
+}
+
+// HELP CENTER & ACADEMY TYPES
+export interface HelpArticle {
+    id: string;
+    categoryId: string;
+    title: string;
+    description: string;
+    content: string; // Rich text / steps
+    readTime: string; // e.g. "5 min"
+    icon: string; // Lucide icon name
+}
+
+export interface HelpCategory {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+}
+
+// N8N AGENT TYPES
+export interface AgentMessage {
+    id: string;
+    sender: 'USER' | 'AGENT';
+    text: string;
+    timestamp: Date;
+    status?: 'SENDING' | 'SENT' | 'THINKING';
+    actionLink?: {
+        label: string;
+        url: string;
+    };
 }

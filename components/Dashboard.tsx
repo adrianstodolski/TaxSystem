@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, FileText, PieChart as PieChartIcon, Zap, Wallet, ArrowRight, ShieldCheck, Scale, Globe, BarChart2, MessageSquare, ScrollText, Store, Leaf, Sparkles, Telescope, Home, Landmark, Magnet } from 'lucide-react';
+import { TrendingUp, FileText, PieChart as PieChartIcon, Zap, Wallet, ArrowRight, ShieldCheck, Scale, Globe, BarChart2, MessageSquare, ScrollText, Store, Leaf, Sparkles, Telescope, Home, Landmark, Magnet, Layers, Bitcoin, CreditCard } from 'lucide-react';
 import { NuffiService } from '../services/api';
-import { Transaction, ExpenseBreakdown, VatSummary, CashFlowPoint, Budget, AuditRiskFactor, MarketComparison, ViewState } from '../types';
+import { Transaction, ExpenseBreakdown, VatSummary, CashFlowPoint, Budget, AuditRiskFactor, MarketComparison, ViewState, RealEstateProperty, StockAsset } from '../types';
 
 interface DashboardProps {
   onNavigate: (view: ViewState) => void;
@@ -26,18 +26,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [auditRisks, setAuditRisks] = useState<AuditRiskFactor[]>([]);
   const [marketComp, setMarketComp] = useState<MarketComparison[]>([]);
+  
+  // Net Worth Data
+  const [properties, setProperties] = useState<RealEstateProperty[]>([]);
+  const [stocks, setStocks] = useState<StockAsset[]>([]);
+  const [cryptoBalance, setCryptoBalance] = useState(125000); // Mock for now
+  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      const [txs, _, vat, flow, bud, risks, market] = await Promise.all([
+      const [txs, _, vat, flow, bud, risks, market, props, stks] = await Promise.all([
         NuffiService.fetchRecentTransactions(),
         NuffiService.fetchExpensesBreakdown(),
         NuffiService.fetchVatSummary(),
         NuffiService.fetchCashFlowProjection(),
         NuffiService.fetchBudgets(),
         NuffiService.runAuditRiskAnalysis(),
-        NuffiService.fetchMarketComparison()
+        NuffiService.fetchMarketComparison(),
+        NuffiService.fetchRealEstate(),
+        NuffiService.fetchStockPortfolio()
       ]);
       setTransactions(txs);
       setVatSummary(vat);
@@ -45,6 +53,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       setBudgets(bud);
       setAuditRisks(risks);
       setMarketComp(market);
+      setProperties(props);
+      setStocks(stks);
       setLoading(false);
     };
     loadData();
@@ -59,6 +69,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   const highRisks = auditRisks.filter(r => r.severity === 'HIGH').length;
 
+  // Net Worth Calculation
+  const realEstateValue = properties.reduce((acc, p) => acc + p.currentValue, 0);
+  const stocksValue = stocks.reduce((acc, s) => acc + s.valuePln, 0);
+  const cashValue = 165420; // From header mock
+  const totalNetWorth = realEstateValue + stocksValue + cryptoBalance + cashValue;
+
+  const allocationData = [
+      { name: 'Nieruchomości', value: realEstateValue, color: '#4F46E5', icon: Home },
+      { name: 'Giełda (Stocks)', value: stocksValue, color: '#10B981', icon: TrendingUp },
+      { name: 'Krypto & DeFi', value: cryptoBalance, color: '#F59E0B', icon: Bitcoin },
+      { name: 'Gotówka', value: cashValue, color: '#64748B', icon: Wallet },
+  ];
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       <header className="flex justify-between items-end border-b border-slate-200 pb-6">
@@ -67,69 +90,104 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <p className="text-slate-500 mt-1">Przegląd kluczowych wskaźników efektywności (KPI).</p>
         </div>
         <div className="text-right hidden md:block">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Dostępne Środki</p>
-            <h3 className="text-3xl font-bold text-slate-900 font-mono">165,420.00 <span className="text-lg text-slate-400">PLN</span></h3>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Majątek Netto (Net Worth)</p>
+            <h3 className="text-3xl font-bold text-slate-900 font-mono">
+                {totalNetWorth.toLocaleString('pl-PL', {minimumFractionDigits: 0, maximumFractionDigits: 0})} <span className="text-lg text-slate-400">PLN</span>
+            </h3>
         </div>
       </header>
 
-      {/* NEW MODULES SHORTCUTS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button 
-            onClick={() => onNavigate(ViewState.PREDICTIVE_TAX)}
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all text-left group relative overflow-hidden"
-          >
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Telescope size={64} className="text-indigo-600" />
+      {/* NET WORTH & ASSET ALLOCATION */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+              <h3 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <PieChartIcon size={20} className="text-indigo-600" /> Struktura Majątku
+              </h3>
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="w-48 h-48 relative">
+                      <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                              <Pie
+                                  data={allocationData}
+                                  innerRadius={60}
+                                  outerRadius={80}
+                                  paddingAngle={5}
+                                  dataKey="value"
+                              >
+                                  {allocationData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                                  ))}
+                              </Pie>
+                              <Tooltip formatter={(val: number) => val.toLocaleString() + ' PLN'} />
+                          </PieChart>
+                      </ResponsiveContainer>
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <span className="font-bold text-slate-400 text-xs uppercase">Allocation</span>
+                      </div>
+                  </div>
+                  
+                  <div className="flex-1 grid grid-cols-2 gap-4 w-full">
+                      {allocationData.map((item) => (
+                          <div key={item.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-3 h-3 rounded-full" style={{backgroundColor: item.color}}></div>
+                                  <div className="flex flex-col">
+                                      <span className="text-xs font-bold text-slate-500 uppercase">{item.name}</span>
+                                      <span className="font-bold text-slate-900 font-mono">{item.value.toLocaleString()}</span>
+                                  </div>
+                              </div>
+                              <div className="text-xs font-bold text-slate-400">
+                                  {((item.value / totalNetWorth) * 100).toFixed(1)}%
+                              </div>
+                          </div>
+                      ))}
+                  </div>
               </div>
-              <div className="bg-indigo-50 w-10 h-10 rounded-lg flex items-center justify-center text-indigo-600 mb-3 group-hover:scale-110 transition-transform">
-                  <Telescope size={20} />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm">Predictive Tax AI</h3>
-              <p className="text-xs text-slate-500 mt-1">Prognozy i zmiany w prawie.</p>
-              <span className="absolute top-2 right-2 bg-indigo-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">AI</span>
-          </button>
+          </div>
 
-          <button 
-            onClick={() => onNavigate(ViewState.TAX_OPTIMIZER)}
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all text-left group relative overflow-hidden"
-          >
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Magnet size={64} className="text-orange-600" />
-              </div>
-              <div className="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-3 group-hover:scale-110 transition-transform">
-                  <Magnet size={20} />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm">Tax Optimizer (Hedge)</h3>
-              <p className="text-xs text-slate-500 mt-1">Realizacja strat i optymalizacja.</p>
-          </button>
+          {/* Quick Shortcuts Grid */}
+          <div className="grid grid-cols-2 gap-4">
+              <button 
+                onClick={() => onNavigate(ViewState.PREDICTIVE_TAX)}
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all text-left group relative overflow-hidden"
+              >
+                  <div className="bg-indigo-50 w-10 h-10 rounded-lg flex items-center justify-center text-indigo-600 mb-3">
+                      <Telescope size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-xs">Predictive AI</h3>
+                  <span className="absolute top-2 right-2 bg-indigo-600 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">PRO</span>
+              </button>
 
-          <button 
-            onClick={() => onNavigate(ViewState.WEALTH)}
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all text-left group relative overflow-hidden"
-          >
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <TrendingUp size={64} className="text-emerald-600" />
-              </div>
-              <div className="bg-emerald-50 w-10 h-10 rounded-lg flex items-center justify-center text-emerald-600 mb-3 group-hover:scale-110 transition-transform">
-                  <TrendingUp size={20} />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm">Wealth (Inwestycje)</h3>
-              <p className="text-xs text-slate-500 mt-1">Portfel Akcji, ETF i Surowców.</p>
-          </button>
+              <button 
+                onClick={() => onNavigate(ViewState.TAX_OPTIMIZER)}
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-300 transition-all text-left group relative overflow-hidden"
+              >
+                  <div className="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center text-orange-600 mb-3">
+                      <Magnet size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-xs">Tax Optimizer</h3>
+              </button>
 
-          <button 
-            onClick={() => onNavigate(ViewState.LOANS)}
-            className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all text-left group relative overflow-hidden"
-          >
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Landmark size={64} className="text-purple-600" />
-              </div>
-              <div className="bg-purple-50 w-10 h-10 rounded-lg flex items-center justify-center text-purple-600 mb-3 group-hover:scale-110 transition-transform">
-                  <Landmark size={20} />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm">Kredyty i Leasing</h3>
-              <p className="text-xs text-slate-500 mt-1">Tarcza odsetkowa i harmonogramy.</p>
-          </button>
+              <button 
+                onClick={() => onNavigate(ViewState.WEALTH)}
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all text-left group relative overflow-hidden"
+              >
+                  <div className="bg-emerald-50 w-10 h-10 rounded-lg flex items-center justify-center text-emerald-600 mb-3">
+                      <TrendingUp size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-xs">Wealth</h3>
+              </button>
+
+              <button 
+                onClick={() => onNavigate(ViewState.LOANS)}
+                className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all text-left group relative overflow-hidden"
+              >
+                  <div className="bg-purple-50 w-10 h-10 rounded-lg flex items-center justify-center text-purple-600 mb-3">
+                      <Landmark size={20} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 text-xs">Kredyty</h3>
+              </button>
+          </div>
       </div>
 
       {/* Hero Stats */}

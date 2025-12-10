@@ -27,7 +27,13 @@ export const TaxOptimizer: React.FC = () => {
         toast.success('Symulacja sprzedaży', `Sprzedaż ${opp.quantity} ${opp.asset} wygeneruje stratę ${opp.unrealizedLoss} PLN i obniży podatek o ${opp.potentialTaxSavings} PLN.`);
     };
 
-    const formatCurrency = (val: number, curr = 'PLN') => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+    const formatCurrency = (val: number, curr = 'PLN') => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} ${curr}`;
+        }
+    };
 
     const totalPotentialSavings = opportunities.reduce((acc, o) => acc + o.potentialTaxSavings, 0);
     const totalUnrealizedLoss = opportunities.reduce((acc, o) => acc + o.unrealizedLoss, 0);

@@ -50,7 +50,14 @@ export const Treasury: React.FC = () => {
     };
 
     const formatRate = (val: number) => val.toFixed(4);
-    const formatCurrency = (val: number, curr: string) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr }).format(val);
+    
+    const formatCurrency = (val: number, curr: string) => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL')} ${curr}`;
+        }
+    };
 
     const getChartData = () => {
         // Mock chart data for selected pair

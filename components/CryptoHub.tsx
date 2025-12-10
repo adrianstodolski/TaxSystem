@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { CryptoExchange, CryptoTransaction, CryptoTaxReport, DeFiReward, TaxHarvestingOpp, NFTAsset, CryptoAnalytics, WalletRiskProfile, ImpermanentLossResult, GoldRushTx, WalletDna, StreamEvent, TokenGodMode, TokenAllowance, NftCollectionStat, DeFiProtocol } from '../types';
 import { CryptoEngine } from '../utils/cryptoEngine';
-import { Bitcoin, RefreshCw, Key, Shield, AlertTriangle, FileText, TrendingUp, TrendingDown, DollarSign, Download, Plus, Layers, Zap, ArrowRight, Wallet, Image, BarChart2, Calculator, ShieldCheck, Activity, X, Server, Database, Code, Box, Eye, Fingerprint, Lock, Search, CheckCircle2, Network, Radio } from 'lucide-react';
+import { Bitcoin, RefreshCw, Key, Shield, AlertTriangle, FileText, TrendingUp, TrendingDown, DollarSign, Download, Plus, Layers, Zap, ArrowRight, Wallet, Image, BarChart2, Calculator, ShieldCheck, Activity, X, Server, Database, Code, Box, Eye, Fingerprint, Lock, Search, CheckCircle2, Network, Radio, Coins } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { toast } from './ui/Toast';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
@@ -14,31 +14,32 @@ export const CryptoHub: React.FC = () => {
     // Data States
     const [transactions, setTransactions] = useState<CryptoTransaction[]>([]);
     const [report, setReport] = useState<CryptoTaxReport | null>(null);
-    const [defiProtocols, setDeFiProtocols] = useState<DeFiProtocol[]>([]); // New state
+    const [defiProtocols, setDeFiProtocols] = useState<DeFiProtocol[]>([]); 
     const [goldRushData, setGoldRushData] = useState<GoldRushTx[]>([]);
+    const [nfts, setNfts] = useState<NFTAsset[]>([]); // New NFT state
     
-    // ... existing states ...
     const [loading, setLoading] = useState(false);
     const [exchangeStatus, setExchangeStatus] = useState<Record<string, boolean>>({});
     
     // IL Calculator
     const [ilOpen, setIlOpen] = useState(false);
-    const [ilResult, setIlResult] = useState<ImpermanentLossResult | null>(null);
-
+    
     const loadData = async () => {
         setLoading(true);
         try {
             const exStatus = await NuffiService.getExchangeConnectionStatus();
             setExchangeStatus(exStatus);
 
-            const [txs, defiData, grData] = await Promise.all([
+            const [txs, defiData, grData, nftData] = await Promise.all([
                 NuffiService.fetchCryptoTransactions(),
                 NuffiService.fetchDeFiProtocols(),
                 NuffiService.fetchGoldRushData('0xMyWallet'),
+                NuffiService.fetchNFTs(),
             ]);
             setTransactions(txs);
             setDeFiProtocols(defiData);
             setGoldRushData(grData);
+            setNfts(nftData);
             
             // Calculate Tax Logic
             const taxReport = CryptoEngine.calculateTax(txs, 'FIFO');
@@ -57,6 +58,7 @@ export const CryptoHub: React.FC = () => {
 
     const formatFiat = (val: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val);
     const formatUsd = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+    const formatEth = (val: number) => `${val.toFixed(3)} ETH`;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -88,8 +90,8 @@ export const CryptoHub: React.FC = () => {
             <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 inline-flex overflow-x-auto max-w-full">
                 {[
                     { id: 'TAX', label: 'Podatki', icon: FileText },
-                    { id: 'LIVE_ANALYZER', label: 'Live Blockchain', icon: Radio }, // New!
-                    { id: 'DEFI', label: 'DeFi Archeology', icon: Layers }, // Renamed
+                    { id: 'LIVE_ANALYZER', label: 'Live Blockchain', icon: Radio },
+                    { id: 'DEFI', label: 'DeFi Archeology', icon: Layers },
                     { id: 'NFT_PARADISE', label: 'NFT Paradise', icon: Image },
                     { id: 'RISK', label: 'Risk', icon: ShieldCheck },
                 ].map(tab => (
@@ -106,6 +108,83 @@ export const CryptoHub: React.FC = () => {
                     </button>
                 ))}
             </div>
+
+            {/* NFT PARADISE - TAX ENGINE */}
+            {activeTab === 'NFT_PARADISE' && (
+                <div className="space-y-6 animate-in fade-in">
+                    <div className="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
+                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div>
+                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">NFT Portfolio Value</p>
+                                <h3 className="text-4xl font-bold tracking-tight">{formatEth(nfts.filter(n => n.status === 'HELD').reduce((acc, n) => acc + n.floorPrice, 0))}</h3>
+                                <p className="text-xs text-purple-300 mt-2">Est. Floor Price Value</p>
+                            </div>
+                            <div className="border-l border-white/10 pl-8">
+                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">Realized Gains (YTD)</p>
+                                <h3 className="text-4xl font-bold tracking-tight text-green-400">
+                                    {formatEth(nfts.reduce((acc, n) => acc + (n.realizedPnL || 0), 0))}
+                                </h3>
+                                <p className="text-xs text-purple-300 mt-2">Taxable Income (Opodatkowane)</p>
+                            </div>
+                            <div className="border-l border-white/10 pl-8">
+                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">Gas Spent (KUP)</p>
+                                <h3 className="text-4xl font-bold tracking-tight text-red-300">
+                                    {formatEth(nfts.reduce((acc, n) => acc + n.gasFee, 0))}
+                                </h3>
+                                <p className="text-xs text-purple-300 mt-2">Koszty uzyskania przychodu</p>
+                            </div>
+                        </div>
+                        {/* Background Art */}
+                        <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-10 translate-y-10">
+                            <Image size={250} />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {nfts.map((nft) => (
+                            <div key={nft.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group relative">
+                                <div className="aspect-square relative overflow-hidden bg-slate-100">
+                                    <img src={nft.imageUrl} alt={nft.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                    <div className="absolute top-2 right-2">
+                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm ${nft.status === 'HELD' ? 'bg-white/90 text-slate-900' : 'bg-green-50 text-white'}`}>
+                                            {nft.status}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="p-4">
+                                    <h4 className="font-bold text-slate-900 mb-1">{nft.name}</h4>
+                                    <p className="text-xs text-slate-500 mb-4">{nft.collection}</p>
+                                    
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Cost Basis (Buy + Gas)</span>
+                                            <span className="font-mono font-bold text-slate-700">{formatEth(nft.purchasePrice + nft.gasFee)}</span>
+                                        </div>
+                                        {nft.status === 'HELD' ? (
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500">Current Floor</span>
+                                                <span className="font-mono font-bold text-indigo-600">{formatEth(nft.floorPrice)}</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500">Sold Price</span>
+                                                <span className="font-mono font-bold text-green-600">{formatEth(nft.soldPrice || 0)}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {nft.status === 'SOLD' && nft.realizedPnL && (
+                                        <div className="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center bg-green-50/50 p-2 rounded-lg">
+                                            <span className="text-xs font-bold text-green-800">Zysk (Taxable)</span>
+                                            <span className="font-mono font-bold text-green-600 text-sm">+{formatEth(nft.realizedPnL)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* LIVE BLOCKCHAIN ANALYZER */}
             {activeTab === 'LIVE_ANALYZER' && (

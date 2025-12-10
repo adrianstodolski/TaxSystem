@@ -18,7 +18,13 @@ export const RealEstate: React.FC = () => {
         load();
     }, []);
 
-    const formatCurrency = (val: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(val);
+    const formatCurrency = (val: number, curr = 'PLN') => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} ${curr}`;
+        }
+    };
 
     const totalValue = properties.reduce((acc, p) => acc + p.currentValue, 0);
     const totalIncome = properties.reduce((acc, p) => acc + p.rentalIncomeMonthly, 0);

@@ -1,8 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { BankAccount, CryptoWallet, IntegrationStatus } from '../types';
-import { Plus, CheckCircle2, Building, Bitcoin, Loader2, ShieldCheck, Lock, ArrowRight, XCircle } from 'lucide-react';
+import { Plus, CheckCircle2, Building, Bitcoin, Loader2, ShieldCheck, Lock, ArrowRight, XCircle, Wallet } from 'lucide-react';
 import { Modal } from './ui/Modal';
+import { toast } from './ui/Toast';
 
 const BANKS = [
   { id: 'mbank', name: 'mBank', color: 'bg-red-500' },
@@ -22,6 +24,10 @@ export const Integrations: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState<IntegrationStatus>('IDLE');
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
+
+  // Web3 Connect
+  const [web3ModalOpen, setWeb3ModalOpen] = useState(false);
+  const [connectingWeb3, setConnectingWeb3] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -54,6 +60,15 @@ export const Integrations: React.FC = () => {
     setIsModalOpen(false);
     setStatus('IDLE');
     setSelectedBank(null);
+  };
+
+  const handleWeb3Connect = async (provider: string) => {
+      setConnectingWeb3(true);
+      await new Promise(r => setTimeout(r, 2000)); // Simulate signing
+      toast.success('Portfel połączony', `Pomyślnie zintegrowano ${provider}.`);
+      setConnectingWeb3(false);
+      setWeb3ModalOpen(false);
+      // In real app, this would add to 'wallets' state
   };
 
   const renderModalContent = () => {
@@ -139,7 +154,7 @@ export const Integrations: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Integracje</h2>
@@ -194,10 +209,10 @@ export const Integrations: React.FC = () => {
         </div>
       </section>
 
-      {/* Crypto Section - Static for demo purposes but consistent style */}
+      {/* Crypto Section */}
       <section>
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Bitcoin className="text-gray-400" /> Kryptowaluty & Giełdy
+          <Bitcoin className="text-gray-400" /> Web3 & Giełdy
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wallets.map(wallet => (
@@ -219,6 +234,18 @@ export const Integrations: React.FC = () => {
                 </div>
             </div>
           ))}
+
+          {/* Connect Web3 Wallet */}
+          <button 
+            onClick={() => setWeb3ModalOpen(true)}
+            className="border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center p-6 hover:border-orange-500 hover:bg-orange-50 transition-all text-gray-500 hover:text-orange-600 h-full min-h-[200px]"
+          >
+            <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
+                <Wallet size={24} />
+            </div>
+            <span className="font-medium">Podłącz Portfel Web3</span>
+            <span className="text-xs mt-1 text-gray-400">MetaMask, Ledger, Trezor</span>
+          </button>
         </div>
       </section>
 
@@ -229,6 +256,38 @@ export const Integrations: React.FC = () => {
         title={status === 'IDLE' ? "Wybierz bank" : "Łączenie z bankiem"}
       >
         {renderModalContent()}
+      </Modal>
+
+      {/* Web3 Modal */}
+      <Modal isOpen={web3ModalOpen} onClose={() => setWeb3ModalOpen(false)} title="Wybierz Portfel">
+          <div className="space-y-4">
+              <button onClick={() => handleWeb3Connect('MetaMask')} className="w-full flex items-center gap-4 p-4 border rounded-xl hover:bg-orange-50 hover:border-orange-200 transition-colors">
+                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">M</div>
+                  <div className="text-left">
+                      <h4 className="font-bold text-slate-900">MetaMask</h4>
+                      <p className="text-xs text-slate-500">Browser Extension</p>
+                  </div>
+              </button>
+              <button onClick={() => handleWeb3Connect('Ledger')} className="w-full flex items-center gap-4 p-4 border rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                  <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-white font-bold">L</div>
+                  <div className="text-left">
+                      <h4 className="font-bold text-slate-900">Ledger</h4>
+                      <p className="text-xs text-slate-500">Hardware Wallet (USB/BLE)</p>
+                  </div>
+              </button>
+              <button onClick={() => handleWeb3Connect('Trezor')} className="w-full flex items-center gap-4 p-4 border rounded-xl hover:bg-green-50 hover:border-green-200 transition-colors">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">T</div>
+                  <div className="text-left">
+                      <h4 className="font-bold text-slate-900">Trezor</h4>
+                      <p className="text-xs text-slate-500">Hardware Wallet</p>
+                  </div>
+              </button>
+              {connectingWeb3 && (
+                  <div className="flex items-center justify-center gap-2 text-sm text-slate-500 py-2">
+                      <Loader2 className="animate-spin" size={16} /> Podpisywanie wiadomości...
+                  </div>
+              )}
+          </div>
       </Modal>
     </div>
   );

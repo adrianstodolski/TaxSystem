@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { TaxFormType, TaxReturn, TaxStatus } from '../types';
 import { NuffiService } from '../services/api';
-import { Check, ChevronRight, FileCheck, PenTool, Send, CreditCard, Loader2, Download, AlertTriangle, Info, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Check, ChevronRight, FileCheck, PenTool, Send, CreditCard, Loader2, Download, AlertTriangle, Info, CheckCircle2, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
 import { Modal } from './ui/Modal';
 
 export const TaxWizard: React.FC = () => {
@@ -11,14 +11,24 @@ export const TaxWizard: React.FC = () => {
   const [taxData, setTaxData] = useState<TaxReturn | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [upo, setUpo] = useState<string | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [explaining, setExplaining] = useState(false);
 
   const handleCalculate = async () => {
     setIsProcessing(true);
     const result = await NuffiService.calculateTax(selectedForm);
     setTaxData(result);
+    setAiExplanation(null);
     setIsProcessing(false);
     setStep(2);
+  };
+
+  const handleExplainAI = async () => {
+      if(!taxData || !taxData.breakdown) return;
+      setExplaining(true);
+      const text = await NuffiService.explainTaxWithAI(taxData.breakdown);
+      setAiExplanation(text);
+      setExplaining(false);
   };
 
   const handleSign = async () => {
@@ -135,6 +145,28 @@ export const TaxWizard: React.FC = () => {
                 <h3 className="text-xl font-bold">Raport Podatkowy (PIT + ZUS)</h3>
                 <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded font-bold">WERYFIKACJA</span>
             </div>
+
+            {/* AI Explanation Box */}
+            {aiExplanation ? (
+                <div className="mb-6 bg-indigo-50 p-6 rounded-xl border border-indigo-100 animate-in fade-in">
+                    <div className="flex items-center gap-2 mb-2 font-bold text-indigo-800">
+                        <Sparkles size={18} /> Nuffi AI Wyjaśnia
+                    </div>
+                    <div className="prose prose-sm text-slate-700">
+                        <pre className="whitespace-pre-wrap font-sans text-sm">{aiExplanation}</pre>
+                    </div>
+                </div>
+            ) : (
+                <div className="mb-6 flex justify-end">
+                    <button 
+                        onClick={handleExplainAI}
+                        disabled={explaining}
+                        className="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-lg font-bold hover:bg-indigo-100 flex items-center gap-2 transition-colors"
+                    >
+                        {explaining ? <Loader2 className="animate-spin" size={14} /> : <><MessageSquare size={14} /> Wyjaśnij wyliczenie z AI</>}
+                    </button>
+                </div>
+            )}
 
             {/* Financial Breakdown Table */}
             <div className="border border-gray-200 rounded-xl overflow-hidden mb-8">

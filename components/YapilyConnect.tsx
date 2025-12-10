@@ -153,8 +153,13 @@ export const YapilyConnect: React.FC = () => {
         }
     };
 
-    const formatCurrency = (val: number, curr: string) => 
-        new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr }).format(val);
+    const formatCurrency = (val: number, curr: string) => {
+        try {
+            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr }).format(val);
+        } catch (e) {
+            return `${val.toLocaleString('pl-PL')} ${curr}`;
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
