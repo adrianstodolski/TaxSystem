@@ -22,7 +22,7 @@ export const SystemStatus: React.FC = () => {
             case 'OPERATIONAL': return 'bg-green-500';
             case 'DEGRADED': return 'bg-amber-500';
             case 'OUTAGE': return 'bg-red-500';
-            default: return 'bg-gray-400';
+            default: return 'bg-zinc-400';
         }
     };
 
@@ -35,7 +35,7 @@ export const SystemStatus: React.FC = () => {
         }
     };
 
-    if (loading || !statusData) return <div className="p-8 text-center text-slate-500">Ładowanie statusu systemu...</div>;
+    if (loading || !statusData) return <div className="p-8 text-center text-zinc-500">Ładowanie statusu systemu...</div>;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -44,15 +44,15 @@ export const SystemStatus: React.FC = () => {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Activity className="text-indigo-400" /> System Status
                     </h2>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-zinc-400 mt-1">
                         Monitoring dostępności usług Nuffi Cloud.
                     </p>
                 </div>
             </header>
 
             {/* Global Status Banner */}
-            <div className={`p-6 rounded-2xl text-white flex items-center gap-4 shadow-lg border border-white/10 ${statusData.globalStatus === 'OPERATIONAL' ? 'bg-green-600/80 backdrop-blur-md' : 'bg-amber-500/80 backdrop-blur-md'}`}>
-                {statusData.globalStatus === 'OPERATIONAL' ? <CheckCircle2 size={32} /> : <AlertTriangle size={32} />}
+            <div className={`p-6 rounded-2xl text-white flex items-center gap-4 shadow-lg border border-white/10 ${statusData.globalStatus === 'OPERATIONAL' ? 'bg-green-600/20 backdrop-blur-md border-green-500/30' : 'bg-amber-500/20 backdrop-blur-md border-amber-500/30'}`}>
+                {statusData.globalStatus === 'OPERATIONAL' ? <CheckCircle2 size={32} className="text-green-400" /> : <AlertTriangle size={32} className="text-amber-400" />}
                 <div>
                     <h3 className="text-2xl font-bold">
                         {statusData.globalStatus === 'OPERATIONAL' ? 'All Systems Operational' : 'Active Incidents Reported'}
@@ -62,10 +62,10 @@ export const SystemStatus: React.FC = () => {
             </div>
 
             {/* Components Grid */}
-            <div className="glass-card rounded-2xl overflow-hidden">
-                <div className="p-6 border-b border-white/10 bg-slate-900/30">
+            <div className="neo-card rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10 bg-white/5">
                     <h3 className="font-bold text-white flex items-center gap-2">
-                        <Server size={18} className="text-slate-400" /> Komponenty Systemu
+                        <Server size={18} className="text-zinc-400" /> Komponenty Systemu
                     </h3>
                 </div>
                 <div className="divide-y divide-white/5">
@@ -73,7 +73,7 @@ export const SystemStatus: React.FC = () => {
                         <div key={idx} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors">
                             <div>
                                 <h4 className="font-bold text-white">{comp.name}</h4>
-                                <p className="text-xs text-slate-400 mt-1">{comp.description}</p>
+                                <p className="text-xs text-zinc-400 mt-1">{comp.description}</p>
                             </div>
                             <div className="text-right">
                                 <div className="flex items-center justify-end gap-2 mb-1">
@@ -85,7 +85,7 @@ export const SystemStatus: React.FC = () => {
                                     </span>
                                     <div className={`w-3 h-3 rounded-full ${getStatusColor(comp.status)}`}></div>
                                 </div>
-                                <span className="text-xs text-slate-500 font-mono">Uptime: {comp.uptime}%</span>
+                                <span className="text-xs text-zinc-500 font-mono">Uptime: {comp.uptime}%</span>
                             </div>
                         </div>
                     ))}
@@ -95,20 +95,20 @@ export const SystemStatus: React.FC = () => {
             {/* Incident History */}
             <div className="space-y-4">
                 <h3 className="font-bold text-white text-lg flex items-center gap-2">
-                    <Clock size={20} className="text-slate-400" /> Past Incidents
+                    <Clock size={20} className="text-zinc-400" /> Past Incidents
                 </h3>
                 
                 {statusData.incidents.length === 0 ? (
-                    <div className="bg-slate-900/50 p-8 rounded-xl border border-slate-700 text-center text-slate-500 text-sm">
+                    <div className="neo-card p-8 rounded-xl text-center text-zinc-500 text-sm">
                         No incidents reported in the last 90 days.
                     </div>
                 ) : (
                     statusData.incidents.map(inc => (
-                        <div key={inc.id} className="bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden">
-                            <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-start">
+                        <div key={inc.id} className="neo-card rounded-xl overflow-hidden">
+                            <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-start">
                                 <div>
                                     <h4 className="font-bold text-white">{inc.title}</h4>
-                                    <p className="text-xs text-slate-400 mt-1">{new Date(inc.createdAt).toLocaleString()}</p>
+                                    <p className="text-xs text-zinc-400 mt-1">{new Date(inc.createdAt).toLocaleString()}</p>
                                 </div>
                                 <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase border ${
                                     inc.status === 'RESOLVED' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
@@ -119,10 +119,10 @@ export const SystemStatus: React.FC = () => {
                             <div className="p-4 space-y-4">
                                 {inc.updates.map((update, idx) => (
                                     <div key={idx} className="flex gap-3 text-sm">
-                                        <div className="w-24 shrink-0 text-slate-500 text-xs pt-0.5">
+                                        <div className="w-24 shrink-0 text-zinc-500 text-xs pt-0.5">
                                             {new Date(update.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                         </div>
-                                        <div className="text-slate-300">
+                                        <div className="text-zinc-300">
                                             {update.message}
                                         </div>
                                     </div>

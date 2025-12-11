@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Modal } from './ui/Modal';
-import { ScrollText, TrendingUp, Leaf, Store, Check, ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { ScrollText, TrendingUp, Leaf, Store, Check, ArrowRight, Sparkles, Zap, ShieldCheck } from 'lucide-react';
 
 interface WelcomeModalProps {
     isOpen: boolean;
@@ -10,62 +10,71 @@ interface WelcomeModalProps {
 
 export const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose }) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Nuffi OS 2.0 – Co nowego?">
-            <div className="space-y-6">
-                <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 p-6 rounded-2xl border border-indigo-500/30 text-center relative overflow-hidden">
+        <Modal isOpen={isOpen} onClose={onClose} title="Nuffi OS 3.0 (Alpha)">
+            <div className="space-y-8">
+                <div className="relative overflow-hidden rounded-2xl bg-[#0A0A0C] border border-white/10 p-8 text-center group">
+                    {/* Glow Effect */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#D4AF37]/20 blur-[80px] rounded-full pointer-events-none"></div>
+                    
                     <div className="relative z-10">
-                        <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/40">
-                            <Sparkles className="text-white" size={24} />
+                        <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#D4AF37]/30 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
+                            <Sparkles className="text-[#D4AF37]" size={32} />
                         </div>
-                        <h3 className="font-bold text-white text-xl mb-2">Witaj w nowej erze finansów!</h3>
-                        <p className="text-indigo-200 text-sm">
-                            Zaktualizowaliśmy Twój terminal do wersji 2.0. Oto 4 kluczowe moduły, które pomogą Ci skalować biznes.
+                        <h3 className="font-bold text-white text-2xl mb-3">Witaj w nowej erze finansów!</h3>
+                        <p className="text-zinc-400 text-sm leading-relaxed max-w-sm mx-auto">
+                            Zaktualizowaliśmy Twój terminal do wersji <strong>Neo-Finance 2027</strong>. 
+                            Interfejs został zoptymalizowany pod kątem szybkości i pracy w trybie Deep Focus.
                         </p>
                     </div>
-                    {/* Background Deco */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-indigo-500/50 transition-colors group cursor-default">
-                        <div className="bg-indigo-500/20 w-10 h-10 rounded-lg flex items-center justify-center text-indigo-400 mb-3 border border-indigo-500/30 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                            <ScrollText size={20} />
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg border border-indigo-500/30">
+                                <ScrollText size={18} />
+                            </div>
+                            <h4 className="font-bold text-white text-sm">AI CLM Contracts</h4>
                         </div>
-                        <h4 className="font-bold text-white text-sm">Umowy (AI CLM)</h4>
-                        <p className="text-xs text-slate-400 mt-1">Automatyczna analiza umów, wykrywanie klauzul i pilnowanie terminów.</p>
+                        <p className="text-xs text-zinc-500 leading-relaxed">Automatyczna analiza umów i wykrywanie klauzul przez Gemini 1.5 Pro.</p>
                     </div>
                     
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-emerald-500/50 transition-colors group cursor-default">
-                        <div className="bg-emerald-500/20 w-10 h-10 rounded-lg flex items-center justify-center text-emerald-400 mb-3 border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                            <TrendingUp size={20} />
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+                                <TrendingUp size={18} />
+                            </div>
+                            <h4 className="font-bold text-white text-sm">Wealth Engine</h4>
                         </div>
-                        <h4 className="font-bold text-white text-sm">Wealth Management</h4>
-                        <p className="text-xs text-slate-400 mt-1">Globalny portfel inwestycyjny: Akcje, ETF, Surowce i Krypto w jednym widoku.</p>
+                        <p className="text-xs text-zinc-500 leading-relaxed">Globalny portfel: Akcje, ETF, Krypto i Nieruchomości w jednym widoku.</p>
                     </div>
                     
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-teal-500/50 transition-colors group cursor-default">
-                        <div className="bg-teal-500/20 w-10 h-10 rounded-lg flex items-center justify-center text-teal-400 mb-3 border border-teal-500/30 group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                            <Leaf size={20} />
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg border border-[#D4AF37]/30">
+                                <ShieldCheck size={18} />
+                            </div>
+                            <h4 className="font-bold text-white text-sm">Audit Defender</h4>
                         </div>
-                        <h4 className="font-bold text-white text-sm">ESG Reporting</h4>
-                        <p className="text-xs text-slate-400 mt-1">Monitorowanie śladu węglowego i zgodność z dyrektywą CSRD.</p>
+                        <p className="text-xs text-zinc-500 leading-relaxed">System generuje bezpieczne paczki dowodowe (JPK) w czasie rzeczywistym.</p>
                     </div>
                     
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-purple-500/50 transition-colors group cursor-default">
-                        <div className="bg-purple-500/20 w-10 h-10 rounded-lg flex items-center justify-center text-purple-400 mb-3 border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                            <Store size={20} />
+                    <div className="p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group cursor-default">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-purple-500/20 text-purple-400 rounded-lg border border-purple-500/30">
+                                <Store size={18} />
+                            </div>
+                            <h4 className="font-bold text-white text-sm">Marketplace 2.0</h4>
                         </div>
-                        <h4 className="font-bold text-white text-sm">Marketplace</h4>
-                        <p className="text-xs text-slate-400 mt-1">Usługi dodane: Leasing 0%, Ubezpieczenia i Faktoring jednym kliknięciem.</p>
+                        <p className="text-xs text-zinc-500 leading-relaxed">Leasing 0%, Faktoring i Ubezpieczenia jednym kliknięciem.</p>
                     </div>
                 </div>
 
                 <button 
                     onClick={onClose}
-                    className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/50 group"
+                    className="w-full bg-[#D4AF37] text-black py-4 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_-5px_rgba(212,175,55,0.4)] group text-sm uppercase tracking-wider"
                 >
-                    <Zap size={18} className="fill-white group-hover:text-yellow-300 transition-colors" /> Zaczynamy
+                    <Zap size={18} className="fill-black group-hover:scale-110 transition-transform" /> Uruchom System
                 </button>
             </div>
         </Modal>

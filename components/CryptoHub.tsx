@@ -28,10 +28,8 @@ export const CryptoHub: React.FC = () => {
     const [nfts, setNfts] = useState<NFTAsset[]>([]);
     const [loading, setLoading] = useState(false);
     
-    // Bubble State
     const [bubbles, setBubbles] = useState(MOCK_BUBBLES);
 
-    // Load Data Logic... (Same as before, simplified for brevity)
     const loadData = async () => {
         setLoading(true);
         try {
@@ -51,18 +49,17 @@ export const CryptoHub: React.FC = () => {
 
     useEffect(() => { loadData(); }, []);
 
-    // TanStack Table Columns (Same as before)
     const columns = useMemo<ColumnDef<CryptoTransaction>[]>(() => [
         {
             accessorKey: 'timestamp',
             header: 'Data',
-            cell: info => <span className="font-mono text-xs text-slate-400">{new Date(info.getValue() as string).toLocaleString()}</span>
+            cell: info => <span className="font-mono text-xs text-zinc-400">{new Date(info.getValue() as string).toLocaleString()}</span>
         },
         {
             accessorKey: 'exchange',
             header: 'Giełda',
             cell: info => (
-                <span className="text-[10px] font-bold px-2 py-1 rounded text-white bg-slate-600">
+                <span className="text-[10px] font-bold px-2 py-1 rounded text-white bg-white/10 border border-white/5">
                     {info.getValue() as string}
                 </span>
             )
@@ -88,21 +85,21 @@ export const CryptoHub: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-white/10 pb-6">
+            <header className="flex justify-between items-center border-b border-white/5 pb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Bitcoin className="text-orange-500" /> Crypto Hub
+                        <Bitcoin className="text-gold" /> Crypto Hub
                     </h2>
-                    <p className="text-slate-400 mt-1">Zarządzanie aktywami, analiza rynku i podatki.</p>
+                    <p className="text-zinc-400 mt-1">Zarządzanie aktywami, analiza rynku i podatki.</p>
                 </div>
                 <div className="flex gap-2 items-center">
-                    <button onClick={loadData} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-lg transition-all text-sm">
+                    <button onClick={loadData} className="bg-white/10 border border-white/10 text-white px-4 py-2 rounded-xl font-bold hover:bg-white/20 flex items-center gap-2 transition-all text-sm">
                         <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Sync Wallets
                     </button>
                 </div>
             </header>
 
-            {/* Navigation Pills */}
+            {/* Navigation Pills - Neo Style */}
             <div className="flex gap-2 mb-6">
                 {[
                     { id: 'BUBBLES', label: 'Market Overview', icon: LayoutGrid },
@@ -114,7 +111,7 @@ export const CryptoHub: React.FC = () => {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         className={`px-4 py-2 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
-                            activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' : 'bg-slate-900 text-slate-400 hover:text-white border border-white/5'
+                            activeTab === tab.id ? 'bg-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.4)]' : 'bg-onyx text-zinc-400 hover:text-white border border-white/5'
                         }`}
                     >
                         <tab.icon size={16} /> {tab.label}
@@ -129,21 +126,19 @@ export const CryptoHub: React.FC = () => {
                         key="BUBBLES"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="h-[600px] bg-slate-900/50 rounded-2xl border border-white/10 relative overflow-hidden p-8 flex items-center justify-center"
+                        className="h-[600px] neo-card rounded-2xl relative overflow-hidden p-8 flex items-center justify-center bg-black/40"
                     >
                         <div className="absolute top-4 left-4 z-10 flex gap-4">
-                            <span className="text-xs font-bold text-slate-400 uppercase">Top 100 Coins</span>
-                            <span className="text-xs font-bold text-slate-400 uppercase">Performance: 24h</span>
+                            <span className="text-xs font-bold text-zinc-500 uppercase">Top 100 Coins</span>
+                            <span className="text-xs font-bold text-zinc-500 uppercase">Performance: 24h</span>
                         </div>
 
-                        {/* Simulated Bubble Layout (CSS Grid/Flex hybrid) */}
                         <div className="flex flex-wrap gap-4 justify-center content-center w-full h-full">
                             {bubbles.map((bubble, i) => {
-                                // Scale size by market cap (simplified log scale)
                                 const size = Math.max(80, Math.log10(bubble.marketCap) * 12); 
                                 const color = bubble.change24h > 0 
-                                    ? `rgba(34, 197, 94, ${Math.min(0.9, 0.3 + (bubble.change24h / 20))})` // Green opacity based on %
-                                    : `rgba(244, 63, 94, ${Math.min(0.9, 0.3 + (Math.abs(bubble.change24h) / 20))})`; // Red opacity
+                                    ? `rgba(34, 197, 94, ${Math.min(0.9, 0.3 + (bubble.change24h / 20))})` 
+                                    : `rgba(244, 63, 94, ${Math.min(0.9, 0.3 + (Math.abs(bubble.change24h) / 20))})`; 
 
                                 return (
                                     <motion.div
@@ -181,22 +176,22 @@ export const CryptoHub: React.FC = () => {
                     >
                         {report && (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-indigo-500">
-                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Dochód do opodatkowania</p>
+                                <div className="neo-card p-6 rounded-2xl border-l-4 border-indigo-500">
+                                    <p className="text-zinc-400 text-xs font-bold uppercase mb-1">Dochód do opodatkowania</p>
                                     <h3 className="text-3xl font-bold text-white font-mono">{formatFiat(report.spotIncomeTaxBase + report.futuresIncomeTaxBase)}</h3>
                                 </div>
-                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-rose-500">
-                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Koszty (Fees + Straty)</p>
+                                <div className="neo-card p-6 rounded-2xl border-l-4 border-rose-500">
+                                    <p className="text-zinc-400 text-xs font-bold uppercase mb-1">Koszty (Fees + Straty)</p>
                                     <h3 className="text-3xl font-bold text-white font-mono">{formatFiat(report.spotCost + report.futuresCost)}</h3>
                                 </div>
-                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-green-500">
-                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Podatek Należny (19%)</p>
+                                <div className="neo-card p-6 rounded-2xl border-l-4 border-green-500">
+                                    <p className="text-zinc-400 text-xs font-bold uppercase mb-1">Podatek Należny (19%)</p>
                                     <h3 className="text-3xl font-bold text-green-400 font-mono">{formatFiat(report.totalTaxDue)}</h3>
                                 </div>
                             </div>
                         )}
 
-                        <div className="glass-card rounded-2xl p-6">
+                        <div className="neo-card rounded-2xl p-6">
                             <h3 className="font-bold text-white mb-4">Pełny Rejestr Operacji</h3>
                             <DataTable columns={columns} data={transactions} />
                         </div>
@@ -207,17 +202,17 @@ export const CryptoHub: React.FC = () => {
                 {activeTab === 'NFT_PARADISE' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {nfts.map((nft, i) => (
-                            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-2xl overflow-hidden group">
-                                <div className="aspect-square bg-slate-800 relative">
-                                    <img src={nft.imageUrl} alt={nft.name} className="w-full h-full object-cover" />
+                            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="neo-card rounded-2xl overflow-hidden group">
+                                <div className="aspect-square bg-zinc-900 relative">
+                                    <img src={nft.imageUrl} alt={nft.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                 </div>
                                 <div className="p-4">
                                     <h4 className="font-bold text-white">{nft.name}</h4>
-                                    <p className="text-xs text-slate-400 font-mono mt-1">Floor: {nft.floorPrice} ETH</p>
+                                    <p className="text-xs text-zinc-400 font-mono mt-1">Floor: {nft.floorPrice} ETH</p>
                                 </div>
                             </motion.div>
                         ))}
-                        {nfts.length === 0 && <div className="col-span-3 text-center py-20 text-slate-500">Brak NFT w połączonym portfelu.</div>}
+                        {nfts.length === 0 && <div className="col-span-3 text-center py-20 text-zinc-500">Brak NFT w połączonym portfelu.</div>}
                     </div>
                 )}
             </AnimatePresence>

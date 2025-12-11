@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { Integrations } from './components/Integrations';
-import { TaxCommandCenter } from './components/TaxCommandCenter'; // Replaced TaxWizard & TaxEngine view
+import { TaxCommandCenter } from './components/TaxCommandCenter';
 import { Documents } from './components/Documents';
 import { Settings } from './components/Settings';
 import { CryptoHub } from './components/CryptoHub';
@@ -37,6 +37,7 @@ import { NuffiPay } from './components/NuffiPay';
 import { Cards } from './components/Cards';
 import { Subscriptions } from './components/Subscriptions';
 import { SmartTreasury } from './components/SmartTreasury';
+import { Loans } from './components/Loans';
 
 // Investment Deck
 import { Derivatives } from './components/Derivatives';
@@ -68,7 +69,7 @@ import { Marketplace } from './components/Marketplace';
 import { DevPortal } from './components/DevPortal';
 import { SystemStatus } from './components/SystemStatus';
 import { HelpCenter } from './components/HelpCenter';
-import { DesignSystemPreview } from './components/DesignSystemPreview'; // NEW
+import { DesignSystemPreview } from './components/DesignSystemPreview';
 
 // Legacy / Extras / Tools
 import { Assets } from './components/Assets';
@@ -100,10 +101,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   
-  // Use Global Store for Workspace Context
   const { activeWorkspace } = useStore();
-  
-  // Lifted State for Search
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
@@ -112,22 +110,15 @@ export default function App() {
       return () => window.removeEventListener('nuffi:open-welcome', handleOpenWelcome);
   }, []);
 
-  // Reset View when switching workspaces to avoid confusion
   useEffect(() => {
       setCurrentView(ViewState.DASHBOARD);
   }, [activeWorkspace]);
 
-  // Global Keydown for Search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
-      }
-      // Optional: Open on '/' if not in input
-      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
-        e.preventDefault();
-        setIsSearchOpen(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -144,7 +135,6 @@ export default function App() {
   const renderContent = () => {
     let Component;
     switch (currentView) {
-        // Intelligence & Dashboard
         case ViewState.DASHBOARD: Component = Dashboard; break;
         case ViewState.LEDGERVERSE: Component = Ledgerverse; break;
         case ViewState.WAR_ROOM: Component = WarRoom; break;
@@ -152,16 +142,13 @@ export default function App() {
         case ViewState.RISK_CENTER: Component = RiskCenter; break;
         case ViewState.ESG: Component = ESG; break;
         case ViewState.MARKET_INTEL: Component = MarketIntel; break;
-
-        // Finance (Business)
         case ViewState.YAPILY_CONNECT: Component = YapilyConnect; break;
         case ViewState.TREASURY: Component = Treasury; break;
         case ViewState.SMART_TREASURY: Component = SmartTreasury; break;
         case ViewState.NUFFI_PAY: Component = NuffiPay; break;
         case ViewState.CARDS: Component = Cards; break;
         case ViewState.SUBSCRIPTIONS: Component = Subscriptions; break;
-
-        // Investment (Wealth)
+        case ViewState.LOANS: Component = Loans; break;
         case ViewState.CRYPTO_HUB: Component = CryptoHub; break;
         case ViewState.YIELD_SCOUT: Component = YieldScout; break;
         case ViewState.WEALTH: Component = Wealth; break;
@@ -171,21 +158,16 @@ export default function App() {
         case ViewState.DEFI_ARCHEOLOGY: Component = DeFiArcheology; break;
         case ViewState.WHALE_WATCHER: Component = WhaleWatcher; break;
         case ViewState.TOKEN_SCANNER: Component = TokenScanner; break;
-
-        // Accounting & Taxes (Unified)
-        case ViewState.TAX_WIZARD: // Fallback to unified center
-        case ViewState.TAX_ENGINE: // Fallback to unified center
+        case ViewState.TAX_WIZARD:
+        case ViewState.TAX_ENGINE:
             Component = TaxCommandCenter; 
             break;
-        
         case ViewState.GENERAL_LEDGER: Component = GeneralLedger; break;
         case ViewState.DOCUMENTS: Component = Documents; break;
         case ViewState.TAX_OPTIMIZER: Component = TaxOptimizer; break;
         case ViewState.AUDIT_DEFENDER: Component = TaxAuditDefender; break;
         case ViewState.REPORTS: Component = Reports; break;
         case ViewState.AUDIT_SNAPSHOTS: Component = AuditSnapshots; break;
-
-        // Operations
         case ViewState.CONTRACTORS: Component = Contractors; break;
         case ViewState.PROJECTS: Component = Projects; break;
         case ViewState.PAYROLL: Component = Payroll; break;
@@ -195,15 +177,11 @@ export default function App() {
         case ViewState.ECOMMERCE: Component = Ecommerce; break;
         case ViewState.CONTRACTS: Component = Contracts; break;
         case ViewState.MARKETPLACE: Component = Marketplace; break;
-
-        // Tools
         case ViewState.SETTINGS: Component = Settings; break;
         case ViewState.DEV_PORTAL: Component = DevPortal; break;
         case ViewState.SYSTEM_STATUS: Component = SystemStatus; break;
         case ViewState.HELP_CENTER: Component = HelpCenter; break;
-        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break; // NEW
-
-        // Extras / Legacy Mappings
+        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break;
         case ViewState.INTEGRATIONS: Component = Integrations; break;
         case ViewState.ASSETS: Component = Assets; break;
         case ViewState.BUDGETS: Component = Budgeting; break;
@@ -225,7 +203,6 @@ export default function App() {
         case ViewState.GLOBAL_TAX: Component = GlobalTax; break;
         case ViewState.ACCOUNTANT_DASHBOARD: Component = AccountantDashboard; break;
         case ViewState.SCENARIOS: Component = ScenarioPlanner; break;
-
         default: Component = Dashboard;
     }
 
@@ -252,12 +229,23 @@ export default function App() {
       );
   }
 
+  // --- DESIGN SYSTEM: VOID BLACK (DESIGN LABORATORY) ---
+  // Replaced bg-[#020617] with #050505 and added global atmosphere layer
   return (
-    <div className="flex min-h-screen font-sans bg-[#020617] text-slate-200 overflow-hidden relative selection:bg-indigo-500 selection:text-white">
-      {/* Mesh Gradient Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-20 mesh-bg"></div>
+    <div className="flex min-h-screen font-sans bg-[#050505] text-[#E1E1E3] overflow-hidden relative selection:bg-[#D4AF37] selection:text-black">
+      
+      {/* 1. ATMOSPHERE - COPIED FROM ONBOARDING (AUTH.TSX) */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+          {/* Grid */}
+          <div className="absolute inset-0" style={{ 
+              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)', 
+              backgroundSize: '50px 50px',
+              maskImage: 'radial-gradient(circle at center, black 40%, transparent 100%)'
+          }}></div>
+          {/* Gold Glow Only */}
+          <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[100px]"></div>
+      </div>
 
-      {/* Global Modals - Rendered at root level via Props */}
       <GlobalSearch 
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
@@ -273,7 +261,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
+              className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm"
               onClick={() => setSidebarOpen(false)}
             ></motion.div>
         )}
@@ -288,25 +276,25 @@ export default function App() {
       />
 
       <main className="flex-1 lg:ml-72 flex flex-col h-screen relative z-10 w-full transition-all duration-300">
-        <header className="h-16 bg-slate-950/50 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative">
+        {/* Header - Transparent Glass */}
+        <header className="h-16 bg-transparent backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative">
           <div className="flex items-center gap-4">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-slate-400 hover:text-white p-2 -ml-2">
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-zinc-400 hover:text-white p-2 -ml-2">
                   <Menu size={24} />
               </button>
               
-              {/* Functional Search Trigger */}
               <div 
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden md:flex items-center gap-3 w-96 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-white/10 hover:border-white/20 transition-all cursor-text group"
+                className="hidden md:flex items-center gap-3 w-96 bg-[#0F0F12]/80 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:border-[#D4AF37]/30 hover:bg-[#141419] transition-all cursor-text group"
               >
-                 <Search size={16} className="group-hover:text-indigo-400 transition-colors" />
+                 <Search size={16} className="group-hover:text-[#D4AF37] transition-colors" />
                  <input 
                     type="text" 
-                    placeholder={activeWorkspace === Workspace.BUSINESS ? "Szukaj faktur, klientów..." : "Szukaj tickerów, aktywów..."}
-                    className="bg-transparent border-none outline-none text-slate-200 placeholder-slate-500 w-full cursor-pointer pointer-events-none"
+                    placeholder={activeWorkspace === Workspace.BUSINESS ? "Szukaj faktur..." : "Szukaj aktywów..."}
+                    className="bg-transparent border-none outline-none text-[#E1E1E3] placeholder-zinc-600 w-full cursor-pointer pointer-events-none"
                     readOnly
                  />
-                 <div className="ml-auto flex items-center gap-1 text-[10px] bg-black/30 px-1.5 py-0.5 rounded text-slate-500 font-mono border border-white/5">
+                 <div className="ml-auto flex items-center gap-1 text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-zinc-500 font-mono border border-white/5">
                     <Command size={10} /> K
                  </div>
               </div>
@@ -316,12 +304,12 @@ export default function App() {
             <NotificationCenter onNavigate={setCurrentView} />
             <div className="flex items-center gap-3 pl-4 md:pl-6 border-l border-white/5">
                 <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold text-slate-200">{currentUser?.firstName} {currentUser?.lastName}</p>
-                    <p className="text-xs text-slate-500 truncate max-w-[150px]">{currentUser?.companyName}</p>
+                    <p className="text-sm font-bold text-[#E1E1E3]">{currentUser?.firstName} {currentUser?.lastName}</p>
+                    <p className="text-xs text-zinc-500 truncate max-w-[150px]">{currentUser?.companyName}</p>
                 </div>
                 <div 
                     onClick={() => setCurrentView(ViewState.SETTINGS)}
-                    className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20 cursor-pointer hover:scale-105 transition-transform border border-white/10"
+                    className="w-9 h-9 bg-[#141419] rounded-lg flex items-center justify-center text-white font-bold shadow-md border border-white/10 cursor-pointer hover:border-[#D4AF37]/50 transition-colors"
                 >
                     {currentUser?.firstName.charAt(0)}{currentUser?.lastName.charAt(0)}
                 </div>

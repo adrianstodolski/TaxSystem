@@ -47,19 +47,10 @@ export const Reports: React.FC = () => {
       toast.success('Eksport zakończony', 'Raport P&L został pobrany.');
   };
 
-  const getEventTypeColor = (type: string) => {
-      switch(type) {
-          case 'ZUS': return 'text-green-400 bg-green-500/20 border-green-500/30';
-          case 'VAT': return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
-          case 'PIT': return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
-          default: return 'text-slate-400 bg-slate-800 border-slate-700';
-      }
-  };
-
   if (loading) return (
       <div className="flex flex-col items-center justify-center h-96">
-          <Loader2 className="animate-spin text-indigo-500 mb-4" size={48} />
-          <p className="text-slate-500 font-medium">Generowanie raportów BI...</p>
+          <Loader2 className="animate-spin text-gold mb-4" size={48} />
+          <p className="text-zinc-500 font-medium">Generowanie raportów BI...</p>
       </div>
   );
 
@@ -68,20 +59,20 @@ export const Reports: React.FC = () => {
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <FileBarChart className="text-indigo-500" /> Raporty & BI
+            <FileBarChart className="text-gold" /> Raporty & BI
           </h2>
-          <p className="text-slate-400">Zaawansowana analityka finansowa i kalendarz fiskalny.</p>
+          <p className="text-zinc-400">Zaawansowana analityka finansowa i kalendarz fiskalny.</p>
         </div>
         <div className="flex gap-2">
             <button 
                 onClick={() => setActiveTab('PNL')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'PNL' ? 'bg-indigo-600 text-white shadow-glow' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'PNL' ? 'bg-gold text-black shadow-glow' : 'bg-onyx text-zinc-400 hover:text-white border border-white/5'}`}
             >
                 Rachunek Zysków i Strat
             </button>
             <button 
                 onClick={() => setActiveTab('CALENDAR')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'CALENDAR' ? 'bg-indigo-600 text-white shadow-glow' : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'CALENDAR' ? 'bg-gold text-black shadow-glow' : 'bg-onyx text-zinc-400 hover:text-white border border-white/5'}`}
             >
                 Kalendarz Podatkowy
             </button>
@@ -90,22 +81,22 @@ export const Reports: React.FC = () => {
 
       {activeTab === 'PNL' && report && (
           <div className="space-y-6">
-              <div className="glass-card p-6 rounded-2xl">
+              <div className="neo-card p-6 rounded-2xl">
                   <div className="flex justify-between items-start mb-8">
                       <div>
                           <h3 className="text-xl font-bold text-white">Rachunek Zysków i Strat (P&L)</h3>
-                          <p className="text-sm text-slate-400">Okres: {report.period}</p>
+                          <p className="text-sm text-zinc-400">Okres: {report.period}</p>
                       </div>
                       <div className="flex gap-2">
-                          <button onClick={handleExportPDF} className="flex items-center gap-2 text-sm text-white bg-slate-800 px-3 py-1.5 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700">
+                          <button onClick={handleExportPDF} className="flex items-center gap-2 text-sm text-white bg-white/5 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors border border-white/10">
                               <Download size={16} /> PDF
                           </button>
                       </div>
                   </div>
 
-                  <div className="overflow-hidden rounded-xl border border-white/10">
+                  <div className="overflow-hidden rounded-xl border border-white/5">
                       <table className="w-full text-sm">
-                          <thead className="bg-slate-900/50 text-slate-400">
+                          <thead className="bg-white/5 text-zinc-400">
                               <tr>
                                   <th className="px-6 py-3 text-left font-medium">Wyszczególnienie</th>
                                   <th className="px-6 py-3 text-right font-medium">Wartość PLN</th>
@@ -118,14 +109,14 @@ export const Reports: React.FC = () => {
                                   const percentage = revenueLine && revenueLine.value !== 0 ? (Math.abs(line.value) / revenueLine.value) * 100 : 0;
                                   
                                   return (
-                                    <tr key={idx} className={`${line.highlight ? 'bg-indigo-500/10' : 'hover:bg-white/5'} transition-colors`}>
-                                        <td className={`px-6 py-3 text-slate-300 ${line.isBold ? 'font-bold text-white' : ''}`} style={{paddingLeft: `${(line.indent * 20) + 24}px`}}>
+                                    <tr key={idx} className={`${line.highlight ? 'bg-gold/10' : 'hover:bg-white/5'} transition-colors`}>
+                                        <td className={`px-6 py-3 text-zinc-300 ${line.isBold ? 'font-bold text-white' : ''}`} style={{paddingLeft: `${(line.indent * 20) + 24}px`}}>
                                             {line.label}
                                         </td>
                                         <td className={`px-6 py-3 text-right font-mono ${line.value < 0 ? 'text-rose-400' : 'text-white'} ${line.isBold ? 'font-bold' : ''}`}>
                                             {formatCurrency(line.value)}
                                         </td>
-                                        <td className="px-6 py-3 text-right text-slate-500 text-xs">
+                                        <td className="px-6 py-3 text-right text-zinc-500 text-xs">
                                             {line.type !== 'REVENUE' ? `${percentage.toFixed(1)}%` : '100%'}
                                         </td>
                                     </tr>
@@ -139,9 +130,8 @@ export const Reports: React.FC = () => {
       )}
       
       {activeTab === 'CALENDAR' && (
-          <div className="glass-card p-6 rounded-2xl min-h-[500px]">
-              {/* Calendar content (simplified for brevity, reuse previous logic if needed) */}
-              <div className="text-center text-slate-400 py-20">Kalendarz w budowie...</div>
+          <div className="neo-card p-6 rounded-2xl min-h-[500px]">
+              <div className="text-center text-zinc-400 py-20">Kalendarz w budowie...</div>
           </div>
       )}
     </div>

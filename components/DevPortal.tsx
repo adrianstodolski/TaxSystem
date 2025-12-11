@@ -56,12 +56,12 @@ export const DevPortal: React.FC = () => {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Terminal className="text-indigo-400" /> Developer Portal
                     </h2>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-zinc-400 mt-1">
                         Zarządzanie dostępem API, kluczami i monitorowanie zużycia.
                     </p>
                 </div>
                 <button 
-                    className="bg-slate-900 border border-slate-700 text-slate-300 px-4 py-2 rounded-xl font-bold hover:bg-slate-800 hover:text-white flex items-center gap-2 shadow-sm text-sm"
+                    className="bg-white/5 border border-white/10 text-zinc-300 px-4 py-2 rounded-xl font-bold hover:bg-white/10 hover:text-white flex items-center gap-2 shadow-sm text-sm"
                     onClick={() => window.open('https://docs.nuffi.io', '_blank')}
                 >
                     <Activity size={16} /> Dokumentacja API
@@ -70,25 +70,25 @@ export const DevPortal: React.FC = () => {
 
             {/* Usage Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl border border-white/10">
-                    <p className="text-slate-400 text-xs font-bold uppercase mb-2">Total Requests (30d)</p>
+                <div className="bg-[#0A0A0C] text-white p-6 rounded-2xl shadow-xl border border-white/10">
+                    <p className="text-zinc-400 text-xs font-bold uppercase mb-2">Total Requests (30d)</p>
                     <h3 className="text-3xl font-bold font-mono">{usage?.totalRequests.toLocaleString() || '...'}</h3>
                 </div>
-                <div className="glass-card p-6 rounded-2xl">
-                    <p className="text-slate-500 text-xs font-bold uppercase mb-2">Avg. Latency</p>
+                <div className="neo-card p-6 rounded-2xl">
+                    <p className="text-zinc-500 text-xs font-bold uppercase mb-2">Avg. Latency</p>
                     <h3 className="text-3xl font-bold text-white font-mono">{usage?.avgLatency || '...'} ms</h3>
                 </div>
-                <div className="glass-card p-6 rounded-2xl">
-                    <p className="text-slate-500 text-xs font-bold uppercase mb-2">Error Rate</p>
+                <div className="neo-card p-6 rounded-2xl">
+                    <p className="text-zinc-500 text-xs font-bold uppercase mb-2">Error Rate</p>
                     <h3 className="text-3xl font-bold text-green-400 font-mono">{usage?.errorRate || '0'}%</h3>
                 </div>
             </div>
 
             {/* API Keys */}
-            <div className="glass-card rounded-2xl overflow-hidden">
-                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-900/30">
+            <div className="neo-card rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                     <h3 className="font-bold text-white flex items-center gap-2">
-                        <Key size={18} className="text-slate-400" /> API Keys
+                        <Key size={18} className="text-zinc-400" /> API Keys
                     </h3>
                     <button 
                         onClick={() => setCreateModal(true)}
@@ -103,15 +103,15 @@ export const DevPortal: React.FC = () => {
                             <div>
                                 <div className="flex items-center gap-3 mb-1">
                                     <h4 className="font-bold text-white text-sm">{key.name}</h4>
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${key.type === 'LIVE' ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-slate-700 text-slate-300 border-slate-600'}`}>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${key.type === 'LIVE' ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-slate-700 text-zinc-300 border-slate-600'}`}>
                                         {key.type}
                                     </span>
                                 </div>
-                                <div className="font-mono text-xs text-slate-400 bg-slate-900 px-2 py-1 rounded inline-block border border-slate-700">
+                                <div className="font-mono text-xs text-zinc-400 bg-black/40 px-2 py-1 rounded inline-block border border-white/5">
                                     {key.prefix}
                                 </div>
                             </div>
-                            <div className="text-right text-xs text-slate-500">
+                            <div className="text-right text-xs text-zinc-500">
                                 <p>Utworzono: {key.created}</p>
                                 <p>Ostatnie użycie: {key.lastUsed}</p>
                             </div>
@@ -121,9 +121,9 @@ export const DevPortal: React.FC = () => {
             </div>
 
             {/* Usage Chart */}
-            <div className="glass-card p-6 rounded-2xl h-80">
+            <div className="neo-card p-6 rounded-2xl h-80">
                 <h3 className="font-bold text-white mb-6 flex items-center gap-2">
-                    <BarChart2 size={18} className="text-slate-400" /> Request Volume
+                    <BarChart2 size={18} className="text-zinc-400" /> Request Volume
                 </h3>
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={usage?.history || []}>
@@ -147,7 +147,7 @@ export const DevPortal: React.FC = () => {
                 {!createdKey ? (
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-bold text-slate-400 mb-1">Nazwa Klucza</label>
+                            <label className="block text-sm font-bold text-zinc-400 mb-1">Nazwa Klucza</label>
                             <input 
                                 type="text" 
                                 value={newKeyName} 
@@ -157,12 +157,12 @@ export const DevPortal: React.FC = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-400 mb-1">Środowisko</label>
+                            <label className="block text-sm font-bold text-zinc-400 mb-1">Środowisko</label>
                             <div className="flex gap-4">
-                                <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-300">
+                                <label className="flex items-center gap-2 text-sm cursor-pointer text-zinc-300">
                                     <input type="radio" checked={newKeyType === 'TEST'} onChange={() => setNewKeyType('TEST')} /> Test Mode
                                 </label>
-                                <label className="flex items-center gap-2 text-sm cursor-pointer text-slate-300">
+                                <label className="flex items-center gap-2 text-sm cursor-pointer text-zinc-300">
                                     <input type="radio" checked={newKeyType === 'LIVE'} onChange={() => setNewKeyType('LIVE')} /> Live Mode
                                 </label>
                             </div>
@@ -192,7 +192,7 @@ export const DevPortal: React.FC = () => {
                             />
                             <button 
                                 onClick={() => copyToClipboard(createdKey)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-white/10 rounded text-slate-400 hover:text-indigo-400 transition-colors"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-white/10 rounded text-zinc-400 hover:text-indigo-400 transition-colors"
                             >
                                 <Copy size={16} />
                             </button>

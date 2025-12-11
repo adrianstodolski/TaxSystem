@@ -22,10 +22,10 @@ export const Projects: React.FC = () => {
 
     const getStatusStyle = (status: string) => {
         switch(status) {
-            case 'ACTIVE': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-            case 'COMPLETED': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-            case 'ARCHIVED': return 'bg-slate-700 text-slate-400 border-slate-600';
-            default: return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+            case 'ACTIVE': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+            case 'COMPLETED': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+            case 'ARCHIVED': return 'bg-zinc-800 text-zinc-400 border-zinc-700';
+            default: return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
         }
     };
 
@@ -34,13 +34,13 @@ export const Projects: React.FC = () => {
             <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <FolderKanban className="text-indigo-400" /> Controlling Projektów
+                        <FolderKanban className="text-gold" /> Controlling Projektów
                     </h2>
-                    <p className="text-slate-400 mt-1">Analiza rentowności i zarządzanie budżetami projektowymi.</p>
+                    <p className="text-zinc-400 mt-1">Analiza rentowności i zarządzanie budżetami projektowymi.</p>
                 </div>
                 <button 
                     onClick={() => toast.info('Nowy Projekt', 'Kreator projektu dostępny w pełnej wersji.')}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 flex items-center gap-2 shadow-lg shadow-indigo-900/50 transition-all"
+                    className="bg-gold text-black px-4 py-2 rounded-xl font-bold hover:bg-[#FCD34D] flex items-center gap-2 shadow-[0_0_20px_-5px_rgba(212,175,55,0.4)] transition-all"
                 >
                     <Plus size={18} /> Nowy Projekt
                 </button>
@@ -48,21 +48,21 @@ export const Projects: React.FC = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glass-card p-6 rounded-2xl">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Aktywne Budżety</p>
-                    <h3 className="text-3xl font-bold text-white mt-2">
+                <div className="neo-card p-6 rounded-2xl">
+                    <p className="text-xs font-bold text-zinc-500 uppercase">Aktywne Budżety</p>
+                    <h3 className="text-3xl font-bold text-white mt-2 font-mono">
                         {loading ? '...' : formatCurrency(projects.filter(p => p.status === 'ACTIVE').reduce((acc, p) => acc + p.budget, 0))}
                     </h3>
                 </div>
-                <div className="glass-card p-6 rounded-2xl">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Łączna Rentowność (Margin)</p>
-                    <h3 className="text-3xl font-bold text-emerald-400 mt-2">
+                <div className="neo-card p-6 rounded-2xl">
+                    <p className="text-xs font-bold text-zinc-500 uppercase">Łączna Rentowność (Margin)</p>
+                    <h3 className="text-3xl font-bold text-emerald-400 mt-2 font-mono">
                         {loading ? '...' : '42.5%'}
                     </h3>
                 </div>
-                <div className="glass-card p-6 rounded-2xl">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Koszty Projektowe (YTD)</p>
-                    <h3 className="text-3xl font-bold text-white mt-2">
+                <div className="neo-card p-6 rounded-2xl">
+                    <p className="text-xs font-bold text-zinc-500 uppercase">Koszty Projektowe (YTD)</p>
+                    <h3 className="text-3xl font-bold text-white mt-2 font-mono">
                         {loading ? '...' : formatCurrency(projects.reduce((acc, p) => acc + p.spent, 0))}
                     </h3>
                 </div>
@@ -70,13 +70,13 @@ export const Projects: React.FC = () => {
 
             {/* Project List */}
             <div className="grid grid-cols-1 gap-6">
-                {loading ? [1,2].map(i => <div key={i} className="h-40 bg-slate-800/50 rounded-xl animate-pulse" />) : 
+                {loading ? [1,2].map(i => <div key={i} className="h-40 bg-white/5 rounded-xl animate-pulse" />) : 
                     projects.map(project => {
                         const progress = (project.spent / project.budget) * 100;
                         const isOverBudget = progress > 100;
                         
                         return (
-                            <div key={project.id} className="glass-card p-6 rounded-2xl hover:border-indigo-500/40 transition-all group relative overflow-hidden">
+                            <div key={project.id} className="neo-card p-6 rounded-2xl hover:border-gold/30 transition-all group relative overflow-hidden">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-2">
@@ -85,14 +85,14 @@ export const Projects: React.FC = () => {
                                                 {project.status}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-slate-400 flex items-center gap-2">
-                                            <span className="font-medium text-slate-300">{project.client}</span>
-                                            <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
+                                        <p className="text-sm text-zinc-400 flex items-center gap-2">
+                                            <span className="font-medium text-zinc-300">{project.client}</span>
+                                            <span className="w-1 h-1 bg-zinc-600 rounded-full"></span>
                                             <span>Start: {project.startDate}</span>
                                         </p>
                                         <div className="flex gap-2 mt-3">
                                             {project.tags.map(tag => (
-                                                <span key={tag} className="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded font-medium border border-slate-700">#{tag}</span>
+                                                <span key={tag} className="text-xs bg-black/40 text-zinc-400 px-2 py-1 rounded font-medium border border-white/5">#{tag}</span>
                                             ))}
                                         </div>
                                     </div>
@@ -100,31 +100,31 @@ export const Projects: React.FC = () => {
                                     {/* Stats */}
                                     <div className="flex gap-8 items-center w-full md:w-auto">
                                         <div className="text-right">
-                                            <p className="text-xs text-slate-500 uppercase font-bold">Marża</p>
-                                            <p className={`text-lg font-bold ${project.profitMargin > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                            <p className="text-xs text-zinc-500 uppercase font-bold">Marża</p>
+                                            <p className={`text-lg font-bold font-mono ${project.profitMargin > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                                 {(project.profitMargin * 100).toFixed(1)}%
                                             </p>
                                         </div>
                                         <div className="w-px h-10 bg-white/10 hidden md:block"></div>
                                         <div className="flex-1 md:w-64">
                                             <div className="flex justify-between text-xs mb-1">
-                                                <span className="font-bold text-slate-300">{formatCurrency(project.spent)}</span>
-                                                <span className="text-slate-500">{formatCurrency(project.budget)}</span>
+                                                <span className="font-bold text-zinc-300">{formatCurrency(project.spent)}</span>
+                                                <span className="text-zinc-500">{formatCurrency(project.budget)}</span>
                                             </div>
-                                            <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                            <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden border border-white/5">
                                                 <div 
                                                     className={`h-full rounded-full ${isOverBudget ? 'bg-rose-500 shadow-[0_0_10px_#f43f5e]' : 'bg-indigo-500 shadow-[0_0_10px_#6366f1]'}`} 
                                                     style={{width: `${Math.min(100, progress)}%`}}
                                                 ></div>
                                             </div>
-                                            <p className="text-[10px] text-right mt-1 text-slate-500">
+                                            <p className="text-[10px] text-right mt-1 text-zinc-500">
                                                 {progress.toFixed(0)}% budżetu
                                             </p>
                                         </div>
                                     </div>
                                     
                                     <div className="md:ml-4">
-                                        <button className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-colors">
+                                        <button className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors">
                                             <MoreHorizontal size={20} />
                                         </button>
                                     </div>

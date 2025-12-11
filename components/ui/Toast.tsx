@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Info, X, AlertTriangle } from 'lucide-react';
 import { Notification, NotificationType } from '../../types';
@@ -43,35 +44,35 @@ export const Toaster: React.FC = () => {
 
   const getIcon = (type: NotificationType) => {
     switch (type) {
-      case 'SUCCESS': return <CheckCircle2 size={20} className="text-green-500" />;
-      case 'ERROR': return <AlertCircle size={20} className="text-red-500" />;
-      case 'WARNING': return <AlertTriangle size={20} className="text-amber-500" />;
-      case 'INFO': return <Info size={20} className="text-blue-500" />;
+      case 'SUCCESS': return <CheckCircle2 size={20} className="text-emerald-400" />;
+      case 'ERROR': return <AlertCircle size={20} className="text-rose-500" />;
+      case 'WARNING': return <AlertTriangle size={20} className="text-amber-400" />;
+      case 'INFO': return <Info size={20} className="text-blue-400" />;
     }
   };
 
   const getBorderColor = (type: NotificationType) => {
     switch (type) {
-      case 'SUCCESS': return 'border-green-200 bg-green-50';
-      case 'ERROR': return 'border-red-200 bg-red-50';
-      case 'WARNING': return 'border-amber-200 bg-amber-50';
-      case 'INFO': return 'border-blue-200 bg-blue-50';
+      case 'SUCCESS': return 'border-emerald-500/20 bg-emerald-950/40';
+      case 'ERROR': return 'border-rose-500/20 bg-rose-950/40';
+      case 'WARNING': return 'border-amber-500/20 bg-amber-950/40';
+      case 'INFO': return 'border-blue-500/20 bg-blue-950/40';
     }
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3">
+    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none">
       {toasts.map((t) => (
         <div 
           key={t.id} 
-          className={`w-80 p-4 rounded-xl shadow-lg border flex items-start gap-3 animate-in slide-in-from-right-full duration-300 ${getBorderColor(t.type)}`}
+          className={`pointer-events-auto w-80 p-4 rounded-xl shadow-lg border flex items-start gap-3 animate-in slide-in-from-right-full duration-300 backdrop-blur-md ${getBorderColor(t.type)}`}
         >
           <div className="shrink-0 mt-0.5">{getIcon(t.type)}</div>
           <div className="flex-1">
-            <h4 className="font-bold text-gray-900 text-sm">{t.title}</h4>
-            <p className="text-xs text-gray-600 mt-1">{t.message}</p>
+            <h4 className="font-bold text-white text-sm">{t.title}</h4>
+            <p className="text-xs text-zinc-300 mt-1">{t.message}</p>
           </div>
-          <button onClick={() => removeToast(t.id)} className="text-gray-400 hover:text-gray-600">
+          <button onClick={() => removeToast(t.id)} className="text-zinc-500 hover:text-white transition-colors">
             <X size={16} />
           </button>
         </div>

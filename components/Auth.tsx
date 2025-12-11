@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { NuffiService } from '../services/api';
-import { ShieldCheck, ArrowRight, Loader2, CheckCircle2, Building, Mail, Lock, UserCheck, Fingerprint, MapPin, Hash, Search, Home, Map, Activity, Check, Briefcase, FileText, Info, Download, History, Printer, Plus, Minus, ScanFace, FileSearch, Database, Terminal, Shield, X, Wallet } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Loader2, CheckCircle2, Building, Mail, Lock, UserCheck, Fingerprint, MapPin, Hash, Search, Home, Map, Activity, Check, Briefcase, FileText, Info, Download, History, Printer, Plus, Minus, ScanFace, FileSearch, Database, Terminal, Shield, X, Wallet, Sparkles } from 'lucide-react';
 import { SubscriptionPlan, UserProfile } from '../types';
 import { toast } from './ui/Toast';
 import { Modal } from './ui/Modal';
+import { motion } from 'framer-motion';
 
 interface AuthProps {
   onLogin: (token: string, plan: SubscriptionPlan, user: UserProfile) => void;
@@ -18,74 +19,21 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [nip, setNip] = useState('');
   const [gusData, setGusData] = useState<any>(null);
   const [checkingNip, setCheckingNip] = useState(false);
-  const [kycStatus, setKycStatus] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS'>('IDLE');
-  const [kycStage, setKycStage] = useState('');
-  const [kycProgress, setKycProgress] = useState(0);
-  const [kycLogs, setKycLogs] = useState<string[]>([]);
-  const logsEndRef = useRef<HTMLDivElement>(null);
-  const [isCeidgSource, setIsCeidgSource] = useState(false);
-  const [reportTab, setReportTab] = useState<'DETAILS' | 'HISTORY'>('DETAILS');
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [mapZoom, setMapZoom] = useState(1);
-  const [showPdf, setShowPdf] = useState(false);
-  const [companyName, setCompanyName] = useState('');
-  const [street, setStreet] = useState('');
-  const [houseNumber, setHouseNumber] = useState('');
-  const [aptNumber, setAptNumber] = useState('');
-  const [companyCity, setCompanyCity] = useState('');
-  const [companyZip, setCompanyZip] = useState('');
-  const [pkd, setPkd] = useState('');
-  const [pkdDesc, setPkdDesc] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [vatStatus, setVatStatus] = useState<string>('');
-  const [regon, setRegon] = useState('');
-  const [legalForm, setLegalForm] = useState<string>('');
-  const [shareCapital, setShareCapital] = useState<number | undefined>(undefined);
-  const [representatives, setRepresentatives] = useState<string[]>([]);
-  const [krs, setKrs] = useState<string>('');
-
-  useEffect(() => {
-      if (logsEndRef.current) {
-          logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-  }, [kycLogs]);
-
+  
+  // Login Handlers
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+        await new Promise(r => setTimeout(r, 1000)); // Cinematic delay
         const { token, plan, user } = await NuffiService.login(email, password);
         onLogin(token, plan, user);
-        toast.success('Witaj z powrotem!', 'Zalogowano pomyślnie.');
+        toast.success('Access Granted', 'Witaj w Nuffi OS.');
     } catch (err) {
-        toast.error('Błąd logowania', 'Nieprawidłowy email lub hasło. Użyj demo@nuffi.com');
+        toast.error('Access Denied', 'Nieprawidłowe poświadczenia.');
     } finally {
         setLoading(false);
     }
-  };
-
-  const handleCivicLogin = async () => {
-      setLoading(true);
-      toast.info('Civic Identity', 'Łączenie z Civic Auth...');
-      await new Promise(r => setTimeout(r, 2000));
-      toast.success('Zweryfikowano przez Civic', 'Tożsamość potwierdzona biometrycznie.');
-      const { token, plan, user } = await NuffiService.login('demo@nuffi.com', 'password');
-      onLogin(token, plan, user);
-      setLoading(false);
-  };
-
-  const handleNftLogin = async () => {
-      setLoading(true);
-      toast.info('Moralis Token Gate', 'Sprawdzanie posiadania NFT dostępowego...');
-      const hasAccess = await NuffiService.verifyNftAccess('0xUserWallet');
-      if (hasAccess) {
-          toast.success('Dostęp przyznany', 'Weryfikacja NFT pomyślna. Witaj w Nuffi Premium.');
-          const { token, plan, user } = await NuffiService.login('demo@nuffi.com', 'password');
-          onLogin(token, plan, user);
-      } else {
-          toast.error('Brak dostępu', 'Nie posiadasz wymaganego NFT w portfelu.');
-      }
-      setLoading(false);
   };
 
   const handleNipCheck = async () => {
@@ -93,54 +41,8 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       setCheckingNip(true);
       const data = await NuffiService.fetchGusData(nip);
       setGusData(data);
-      if (data) {
-          setCompanyName(data.name);
-          setStreet(data.street || '');
-          setHouseNumber(data.propertyNumber || '');
-          setAptNumber(data.apartmentNumber || '');
-          setCompanyCity(data.city);
-          setCompanyZip(data.zipCode);
-          setPkd(data.pkd || '');
-          setPkdDesc(data.pkdDesc || '');
-          setStartDate(data.startDate || '');
-          setVatStatus(data.vatStatus || '');
-          setRegon(data.regon || '');
-          setLegalForm(data.legalForm || 'JDG');
-          setShareCapital(data.shareCapital);
-          setRepresentatives(data.representatives || []);
-          setKrs(data.krs || '');
-          setIsCeidgSource(true);
-          toast.success('Pobrano dane z CEIDG/GUS', `Formularz uzupełniony dla firmy: ${data.name}`);
-      } else {
-          toast.warning('Nie znaleziono firmy', 'Sprawdź poprawność numeru NIP lub spróbuj ponownie.');
-      }
       setCheckingNip(false);
-  };
-
-  // ... (rest of KYC logic same as before but wrapped in glassmorphism) ...
-  const startKycProcess = async () => {
-      setKycStatus('PROCESSING');
-      setKycLogs([]);
-      setKycProgress(0);
-      const addLog = (msg: string) => setKycLogs(prev => [...prev, `[${new Date().toLocaleTimeString().split(' ')[0]}] ${msg}`]);
-      const stages = [
-          { name: 'ID_SCAN', label: 'Weryfikacja Dokumentu', steps: ['Initializing secure session (TLS 1.3)...', 'Connecting to identity provider...', 'Requesting camera access...', 'Capturing ID document (Front)...', 'Analyzing hologram pattern...', 'Extracting OCR data...', 'Checksum validation: OK.'] },
-          { name: 'BIOMETRICS', label: 'Analiza Biometryczna', steps: ['Locating facial features...', 'Mapping 3D depth grid...', 'Checking liveness (active blink)...', 'Calculating face vector hash...', 'Matching face with ID photo...', 'Similarity Score: 99.8%.'] },
-          { name: 'COMPLIANCE', label: 'AML & Sankcje', steps: ['Connecting to global databases...', 'Scanning PEP lists (Politically Exposed)...', 'Checking OFAC/EU sanction lists...', 'Analyzing adverse media...', 'Risk Assessment: LOW.'] }
-      ];
-      let totalSteps = stages.reduce((acc, stage) => acc + stage.steps.length, 0);
-      let currentStep = 0;
-      for (const stage of stages) {
-          setKycStage(stage.name);
-          for (const step of stage.steps) {
-             addLog(step);
-             currentStep++;
-             setKycProgress((currentStep / totalSteps) * 100);
-             await new Promise(r => setTimeout(r, 600));
-          }
-      }
-      addLog('Verification Complete. Access Granted.');
-      setKycStatus('SUCCESS');
+      if(data) toast.success('GUS/CEIDG', 'Pobrano dane firmy.');
   };
 
   const handleRegister = async () => {
@@ -151,208 +53,206 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       setLoading(false);
   };
 
-  const downloadExtract = async () => {
-      setIsDownloading(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setIsDownloading(false);
-      setShowPdf(true);
-      toast.success('Pobrano Dokument', `Oficjalny odpis ${legalForm === 'JDG' ? 'CEIDG' : 'KRS'} dla NIP ${nip} został wygenerowany.`);
-  };
-
-  const getLegalFormLabel = (code: string) => {
-      switch(code) {
-          case 'JDG': return 'Jednoosobowa Działalność';
-          case 'KRS_SP_Z_OO': return 'Spółka z o.o.';
-          case 'KRS_SA': return 'Spółka Akcyjna';
-          case 'KRS_SP_KOM': return 'Spółka Komandytowa';
-          case 'CIVIL': return 'Spółka Cywilna';
-          default: return code;
-      }
-  };
-
-  const formatCurrency = (val: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(val);
-
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background with reliable gradients */}
-      <div className="absolute inset-0 bg-slate-950 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/60 via-slate-950 to-black z-0"></div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -mr-20 -mt-20 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] -ml-20 -mb-20 pointer-events-none"></div>
-      </div>
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden font-sans selection:bg-[#D4AF37] selection:text-black">
       
-      <div className="relative z-10 glass-card rounded-2xl shadow-2xl w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 overflow-hidden border border-white/5">
+      {/* --- BACKGROUND ATMOSPHERE --- */}
+      <div className="absolute inset-0 pointer-events-none">
+          {/* Grid */}
+          <div className="absolute inset-0" style={{ 
+              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)', 
+              backgroundSize: '50px 50px',
+              maskImage: 'radial-gradient(circle at center, black 40%, transparent 100%)'
+          }}></div>
+          {/* Gold Glow Only */}
+          <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[100px]"></div>
+      </div>
+
+      {/* --- MAIN CARD --- */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-[#0A0A0C]/80 backdrop-blur-2xl border border-white/5 rounded-3xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.7)] overflow-hidden"
+      >
         
-        {/* Left Side: Brand */}
-        <div className="bg-indigo-600/90 backdrop-blur-xl p-12 text-white flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/20 rounded-full blur-3xl -ml-16 -mb-16"></div>
+        {/* LEFT: BRANDING */}
+        <div className="relative p-12 flex flex-col justify-between border-r border-white/5 overflow-hidden group">
+            {/* Dynamic Background on Hover */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
             
             <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="bg-white/20 p-2 rounded-lg backdrop-blur-md">
-                        <ShieldCheck size={32} />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center">
+                        <ShieldCheck className="text-[#D4AF37]" size={20} />
                     </div>
-                    <span className="text-2xl font-bold tracking-tight font-mono">Nuffi OS</span>
+                    <span className="text-2xl font-bold text-white tracking-tight font-mono">Nuffi<span className="text-[#D4AF37]">.OS</span></span>
                 </div>
-                <h2 className="text-4xl font-bold mb-6 leading-tight">
-                    {mode === 'LOGIN' ? 'Twoje Finanse.\nPod Kontrolą.' : 'Rejestracja Firmy.\nAutomatycznie.'}
-                </h2>
-                <p className="text-indigo-100 text-lg">
-                    Kompleksowa platforma podatkowa dla nowoczesnych przedsiębiorców. KSeF, Open Banking i Krypto w jednym terminalu.
+                
+                <h1 className="text-5xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+                    Architektura <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">Twojego Kapitału.</span>
+                </h1>
+                
+                <p className="text-zinc-400 text-lg leading-relaxed max-w-md">
+                    Symbioza tradycyjnej księgowości i aktywów cyfrowych. 
+                    Pełna automatyzacja KSeF, AI Tax Optimization i Wealth Management w jednym terminalu.
                 </p>
-                <div className="mt-8 flex items-center gap-2 text-xs bg-indigo-800/50 p-2 rounded border border-indigo-400/30 w-fit backdrop-blur-sm">
-                    <ShieldCheck size={14} /> Secured by SumSub & Civic
-                </div>
             </div>
-            
-            <div className="relative z-10 mt-12 flex items-center gap-4 text-sm font-medium text-indigo-200">
-                <div className="flex -space-x-2">
-                    {[1,2,3].map(i => (
-                        <div key={i} className="w-8 h-8 rounded-full bg-white/20 border-2 border-indigo-600"></div>
-                    ))}
+
+            <div className="relative z-10 mt-12">
+                <div className="flex items-center gap-4 text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">
+                    <span>Trusted by leaders</span>
+                    <div className="h-px bg-white/10 flex-1"></div>
                 </div>
-                <span>Dołącz do 10,000+ firm</span>
+                <div className="flex gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                    <div className="h-8 w-24 bg-white/10 rounded flex items-center justify-center font-bold text-white">Google</div>
+                    <div className="h-8 w-24 bg-white/10 rounded flex items-center justify-center font-bold text-white">Stripe</div>
+                    <div className="h-8 w-24 bg-white/10 rounded flex items-center justify-center font-bold text-white">Binance</div>
+                </div>
             </div>
         </div>
 
-        {/* Right Side: Form */}
-        <div className="p-12 flex flex-col justify-center overflow-y-auto max-h-[90vh] custom-scrollbar bg-slate-900/50">
-            <div className="flex justify-end mb-8">
-                <button 
-                    onClick={() => { setMode(mode === 'LOGIN' ? 'REGISTER' : 'LOGIN'); setGusData(null); setKycStatus('IDLE'); setNip(''); setIsCeidgSource(false); }}
-                    className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                    {mode === 'LOGIN' ? 'Nie masz konta? Zarejestruj się' : 'Masz już konto? Zaloguj się'}
-                </button>
-            </div>
-
+        {/* RIGHT: FORM */}
+        <div className="p-12 bg-[#050505] flex flex-col justify-center">
             {mode === 'LOGIN' ? (
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div>
-                        <h3 className="text-2xl font-bold text-white mb-1">Zaloguj się</h3>
-                        <p className="text-slate-400 text-sm">Użyj demo@nuffi.com / password</p>
+                        <h2 className="text-2xl font-bold text-white mb-2">Witaj w systemie</h2>
+                        <p className="text-zinc-500 text-sm">Zaloguj się, aby uzyskać dostęp do terminala.</p>
                     </div>
-                    
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div className="relative">
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input 
-                                type="email" 
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-white placeholder-slate-500"
-                                placeholder="Adres email"
-                            />
+
+                    <form onSubmit={handleLogin} className="space-y-5">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-1">Email</label>
+                            <div className="relative group">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-white transition-colors" size={18} />
+                                <input 
+                                    type="email" 
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 bg-[#0A0A0C] border border-white/10 rounded-xl text-white placeholder-zinc-700 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all outline-none"
+                                    placeholder="name@company.com"
+                                />
+                            </div>
                         </div>
-                        <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input 
-                                type="password" 
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-white placeholder-slate-500"
-                                placeholder="Hasło"
-                            />
+
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between ml-1">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Hasło</label>
+                                <a href="#" className="text-[10px] text-[#D4AF37] hover:underline">Reset?</a>
+                            </div>
+                            <div className="relative group">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-white transition-colors" size={18} />
+                                <input 
+                                    type="password" 
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-4 bg-[#0A0A0C] border border-white/10 rounded-xl text-white placeholder-zinc-700 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all outline-none"
+                                    placeholder="••••••••"
+                                />
+                            </div>
                         </div>
 
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/50"
+                            className="w-full bg-[#D4AF37] text-black py-4 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_-5px_rgba(212,175,55,0.4)] hover:shadow-[0_0_30px_-5px_rgba(212,175,55,0.6)] disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            {loading ? <Loader2 className="animate-spin" /> : <>Zaloguj się <ArrowRight size={18} /></>}
+                            {loading ? <Loader2 className="animate-spin" /> : <>Uruchom Terminal <ArrowRight size={18} /></>}
                         </button>
                     </form>
 
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-700"></div></div>
-                        <div className="relative flex justify-center text-sm"><span className="px-2 bg-slate-900 text-slate-500">lub</span></div>
+                    <div className="relative py-4">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
+                        <div className="relative flex justify-center text-xs uppercase"><span className="px-4 bg-[#050505] text-zinc-600">Alternatywne Metody</span></div>
                     </div>
 
-                    <button 
-                        onClick={handleCivicLogin}
-                        className="w-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 py-3 rounded-xl font-bold hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2"
-                    >
-                        <Fingerprint size={18} /> Zaloguj z Civic Secure ID
-                    </button>
+                    <div className="grid grid-cols-2 gap-4">
+                        <button className="flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-zinc-300 text-sm font-bold transition-all">
+                            <Fingerprint size={16} /> Civic ID
+                        </button>
+                        <button className="flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-zinc-300 text-sm font-bold transition-all">
+                            <Wallet size={16} /> Wallet Connect
+                        </button>
+                    </div>
 
-                    <button 
-                        onClick={handleNftLogin}
-                        className="w-full border border-purple-500/30 text-purple-400 bg-purple-500/10 py-3 rounded-xl font-bold hover:bg-purple-500/20 transition-all flex items-center justify-center gap-2 mt-3"
-                    >
-                        <Wallet size={18} /> Zaloguj portfelem (NFT Gate)
-                    </button>
+                    <div className="text-center">
+                        <button onClick={() => setMode('REGISTER')} className="text-zinc-500 hover:text-white text-sm transition-colors">
+                            Nie posiadasz konta? <span className="text-[#D4AF37] font-bold">Dołącz do Nuffi</span>
+                        </button>
+                    </div>
                 </div>
             ) : (
-                // REGISTER MODE (Simplified for styling focus)
-                <div className="space-y-6">
+                <div className="space-y-8 animate-in fade-in slide-in-from-right-8">
                     <div>
-                        <h3 className="text-2xl font-bold text-white mb-1">Stwórz konto firmowe</h3>
-                        <p className="text-slate-400 text-sm">Pobierzemy dane z CEIDG / GUS automatycznie.</p>
+                        <h2 className="text-2xl font-bold text-white mb-2">Rejestracja Podmiotu</h2>
+                        <p className="text-zinc-500 text-sm">Automatyczny pobór danych z rejestrów (GUS/CEIDG/KRS).</p>
                     </div>
 
                     {!gusData ? (
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Podaj NIP</label>
-                                <div className="flex gap-2">
-                                    <div className="relative flex-1">
-                                        <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                        <input 
-                                            type="text" 
-                                            value={nip}
-                                            onChange={e => setNip(e.target.value)}
-                                            onKeyDown={e => e.key === 'Enter' && handleNipCheck()}
-                                            placeholder="np. 5213214567"
-                                            className="w-full pl-11 pr-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-white placeholder-slate-500"
-                                        />
-                                    </div>
+                        <div className="space-y-6">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-1">Numer NIP</label>
+                                <div className="relative group">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-white transition-colors" size={18} />
+                                    <input 
+                                        type="text" 
+                                        value={nip}
+                                        onChange={e => setNip(e.target.value)}
+                                        onKeyDown={e => e.key === 'Enter' && handleNipCheck()}
+                                        className="w-full pl-12 pr-4 py-4 bg-[#0A0A0C] border border-white/10 rounded-xl text-white placeholder-zinc-700 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all outline-none font-mono"
+                                        placeholder="000-000-00-00"
+                                    />
                                     <button 
                                         onClick={handleNipCheck}
                                         disabled={checkingNip || nip.length < 10}
-                                        className="bg-indigo-600 text-white px-6 rounded-xl font-bold hover:bg-indigo-500 disabled:opacity-50 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-900/50"
+                                        className="absolute right-2 top-2 bottom-2 bg-white/10 hover:bg-white/20 text-white px-4 rounded-lg font-bold text-xs transition-colors disabled:opacity-0"
                                     >
-                                        {checkingNip ? <Loader2 className="animate-spin" /> : <><Search size={18} /> Szukaj</>}
+                                        {checkingNip ? <Loader2 className="animate-spin" size={16} /> : 'Pobierz'}
                                     </button>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 h-full text-white">
-                            {/* ... KYC Visualization & Data Form (Styled Dark) ... */}
-                            <div className="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
-                                    <CheckCircle2 size={16} /> Dane pobrane z CEIDG/KRS
+                        <div className="space-y-6">
+                            <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex items-start gap-4">
+                                <div className="p-2 bg-green-500/20 rounded-lg text-green-400">
+                                    <CheckCircle2 size={20} />
                                 </div>
-                                <button 
-                                    onClick={() => { setGusData(null); setIsCeidgSource(false); }}
-                                    className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline"
-                                >
-                                    Zmień NIP
-                                </button>
+                                <div>
+                                    <h4 className="font-bold text-white text-sm">{gusData.name}</h4>
+                                    <p className="text-zinc-400 text-xs mt-1">{gusData.street} {gusData.propertyNumber}, {gusData.city}</p>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-zinc-300 border border-white/5">NIP: {gusData.nip}</span>
+                                        <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-zinc-300 border border-white/5">VAT: {gusData.vatStatus}</span>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <p className="text-sm text-slate-300">
-                                Firma: <strong className="text-white">{companyName}</strong><br/>
-                                Adres: {street} {houseNumber}, {companyCity}
-                            </p>
 
                             <button 
                                 onClick={handleRegister}
                                 disabled={loading}
-                                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-indigo-900/50"
+                                className="w-full bg-[#D4AF37] text-black py-4 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_-5px_rgba(212,175,55,0.4)]"
                             >
-                                {loading ? <Loader2 className="animate-spin" /> : <>Utwórz Konto <ArrowRight size={18} /></>}
+                                {loading ? <Loader2 className="animate-spin" /> : <>Potwierdź i Utwórz Konto</>}
+                            </button>
+                            
+                            <button onClick={() => setGusData(null)} className="w-full text-zinc-500 hover:text-white text-xs">
+                                To nie ta firma? Wpisz NIP ponownie.
                             </button>
                         </div>
                     )}
+
+                    <div className="text-center pt-4">
+                        <button onClick={() => setMode('LOGIN')} className="text-zinc-500 hover:text-white text-sm transition-colors">
+                            Masz już konto? <span className="text-[#D4AF37] font-bold">Zaloguj się</span>
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
-      </div>
-      
-      <Modal isOpen={false} onClose={() => {}} title="">{null}</Modal>
+      </motion.div>
     </div>
   );
 };

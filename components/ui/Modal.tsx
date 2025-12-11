@@ -31,7 +31,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
             onClick={onClose}
           ></motion.div>
 
@@ -41,18 +41,18 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative bg-[#0F172A] border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative bg-[#0A0A0C] border border-white/10 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
           >
             <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-white/5">
               <h3 className="text-lg font-bold text-white tracking-tight">{title}</h3>
               <button 
                 onClick={onClose}
-                className="text-slate-400 hover:text-white hover:bg-white/10 p-2 rounded-full transition-all"
+                className="text-zinc-400 hover:text-white hover:bg-white/10 p-2 rounded-full transition-all"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto custom-scrollbar text-slate-300">
+            <div className="p-6 overflow-y-auto custom-scrollbar text-zinc-300">
               {children}
             </div>
           </motion.div>
