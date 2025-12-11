@@ -31,12 +31,12 @@ export const Subscriptions: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Repeat className="text-indigo-600" /> Menedżer Subskrypcji
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Repeat className="text-indigo-400" /> Menedżer Subskrypcji
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Kontrola kosztów SaaS i wykrywanie nieużywanych usług ("Ghost Subs").
                     </p>
                 </div>
@@ -44,18 +44,18 @@ export const Subscriptions: React.FC = () => {
 
             {/* Ghost Alert */}
             {ghostCount > 0 && (
-                <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 flex items-start gap-4 shadow-sm relative overflow-hidden">
-                    <div className="bg-rose-100 p-3 rounded-full text-rose-600 z-10">
+                <div className="bg-rose-900/20 border border-rose-500/30 rounded-2xl p-6 flex items-start gap-4 shadow-sm relative overflow-hidden">
+                    <div className="bg-rose-500/20 p-3 rounded-full text-rose-400 z-10">
                         <Zap size={24} />
                     </div>
                     <div className="z-10">
-                        <h3 className="text-lg font-bold text-rose-800">Wykryto {ghostCount} "duchów"</h3>
-                        <p className="text-rose-700 text-sm mt-1">
+                        <h3 className="text-lg font-bold text-rose-400">Wykryto {ghostCount} "duchów"</h3>
+                        <p className="text-rose-200 text-sm mt-1">
                             Płacisz za usługi, z których rzadko korzystasz. Możesz zaoszczędzić ok. {safeFormatCurrency(subs.filter(s => s.status === 'GHOST').reduce((acc, s) => acc + (s.currency === 'PLN' ? s.cost : s.cost * 4.2), 0))} miesięcznie.
                         </p>
                     </div>
                     {/* Ghost Icon Background */}
-                    <div className="absolute right-[-20px] top-[-20px] text-rose-100 opacity-50">
+                    <div className="absolute right-[-20px] top-[-20px] text-rose-500/10 opacity-50">
                         <AlertTriangle size={150} />
                     </div>
                 </div>
@@ -63,44 +63,48 @@ export const Subscriptions: React.FC = () => {
 
             {/* Burn Rate */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl">
+                <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl border border-white/10">
                     <p className="text-slate-400 text-xs font-bold uppercase mb-2">Miesięczny Burn Rate (SaaS)</p>
                     <h3 className="text-4xl font-bold font-mono">{safeFormatCurrency(totalBurn)}</h3>
                     <p className="text-xs text-slate-500 mt-2">Suma kosztów stałych</p>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                <div className="glass-card p-6 rounded-2xl flex flex-col justify-center">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-slate-500 font-bold">Efektywność Wydatków</span>
-                        <span className="text-xl font-bold text-slate-900">82%</span>
+                        <span className="text-sm text-slate-400 font-bold">Efektywność Wydatków</span>
+                        <span className="text-xl font-bold text-white">82%</span>
                     </div>
-                    <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
-                        <div className="bg-indigo-600 h-full rounded-full" style={{width: '82%'}}></div>
+                    <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                        <div className="bg-indigo-600 h-full rounded-full shadow-[0_0_10px_#6366f1]" style={{width: '82%'}}></div>
                     </div>
                 </div>
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 className="font-bold text-slate-900">Aktywne Usługi</h3>
+            <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="p-4 border-b border-white/10 bg-slate-900/30 flex justify-between items-center">
+                    <h3 className="font-bold text-white">Aktywne Usługi</h3>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                        <input type="text" placeholder="Szukaj..." className="pl-9 pr-4 py-1.5 border border-slate-200 rounded-lg text-sm outline-none focus:ring-1 focus:ring-indigo-500" />
+                        <input 
+                            type="text" 
+                            placeholder="Szukaj..." 
+                            className="pl-9 pr-4 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white outline-none focus:ring-1 focus:ring-indigo-500" 
+                        />
                     </div>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-white/5">
                     {subs.map(sub => (
-                        <div key={sub.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+                        <div key={sub.id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
                             <div className="flex items-center gap-4">
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-sm ${sub.name.includes('Adobe') ? 'bg-red-600' : sub.name.includes('LinkedIn') ? 'bg-blue-600' : sub.name.includes('AWS') ? 'bg-orange-500' : 'bg-slate-800'}`}>
                                     {sub.logo}
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h4 className="font-bold text-slate-900">{sub.name}</h4>
-                                        {sub.status === 'GHOST' && <span className="bg-rose-100 text-rose-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase border border-rose-200">Ghost 👻</span>}
+                                        <h4 className="font-bold text-white">{sub.name}</h4>
+                                        {sub.status === 'GHOST' && <span className="bg-rose-500/20 text-rose-400 text-[10px] px-2 py-0.5 rounded font-bold uppercase border border-rose-500/30">Ghost 👻</span>}
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                                         <Calendar size={10} /> Next: {sub.nextPayment} • {sub.billingCycle}
                                     </p>
                                 </div>
@@ -108,10 +112,10 @@ export const Subscriptions: React.FC = () => {
 
                             <div className="flex items-center gap-8">
                                 <div className="text-right">
-                                    <p className="font-bold text-slate-900 font-mono">{safeFormatCurrency(sub.cost, sub.currency)}</p>
+                                    <p className="font-bold text-white font-mono">{safeFormatCurrency(sub.cost, sub.currency)}</p>
                                     <div className="flex items-center gap-1 justify-end mt-1">
-                                        <span className="text-[10px] text-slate-400 uppercase font-bold">Usage:</span>
-                                        <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <span className="text-[10px] text-slate-500 uppercase font-bold">Usage:</span>
+                                        <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
                                             <div 
                                                 className={`h-full rounded-full ${sub.usageScore < 20 ? 'bg-red-500' : 'bg-green-500'}`} 
                                                 style={{width: `${sub.usageScore}%`}}
@@ -121,7 +125,7 @@ export const Subscriptions: React.FC = () => {
                                 </div>
                                 <button 
                                     onClick={() => handleAction(sub)}
-                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                    className="p-2 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
                                 >
                                     <XCircle size={20} />
                                 </button>

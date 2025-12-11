@@ -2,155 +2,146 @@
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { AuditRiskFactor, AuditPackage } from '../types';
-import { ShieldCheck, AlertTriangle, FileText, Lock, Activity, CheckCircle2, Search, Download, Loader2, Scale } from 'lucide-react';
+import { ShieldCheck, Archive, FileLock, Download, Search, AlertOctagon, Lock, FolderClosed, FileText, CheckCircle2 } from 'lucide-react';
 import { toast } from './ui/Toast';
+import { motion } from 'framer-motion';
 
 export const TaxAuditDefender: React.FC = () => {
     const [risks, setRisks] = useState<AuditRiskFactor[]>([]);
     const [auditPkg, setAuditPkg] = useState<AuditPackage | null>(null);
-    const [scanning, setScanning] = useState(false);
+    const [activeTab, setActiveTab] = useState<'VAULT' | 'RISKS'>('VAULT');
     const [generating, setGenerating] = useState(false);
 
-    const runScan = async () => {
-        setScanning(true);
-        const data = await NuffiService.runAuditRiskAnalysis();
-        setRisks(data);
-        setScanning(false);
-    };
+    useEffect(() => {
+        // Mock load
+        NuffiService.runAuditRiskAnalysis().then(setRisks);
+    }, []);
 
     const generatePackage = async () => {
         setGenerating(true);
-        try {
-            const pkg = await NuffiService.generateDefensePackage(2023);
-            setAuditPkg(pkg);
-            toast.success('Paczka dowodowa gotowa', 'Wszystkie dokumenty zostały zabezpieczone i podpisane.');
-        } finally {
-            setGenerating(false);
-        }
+        const pkg = await NuffiService.generateDefensePackage(2023);
+        setAuditPkg(pkg);
+        setGenerating(false);
+        toast.success('Paczka gotowa', 'Dokumentacja została zabezpieczona kryptograficznie.');
     };
 
-    const highRisks = risks.filter(r => r.severity === 'HIGH').length;
-    const mediumRisks = risks.filter(r => r.severity === 'MEDIUM').length;
-
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+        <div className="h-[calc(100vh-120px)] flex flex-col pb-4 animate-in fade-in duration-300">
+            {/* Header Area */}
+            <div className="flex justify-between items-end mb-6 shrink-0">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <ShieldCheck className="text-indigo-600" /> Tarcza Antykontrolna
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <ShieldCheck className="text-indigo-500" /> Audit Defender
                     </h2>
-                    <p className="text-slate-500 mt-1">Analiza ryzyka podatkowego i generowanie paczek dowodowych dla Urzędu Skarbowego.</p>
+                    <p className="text-slate-400 text-sm mt-1">Generuj paczki dowodowe i archiwizuj dokumenty w formacie JPK.</p>
                 </div>
-                <button 
-                    onClick={runScan}
-                    disabled={scanning}
-                    className="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-slate-800 flex items-center gap-2 shadow-lg disabled:opacity-70 transition-all"
-                >
-                    {scanning ? <Loader2 className="animate-spin" /> : <><Activity size={18} /> Uruchom Audyt AI</>}
-                </button>
-            </header>
-
-            {/* Status Hero */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className={`p-8 rounded-2xl text-white shadow-xl relative overflow-hidden transition-all ${highRisks > 0 ? 'bg-rose-600' : 'bg-emerald-600'}`}>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-white/20 p-2 rounded-lg backdrop-blur-md">
-                                <Scale size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold">Status Podatnika</h3>
-                        </div>
-                        
-                        {risks.length === 0 && !scanning ? (
-                            <p className="text-white/80">Uruchom skanowanie, aby sprawdzić ryzyko.</p>
-                        ) : highRisks > 0 ? (
-                            <div>
-                                <h4 className="text-3xl font-bold mb-2">WYKRYTO RYZYKO</h4>
-                                <p className="text-rose-100">Znaleziono {highRisks} krytycznych anomalii, które mogą sprowokować kontrolę.</p>
-                            </div>
-                        ) : (
-                            <div>
-                                <h4 className="text-3xl font-bold mb-2">BEZPIECZNY</h4>
-                                <p className="text-emerald-100">Twoje księgi nie wykazują odchyleń od normy.</p>
-                            </div>
-                        )}
-                    </div>
-                    {/* Bg Deco */}
-                    <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10">
-                        <ShieldCheck size={200} />
-                    </div>
-                </div>
-
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-center">
-                    <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <Lock className="text-indigo-600" /> Defense File Generator
-                    </h3>
-                    <p className="text-slate-500 text-sm mb-6">
-                        System automatycznie agreguje JPK, faktury, potwierdzenia przelewów i KPiR w jeden zaszyfrowany plik ZIP, gotowy do przekazania kontrolerowi.
-                    </p>
-                    
-                    {auditPkg ? (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <CheckCircle2 className="text-green-600" />
-                                <div>
-                                    <p className="font-bold text-green-800 text-sm">Paczka gotowa</p>
-                                    <p className="text-xs text-green-600 font-mono">{auditPkg.hash.substring(0, 20)}...</p>
-                                </div>
-                            </div>
-                            <button className="bg-white border border-green-200 text-green-700 p-2 rounded-lg hover:bg-green-100">
-                                <Download size={18} />
-                            </button>
-                        </div>
-                    ) : (
-                        <button 
-                            onClick={generatePackage}
-                            disabled={generating}
-                            className="w-full bg-white border-2 border-indigo-100 text-indigo-700 py-3 rounded-xl font-bold hover:border-indigo-600 hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
-                        >
-                            {generating ? <Loader2 className="animate-spin" /> : 'Generuj Paczkę Dowodową (2023)'}
-                        </button>
-                    )}
+                <div className="bg-slate-900 p-1 rounded-lg border border-slate-700 flex">
+                    <button onClick={() => setActiveTab('VAULT')} className={`px-4 py-2 text-xs font-bold rounded flex items-center gap-2 transition-all ${activeTab === 'VAULT' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+                        <Archive size={14} /> Evidence Vault
+                    </button>
+                    <button onClick={() => setActiveTab('RISKS')} className={`px-4 py-2 text-xs font-bold rounded flex items-center gap-2 transition-all ${activeTab === 'RISKS' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+                        <AlertOctagon size={14} /> Risk Factors
+                    </button>
                 </div>
             </div>
 
-            {/* Risk Factors List */}
-            {risks.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                        <h3 className="font-bold text-slate-900">Raport Szczegółowy</h3>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                        {risks.map(risk => (
-                            <div key={risk.id} className="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                                <div className={`mt-1 p-2 rounded-lg shrink-0 ${
-                                    risk.severity === 'HIGH' ? 'bg-rose-100 text-rose-600' :
-                                    risk.severity === 'MEDIUM' ? 'bg-amber-100 text-amber-600' :
-                                    'bg-green-100 text-green-600'
-                                }`}>
-                                    {risk.severity === 'HIGH' ? <AlertTriangle size={20} /> :
-                                     risk.severity === 'MEDIUM' ? <Search size={20} /> :
-                                     <CheckCircle2 size={20} />}
-                                </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between mb-1">
-                                        <h4 className="font-bold text-slate-900">{risk.title}</h4>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                                            risk.severity === 'HIGH' ? 'bg-rose-50 text-rose-700 border border-rose-100' :
-                                            risk.severity === 'MEDIUM' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
-                                            'bg-green-50 text-green-700 border border-green-100'
-                                        }`}>{risk.severity} Risk</span>
+            {/* Content Area */}
+            <div className="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                {activeTab === 'VAULT' && (
+                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="h-full flex flex-col">
+                        <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-700 rounded-xl bg-slate-800/50">
+                            {!auditPkg ? (
+                                <div className="text-center p-8">
+                                    <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
+                                        <FolderClosed size={32} className="text-slate-500" />
                                     </div>
-                                    <p className="text-sm text-slate-600">{risk.description}</p>
-                                    <div className="mt-2 text-xs font-mono text-slate-400 uppercase tracking-wide">
-                                        Kategoria: {risk.category}
+                                    <h3 className="text-lg font-bold text-white mb-2">Brak aktywnej paczki kontrolnej</h3>
+                                    <p className="text-slate-400 text-sm max-w-sm mx-auto mb-6">
+                                        Wygeneruj "Defense Package" zawierający wszystkie JPK, faktury i potwierdzenia przelewów dla organów podatkowych.
+                                    </p>
+                                    <button 
+                                        onClick={generatePackage}
+                                        disabled={generating}
+                                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 mx-auto transition-all shadow-lg shadow-indigo-900/50 disabled:opacity-50"
+                                    >
+                                        {generating ? 'Generowanie...' : <><FileLock size={18} /> Generuj Paczkę (2023)</>}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="text-center p-8 w-full max-w-md">
+                                    <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                                        <CheckCircle2 size={32} className="text-green-500" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-white mb-1">Paczka Dowodowa Gotowa</h3>
+                                    <p className="font-mono text-xs text-slate-500 bg-black/30 px-2 py-1 rounded mb-6 break-all">
+                                        HASH: {auditPkg.hash}
+                                    </p>
+                                    
+                                    <div className="bg-slate-800 p-4 rounded-xl text-left space-y-3 mb-6 border border-slate-700">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-400 flex items-center gap-2"><FileText size={14} /> JPK_V7M</span>
+                                            <span className="text-green-400 font-bold">Included</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-400 flex items-center gap-2"><FileText size={14} /> Wyciągi Bankowe</span>
+                                            <span className="text-green-400 font-bold">Included</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-400 flex items-center gap-2"><FileText size={14} /> Logi Systemowe</span>
+                                            <span className="text-green-400 font-bold">Included</span>
+                                        </div>
+                                    </div>
+
+                                    <button className="w-full bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border border-slate-600">
+                                        <Download size={18} /> Pobierz ZIP (Szyfrowany)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'RISKS' && (
+                    <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="h-full overflow-y-auto custom-scrollbar pr-2">
+                        <div className="mb-4 flex items-center gap-2 text-sm text-slate-400 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                            <AlertOctagon size={16} className="text-amber-500" />
+                            <span>System automatycznie flaguje transakcje mogące budzić wątpliwości US.</span>
+                        </div>
+                        <div className="space-y-3">
+                            {risks.map(risk => (
+                                <div key={risk.id} className="bg-slate-800 border border-slate-700 p-4 rounded-xl flex gap-4 items-start hover:border-indigo-500/50 transition-colors">
+                                    <div className={`mt-1 p-2 rounded-lg ${risk.severity === 'HIGH' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                        <Search size={18} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start">
+                                            <h4 className="text-white font-bold text-sm">{risk.title}</h4>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase border ${risk.severity === 'HIGH' ? 'border-red-500/30 text-red-400 bg-red-500/10' : 'border-amber-500/30 text-amber-400 bg-amber-500/10'}`}>
+                                                {risk.severity} Risk
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-400 text-xs mt-1">{risk.description}</p>
+                                        <div className="mt-3 flex gap-2">
+                                            <button className="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded hover:bg-slate-600 transition-colors">
+                                                Zobacz dokumenty
+                                            </button>
+                                            <button className="text-xs bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded hover:bg-indigo-600/30 transition-colors">
+                                                Dodaj wyjaśnienie
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+                            ))}
+                            {risks.length === 0 && (
+                                <div className="text-center py-10 text-slate-500">
+                                    <CheckCircle2 size={48} className="mx-auto mb-4 opacity-20" />
+                                    <p>Brak wykrytych ryzyk podatkowych.</p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </div>
         </div>
     );
 };

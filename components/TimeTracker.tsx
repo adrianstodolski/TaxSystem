@@ -11,7 +11,7 @@ export const TimeTracker: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [activeEntry, setActiveEntry] = useState<TimeEntry | null>(null);
     const [timer, setTimer] = useState(0);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
         const load = async () => {

@@ -29,61 +29,61 @@ export const AccountantDashboard: React.FC = () => {
 
     const getStatusColor = (status: string) => {
         switch(status) {
-            case 'OK': return 'text-green-600 bg-green-100';
-            case 'DUE': return 'text-amber-600 bg-amber-100';
-            case 'OVERDUE': return 'text-red-600 bg-red-100';
-            default: return 'text-gray-600 bg-gray-100';
+            case 'OK': return 'text-green-400 bg-green-500/20 border-green-500/30';
+            case 'DUE': return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
+            case 'OVERDUE': return 'text-rose-400 bg-rose-500/20 border-rose-500/30';
+            default: return 'text-slate-400 bg-slate-800 border-slate-700';
         }
     };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Briefcase className="text-indigo-600" /> Pulpit Księgowego
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Briefcase className="text-indigo-400" /> Pulpit Księgowego
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Zarządzanie portfelem klientów (Multi-tenant).
                     </p>
                 </div>
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-lg shadow-indigo-200">
+                <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 flex items-center gap-2 shadow-lg shadow-indigo-900/50">
                     <Plus size={18} /> Dodaj Klienta
                 </button>
             </header>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="glass-card p-6 rounded-2xl">
                     <p className="text-xs font-bold text-slate-500 uppercase">Aktywni Klienci</p>
-                    <h3 className="text-3xl font-bold text-slate-900 mt-2">{clients.length}</h3>
+                    <h3 className="text-3xl font-bold text-white mt-2">{clients.length}</h3>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="glass-card p-6 rounded-2xl">
                     <p className="text-xs font-bold text-slate-500 uppercase">Dokumenty (Inbox)</p>
-                    <h3 className="text-3xl font-bold text-indigo-600 mt-2">
+                    <h3 className="text-3xl font-bold text-indigo-400 mt-2">
                         {clients.reduce((acc, c) => acc + c.documentsToProcess, 0)}
                     </h3>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="glass-card p-6 rounded-2xl">
                     <p className="text-xs font-bold text-slate-500 uppercase">Zagrożone Terminy</p>
-                    <h3 className="text-3xl font-bold text-rose-600 mt-2">
+                    <h3 className="text-3xl font-bold text-rose-400 mt-2">
                         {clients.filter(c => c.vatStatus === 'OVERDUE' || c.pitStatus === 'OVERDUE').length}
                     </h3>
                 </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div className="glass-card p-6 rounded-2xl">
                     <p className="text-xs font-bold text-slate-500 uppercase">Zamknięcie Miesiąca</p>
                     <div className="flex items-center gap-2 mt-2">
-                        <div className="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden">
+                        <div className="flex-1 bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
                             <div className="bg-green-500 h-full" style={{width: '65%'}}></div>
                         </div>
-                        <span className="font-bold text-sm">65%</span>
+                        <span className="font-bold text-sm text-white">65%</span>
                     </div>
                 </div>
             </div>
 
             {/* Clients Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
-                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <div className="glass-card rounded-2xl overflow-hidden min-h-[500px]">
+                <div className="p-4 border-b border-white/10 bg-slate-900/30 flex justify-between items-center">
                     <div className="relative w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input 
@@ -91,16 +91,16 @@ export const AccountantDashboard: React.FC = () => {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Szukaj firmy..." 
-                            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" 
+                            className="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none" 
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button className="p-2 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600"><Filter size={18} /></button>
+                        <button className="p-2 hover:bg-white/5 rounded text-slate-400 hover:text-white transition-colors"><Filter size={18} /></button>
                     </div>
                 </div>
 
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                <table className="w-full text-sm text-left text-slate-300">
+                    <thead className="bg-slate-900/50 text-slate-500 border-b border-white/10">
                         <tr>
                             <th className="px-6 py-3 font-medium">Firma</th>
                             <th className="px-6 py-3 font-medium">Status VAT</th>
@@ -110,17 +110,17 @@ export const AccountantDashboard: React.FC = () => {
                             <th className="px-6 py-3 font-medium text-right">Akcje</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-white/5">
                         {loading ? <tr><td colSpan={6} className="p-8 text-center text-slate-400">Ładowanie klientów...</td></tr> : 
                             filteredClients.map(client => (
-                                <tr key={client.id} className="hover:bg-slate-50 group">
+                                <tr key={client.id} className="hover:bg-white/5 group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold">
+                                            <div className="w-10 h-10 bg-indigo-500/20 text-indigo-400 rounded-lg flex items-center justify-center font-bold border border-indigo-500/30">
                                                 {client.name.substring(0, 2).toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-900">{client.name}</p>
+                                                <p className="font-bold text-white">{client.name}</p>
                                                 <p className="text-xs text-slate-500 font-mono">NIP: {client.nip}</p>
                                             </div>
                                         </div>
@@ -138,7 +138,7 @@ export const AccountantDashboard: React.FC = () => {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
                                             <FileText size={16} className="text-slate-400" />
-                                            <span className={`font-bold ${client.documentsToProcess > 0 ? 'text-indigo-600' : 'text-slate-500'}`}>
+                                            <span className={`font-bold ${client.documentsToProcess > 0 ? 'text-indigo-400' : 'text-slate-500'}`}>
                                                 {client.documentsToProcess} do oceny
                                             </span>
                                         </div>
@@ -146,22 +146,22 @@ export const AccountantDashboard: React.FC = () => {
                                     <td className="px-6 py-4 w-48">
                                         <div className="flex justify-between text-xs mb-1">
                                             <span className="text-slate-500">Miesiąc</span>
-                                            <span className="font-bold">{client.monthProgress}%</span>
+                                            <span className="font-bold text-white">{client.monthProgress}%</span>
                                         </div>
-                                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                            <div className="bg-indigo-600 h-full rounded-full" style={{width: `${client.monthProgress}%`}}></div>
+                                        <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden border border-slate-700">
+                                            <div className="bg-indigo-500 h-full rounded-full" style={{width: `${client.monthProgress}%`}}></div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
                                             <button 
                                                 onClick={() => handleRemind(client)}
-                                                className="p-2 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600" 
+                                                className="p-2 hover:bg-white/10 rounded text-slate-400 hover:text-white transition-colors" 
                                                 title="Wyślij przypomnienie"
                                             >
                                                 <Send size={16} />
                                             </button>
-                                            <button className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-100">
+                                            <button className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-500/30">
                                                 Otwórz
                                             </button>
                                         </div>

@@ -45,28 +45,28 @@ export const AiClassifier: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <BrainCircuit className="text-indigo-600" /> Nuffi AI Lab
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <BrainCircuit className="text-indigo-400" /> Nuffi AI Lab
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Klasyfikacja transakcji "Human-in-the-loop". Ucz model na trudnych przypadkach.
                     </p>
                 </div>
-                <div className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-100 flex items-center gap-2">
+                <div className="bg-indigo-500/20 text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-500/30 flex items-center gap-2">
                     <Sparkles size={14} /> AI Confidence Threshold: &lt;70%
                 </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[600px]">
                 {/* List */}
-                <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                        <h3 className="font-bold text-slate-900 text-sm">Do wyjaśnienia ({transactions.length})</h3>
+                <div className="lg:col-span-1 glass-card rounded-2xl overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-white/10 bg-slate-900/30">
+                        <h3 className="font-bold text-white text-sm">Do wyjaśnienia ({transactions.length})</h3>
                     </div>
-                    <div className="flex-1 overflow-y-auto">
-                        {loading ? <div className="p-8 text-center"><Loader2 className="animate-spin" /></div> : 
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        {loading ? <div className="p-8 text-center"><Loader2 className="animate-spin text-indigo-500 mx-auto" /></div> : 
                             transactions.length === 0 ? (
                                 <div className="p-8 text-center text-slate-400 text-sm">Wszystkie transakcje sklasyfikowane!</div>
                             ) : (
@@ -74,15 +74,15 @@ export const AiClassifier: React.FC = () => {
                                     <div 
                                         key={tx.id} 
                                         onClick={() => setSelectedTx(tx)}
-                                        className={`p-4 border-b border-slate-50 cursor-pointer transition-colors hover:bg-slate-50 ${selectedTx?.id === tx.id ? 'bg-indigo-50 border-l-4 border-l-indigo-600' : ''}`}
+                                        className={`p-4 border-b border-white/5 cursor-pointer transition-colors hover:bg-white/5 ${selectedTx?.id === tx.id ? 'bg-indigo-500/10 border-l-4 border-l-indigo-500' : ''}`}
                                     >
                                         <div className="flex justify-between items-start mb-1">
-                                            <span className="font-bold text-slate-900 text-sm">{formatCurrency(tx.amount, tx.currency)}</span>
+                                            <span className="font-bold text-white text-sm">{formatCurrency(tx.amount, tx.currency)}</span>
                                             <span className="text-[10px] text-slate-400">{tx.date}</span>
                                         </div>
-                                        <p className="text-xs text-slate-600 line-clamp-1">{tx.description}</p>
+                                        <p className="text-xs text-slate-300 line-clamp-1">{tx.description}</p>
                                         <div className="mt-2 flex items-center gap-2">
-                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${tx.confidence > 0.5 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${tx.confidence > 0.5 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'}`}>
                                                 {(tx.confidence * 100).toFixed(0)}% Pewności
                                             </span>
                                         </div>
@@ -94,11 +94,11 @@ export const AiClassifier: React.FC = () => {
                 </div>
 
                 {/* Detail & Action */}
-                <div className="lg:col-span-2 bg-slate-900 text-white rounded-2xl shadow-xl p-8 relative overflow-hidden flex flex-col justify-center">
+                <div className="lg:col-span-2 bg-slate-900 text-white rounded-2xl shadow-xl p-8 relative overflow-hidden flex flex-col justify-center border border-white/10">
                     {selectedTx ? (
                         <div className="relative z-10 animate-in fade-in slide-in-from-right-4">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="bg-white/10 p-3 rounded-xl">
+                                <div className="bg-white/10 p-3 rounded-xl border border-white/5">
                                     <Wallet size={24} />
                                 </div>
                                 <div>
@@ -123,7 +123,7 @@ export const AiClassifier: React.FC = () => {
                                         <p className="text-sm text-slate-300 leading-relaxed">"{selectedTx.aiSuggestion.reasoning}"</p>
                                     </div>
                                     <div className="shrink-0">
-                                        <div className="text-center bg-black/20 p-2 rounded-lg">
+                                        <div className="text-center bg-black/20 p-2 rounded-lg border border-white/5">
                                             <span className="block text-2xl font-bold text-amber-400">{(selectedTx.confidence * 100).toFixed(0)}%</span>
                                             <span className="text-[10px] uppercase text-slate-500 font-bold">Confidence</span>
                                         </div>

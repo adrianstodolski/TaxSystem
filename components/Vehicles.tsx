@@ -21,36 +21,36 @@ export const Vehicles: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Car className="text-indigo-600" /> Flota Samochodowa
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Car className="text-indigo-400" /> Flota Samochodowa
                     </h2>
-                    <p className="text-slate-500 mt-1">Ewidencja pojazdów, odliczenia VAT (50%/100%) i kilometrówka.</p>
+                    <p className="text-slate-400 mt-1">Ewidencja pojazdów, odliczenia VAT (50%/100%) i kilometrówka.</p>
                 </div>
                 <button 
                     onClick={() => toast.success('Dodano pojazd', 'Kreator pojazdu dostępny w pełnej wersji.')}
-                    className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold hover:bg-slate-800 flex items-center gap-2 shadow-sm"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 flex items-center gap-2 shadow-lg shadow-indigo-900/50 transition-all"
                 >
                     <Plus size={18} /> Dodaj Pojazd
                 </button>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {loading ? [1,2].map(i => <div key={i} className="h-64 bg-slate-100 rounded-2xl animate-pulse" />) : 
+                {loading ? [1,2].map(i => <div key={i} className="h-64 bg-slate-800/50 rounded-2xl animate-pulse" />) : 
                     vehicles.map(v => (
-                        <div key={v.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden">
+                        <div key={v.id} className="glass-card p-6 rounded-2xl relative overflow-hidden group hover:border-indigo-500/30 transition-all">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="bg-indigo-50 p-3 rounded-xl text-indigo-600">
+                                    <div className="bg-indigo-500/20 p-3 rounded-xl text-indigo-400 border border-indigo-500/30">
                                         {v.type === 'TRUCK' ? <Truck size={24} /> : <Car size={24} />}
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-900">{v.name}</h3>
-                                        <p className="text-sm font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded inline-block mt-1">{v.licensePlate}</p>
+                                        <h3 className="text-xl font-bold text-white">{v.name}</h3>
+                                        <p className="text-sm font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded inline-block mt-1 border border-slate-700">{v.licensePlate}</p>
                                     </div>
                                 </div>
-                                <div className={`text-[10px] font-bold px-2 py-1 rounded border uppercase ${v.vatDeduction === 'FULL_100' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                                <div className={`text-[10px] font-bold px-2 py-1 rounded border uppercase ${v.vatDeduction === 'FULL_100' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'}`}>
                                     VAT {v.vatDeduction === 'FULL_100' ? '100%' : '50%'}
                                 </div>
                             </div>
@@ -58,23 +58,23 @@ export const Vehicles: React.FC = () => {
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-slate-500 flex items-center gap-2"><Fuel size={16} /> Przebieg</span>
-                                    <span className="font-bold font-mono">{v.mileageCurrent.toLocaleString()} km</span>
+                                    <span className="font-bold font-mono text-white">{v.mileageCurrent.toLocaleString()} km</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-slate-500 flex items-center gap-2"><CheckCircle2 size={16} /> Przegląd</span>
-                                    <span className="font-mono">{v.inspectionExpiry}</span>
+                                    <span className="font-mono text-slate-300">{v.inspectionExpiry}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-slate-500 flex items-center gap-2"><AlertCircle size={16} /> OC/AC</span>
-                                    <span className="font-mono">{v.insuranceExpiry}</span>
+                                    <span className="font-mono text-slate-300">{v.insuranceExpiry}</span>
                                 </div>
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-slate-100 flex gap-2">
-                                <button className="flex-1 bg-white border border-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 flex items-center justify-center gap-2">
+                            <div className="mt-6 pt-6 border-t border-white/10 flex gap-2">
+                                <button className="flex-1 bg-white/5 border border-white/10 text-slate-300 py-2 rounded-lg text-xs font-bold hover:bg-white/10 flex items-center justify-center gap-2 transition-colors">
                                     <MapPin size={14} /> Ewidencja Przebiegu
                                 </button>
-                                <button className="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center justify-center gap-2">
+                                <button className="flex-1 bg-white/5 border border-white/10 text-slate-300 hover:text-white py-2 rounded-lg text-xs font-bold hover:bg-white/10 flex items-center justify-center gap-2 transition-colors">
                                     <Plus size={14} /> Dodaj Trasę (GPS)
                                 </button>
                             </div>

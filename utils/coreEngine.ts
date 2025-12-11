@@ -2,7 +2,7 @@
 import { CalculationMethod, CryptoTransaction, CryptoTransactionType, CryptoTaxReport, EngineSnapshot, TaxLot } from "../types";
 
 interface FifoQueueItem extends TaxLot {
-    source: string; // Exchange/Wallet - extends TaxLot which has sourceTxId
+    source: string; // Exchange/Wallet
 }
 
 interface ProcessedTransaction extends CryptoTransaction {
@@ -19,8 +19,7 @@ interface ProcessedTransaction extends CryptoTransaction {
 export class CoreEngine {
     private inventory: Record<string, FifoQueueItem[]> = {}; // Asset -> Lots
     private processedTransactions: ProcessedTransaction[] = [];
-    private snapshots: Record<string, EngineSnapshot> = {};
-
+    
     constructor(private strategy: CalculationMethod = 'FIFO') {}
 
     /**
@@ -51,7 +50,8 @@ export class CoreEngine {
                     costBasis: tx.price, // For deposits, this might need Fair Market Value lookup
                     remaining: tx.amount,
                     sourceTxId: tx.id,
-                    source: tx.exchange
+                    source: typeof tx.exchange === 'string' ? tx.exchange : 'UNKNOWN',
+                    asset: asset
                 });
             } 
             
@@ -130,8 +130,6 @@ export class CoreEngine {
         }
 
         // Iteracja i zdejmowanie z kolejki
-        // Uwaga: Modyfikujemy `remaining` w obiektach lotów.
-        // Jeśli lot zostanie opróżniony, w prawdziwym silniku usuwamy go lub oznaczamy jako closed.
         
         for (const lot of queue) {
             if (remainingToSell <= 0) break;
@@ -179,20 +177,14 @@ export class CoreEngine {
     public getSnapshotAtDate(date: string): EngineSnapshot {
         // To wymagałoby przechowywania pełnej historii zmian inventory.
         // Uproszczona wersja:
-        const holdings: Record<string, number> = {};
+        const holdings: Record<string, TaxLot[]> = {};
         for(const asset in this.inventory) {
-            holdings[asset] = this.inventory[asset].reduce((acc, lot) => {
-                // Check if lot was created before date
-                if (new Date(lot.date) <= new Date(date)) {
-                    return acc + lot.remaining;
-                }
-                return acc;
-            }, 0);
+            holdings[asset] = this.inventory[asset].filter(lot => new Date(lot.date) <= new Date(date));
         }
 
         return {
             date,
-            inventory: this.inventory, // This is current state, meant to be historical in full impl
+            inventory: holdings, 
             realizedGains: 0,
             unrealizedGains: 0,
             taxDue: 0,

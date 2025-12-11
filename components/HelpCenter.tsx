@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { NuffiService } from '../services/api';
 import { HelpCategory, HelpArticle, AgentMessage } from '../types';
-import { Search, Book, ArrowRight, Zap, MessageSquare, X, Send, Bot, FileText, ChevronRight, GraduationCap, Loader2, Sparkles, Terminal } from 'lucide-react';
+import { Search, Book, ArrowRight, Zap, MessageSquare, X, Send, Bot, FileText, ChevronRight, GraduationCap, Loader2, Sparkles, Terminal, Info } from 'lucide-react';
 import { Modal } from './ui/Modal';
 
 export const HelpCenter: React.FC = () => {
@@ -53,6 +53,10 @@ export const HelpCenter: React.FC = () => {
         setMessages(prev => [...prev, { id: (Date.now()+1).toString(), sender: 'AGENT', text: responseText, timestamp: new Date() }]);
     };
 
+    const triggerWelcomeModal = () => {
+        window.dispatchEvent(new CustomEvent('nuffi:open-welcome'));
+    };
+
     const filteredArticles = articles.filter(a => 
         (selectedCategory ? a.categoryId === selectedCategory : true) &&
         (a.title.toLowerCase().includes(search.toLowerCase()) || a.description.toLowerCase().includes(search.toLowerCase()))
@@ -60,7 +64,7 @@ export const HelpCenter: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="relative bg-slate-900 text-white p-12 rounded-3xl overflow-hidden shadow-2xl">
+            <header className="relative bg-slate-900 text-white p-12 rounded-3xl overflow-hidden shadow-2xl border border-white/10">
                 <div className="relative z-10 max-w-2xl">
                     <div className="flex items-center gap-3 mb-4 text-indigo-400 font-bold uppercase tracking-wider text-xs">
                         <GraduationCap size={18} /> Nuffi Academy
@@ -70,15 +74,23 @@ export const HelpCenter: React.FC = () => {
                         Przeszukaj instrukcje krok po kroku lub poproś naszego Agenta AI o wykonanie zadania.
                     </p>
                     
-                    <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                        <input 
-                            type="text" 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Czego szukasz? (np. JPK, Krypto, ZUS)"
-                            className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                        />
+                    <div className="flex gap-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                            <input 
+                                type="text" 
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Czego szukasz? (np. JPK, Krypto, ZUS)"
+                                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            />
+                        </div>
+                        <button 
+                            onClick={triggerWelcomeModal}
+                            className="bg-white/10 border border-white/20 text-white px-6 rounded-xl font-bold hover:bg-white/20 transition-all flex items-center gap-2 whitespace-nowrap"
+                        >
+                            <Sparkles size={18} /> Co nowego?
+                        </button>
                     </div>
                 </div>
                 
@@ -105,7 +117,7 @@ export const HelpCenter: React.FC = () => {
                 </div>
 
                 {/* Decorative BG */}
-                <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
             </header>
 
@@ -116,12 +128,12 @@ export const HelpCenter: React.FC = () => {
                         <button 
                             key={cat.id}
                             onClick={() => setSelectedCategory(cat.id)}
-                            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all text-left group"
+                            className="glass-card p-6 rounded-2xl hover:border-indigo-500/40 transition-all text-left group"
                         >
-                            <div className="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors mb-4">
+                            <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors mb-4 border border-slate-700">
                                 <Book size={20} />
                             </div>
-                            <h4 className="font-bold text-slate-900 mb-1">{cat.name}</h4>
+                            <h4 className="font-bold text-white mb-1">{cat.name}</h4>
                             <p className="text-xs text-slate-500 line-clamp-2">{cat.description}</p>
                         </button>
                     ))}
@@ -129,41 +141,41 @@ export const HelpCenter: React.FC = () => {
             )}
 
             {/* Articles List */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+            <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10 bg-slate-900/30 flex items-center gap-2">
                     {selectedCategory && (
-                        <button onClick={() => setSelectedCategory(null)} className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1">
+                        <button onClick={() => setSelectedCategory(null)} className="text-xs font-bold text-slate-500 hover:text-white flex items-center gap-1">
                             Kategorie <ChevronRight size={12} />
                         </button>
                     )}
-                    <h3 className="font-bold text-slate-900">
+                    <h3 className="font-bold text-white">
                         {search ? `Wyniki wyszukiwania: "${search}"` : selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'Najnowsze Artykuły'}
                     </h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
                     {filteredArticles.map(article => (
                         <div 
                             key={article.id}
                             onClick={() => setActiveArticle(article)}
-                            className="bg-white p-6 cursor-pointer hover:bg-slate-50 transition-colors group"
+                            className="bg-slate-900/80 p-6 cursor-pointer hover:bg-slate-800/80 transition-colors group"
                         >
                             <div className="flex justify-between items-start mb-2">
-                                <div className="bg-indigo-50 text-indigo-700 p-2 rounded-lg">
+                                <div className="bg-indigo-500/20 text-indigo-400 p-2 rounded-lg border border-indigo-500/30">
                                     <FileText size={20} />
                                 </div>
-                                <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">{article.readTime}</span>
+                                <span className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-700">{article.readTime}</span>
                             </div>
-                            <h4 className="font-bold text-slate-900 text-lg mb-2 group-hover:text-indigo-700 transition-colors">{article.title}</h4>
-                            <p className="text-sm text-slate-500">{article.description}</p>
-                            <div className="mt-4 flex items-center text-xs font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <h4 className="font-bold text-white text-lg mb-2 group-hover:text-indigo-400 transition-colors">{article.title}</h4>
+                            <p className="text-sm text-slate-400">{article.description}</p>
+                            <div className="mt-4 flex items-center text-xs font-bold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
                                 Czytaj dalej <ArrowRight size={12} className="ml-1" />
                             </div>
                         </div>
                     ))}
                 </div>
                 {filteredArticles.length === 0 && (
-                    <div className="p-12 text-center text-slate-400">
+                    <div className="p-12 text-center text-slate-500 bg-slate-900">
                         Brak artykułów spełniających kryteria.
                     </div>
                 )}
@@ -173,17 +185,20 @@ export const HelpCenter: React.FC = () => {
             <Modal isOpen={!!activeArticle} onClose={() => setActiveArticle(null)} title={activeArticle?.title || ''}>
                 {activeArticle && (
                     <div className="space-y-6">
-                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-sm text-indigo-800 flex gap-3">
+                        <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl text-sm text-indigo-300 flex gap-3">
                             <Zap className="shrink-0" size={20} />
                             <p className="font-medium">{activeArticle.description}</p>
                         </div>
-                        <div className="prose prose-sm prose-slate max-w-none">
+                        <div className="prose prose-sm prose-invert max-w-none text-slate-300">
                             {activeArticle.content.split('\n').map((line, i) => (
                                 <p key={i} className="mb-2">{line}</p>
                             ))}
                         </div>
-                        <div className="pt-6 border-t border-slate-100 flex justify-end">
-                            <button className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800">
+                        <div className="pt-6 border-t border-white/10 flex justify-end">
+                            <button 
+                                onClick={() => setActiveArticle(null)}
+                                className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 border border-slate-600"
+                            >
                                 OK, Rozumiem
                             </button>
                         </div>
@@ -193,9 +208,9 @@ export const HelpCenter: React.FC = () => {
 
             {/* N8N AGENT CHAT (Floating or Modal) */}
             {agentOpen && (
-                <div className="fixed bottom-6 right-6 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 h-[600px]">
+                <div className="fixed bottom-6 right-6 w-96 bg-[#0F172A] rounded-2xl shadow-2xl border border-slate-700 z-50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 h-[600px]">
                     {/* Chat Header */}
-                    <div className="bg-[#0B1120] p-4 flex justify-between items-center text-white">
+                    <div className="bg-[#0B1120] p-4 flex justify-between items-center text-white border-b border-slate-800">
                         <div className="flex items-center gap-3">
                             <div className="relative">
                                 <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
@@ -216,16 +231,16 @@ export const HelpCenter: React.FC = () => {
                     </div>
 
                     {/* Chat Body */}
-                    <div className="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-4">
+                    <div className="flex-1 bg-slate-900 p-4 overflow-y-auto space-y-4 custom-scrollbar">
                         {messages.map(msg => (
                             <div key={msg.id} className={`flex ${msg.sender === 'USER' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
                                     msg.sender === 'USER' 
                                         ? 'bg-indigo-600 text-white rounded-br-none' 
-                                        : 'bg-white border border-slate-200 text-slate-700 rounded-bl-none shadow-sm'
+                                        : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-bl-none shadow-sm'
                                 }`}>
                                     {msg.text}
-                                    <div className={`text-[9px] mt-1 text-right ${msg.sender === 'USER' ? 'text-indigo-200' : 'text-slate-400'}`}>
+                                    <div className={`text-[9px] mt-1 text-right ${msg.sender === 'USER' ? 'text-indigo-200' : 'text-slate-500'}`}>
                                         {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                     </div>
                                 </div>
@@ -233,8 +248,8 @@ export const HelpCenter: React.FC = () => {
                         ))}
                         {isAgentThinking && (
                             <div className="flex justify-start">
-                                <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-2 text-xs text-slate-500">
-                                    <Loader2 size={14} className="animate-spin text-indigo-600" />
+                                <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-2 text-xs text-slate-400">
+                                    <Loader2 size={14} className="animate-spin text-indigo-500" />
                                     <span>Uruchamianie workflow...</span>
                                 </div>
                             </div>
@@ -243,7 +258,7 @@ export const HelpCenter: React.FC = () => {
                     </div>
 
                     {/* Chat Input */}
-                    <div className="p-3 bg-white border-t border-slate-200">
+                    <div className="p-3 bg-[#0B1120] border-t border-slate-800">
                         <div className="relative">
                             <input 
                                 type="text" 
@@ -251,7 +266,7 @@ export const HelpCenter: React.FC = () => {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                 placeholder="Napisz wiadomość..."
-                                className="w-full pl-4 pr-12 py-3 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none"
+                                className="w-full pl-4 pr-12 py-3 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none placeholder-slate-500"
                             />
                             <button 
                                 onClick={handleSendMessage}
@@ -262,7 +277,7 @@ export const HelpCenter: React.FC = () => {
                             </button>
                         </div>
                         <div className="mt-2 text-center">
-                            <span className="text-[10px] text-slate-400 flex items-center justify-center gap-1">
+                            <span className="text-[10px] text-slate-500 flex items-center justify-center gap-1">
                                 <Sparkles size={10} /> AI może popełniać błędy. Sprawdź ważne informacje.
                             </span>
                         </div>

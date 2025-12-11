@@ -1,54 +1,118 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, FileText, Users, Box, Layout, ArrowRight, Loader2, Command, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Search, FileText, Users, Box, Layout, ArrowRight, Loader2, Command, Zap, CreditCard, Calculator, Play, X } from 'lucide-react';
 import { SearchResult, ViewState } from '../types';
 import { NuffiService } from '../services/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface GlobalSearchProps {
+  isOpen: boolean;
+  onClose: () => void;
   onNavigate: (view: ViewState) => void;
 }
 
-export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate }) => {
+export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onNavigate }) => {
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
+  // --- Reset & Focus on Open ---
   useEffect(() => {
-    // Close on click outside
-    const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+    if (isOpen) {
+      setQuery('');
+      setResults([]);
+      setSelectedIndex(0);
+      
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+
+      // Force focus
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isOpen]);
+
+  // --- Search Logic ---
+  useEffect(() => {
+    const search = async () => {
+      if (query.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const data = await NuffiService.searchGlobal(query);
+        setResults(data);
+        setSelectedIndex(0);
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setLoading(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
-  useEffect(() => {
-    const doSearch = async () => {
-        if(query.length >= 2) {
-            setLoading(true);
-            const res = await NuffiService.searchGlobal(query);
-            setResults(res);
-            setLoading(false);
-            setIsOpen(true);
-        } else {
-            setResults([]);
-            setIsOpen(false);
-        }
-    };
-
-    const timeout = setTimeout(doSearch, 300);
-    return () => clearTimeout(timeout);
+    const debounce = setTimeout(search, 300);
+    return () => clearTimeout(debounce);
   }, [query]);
 
-  const handleSelect = (result: SearchResult) => {
-      setQuery('');
-      setIsOpen(false);
-      if(result.targetView) onNavigate(result.targetView);
+  // --- Navigation & Selection ---
+  const quickActions = [
+      { id: 'act_inv', type: 'ACTION', title: 'Wystaw Fakturę', subtitle: 'Nowy dokument sprzedaży', icon: <FileText size={18} />, action: () => onNavigate(ViewState.DOCUMENTS) },
+      { id: 'act_pay', type: 'ACTION', title: 'Szybki Przelew', subtitle: 'Wykonaj płatność', icon: <CreditCard size={18} />, action: () => onNavigate(ViewState.YAPILY_CONNECT) },
+      { id: 'act_tax', type: 'ACTION', title: 'Symulator Podatkowy', subtitle: 'Kalkulator B2B', icon: <Calculator size={18} />, action: () => onNavigate(ViewState.PRICE_CALCULATOR) },
+      { id: 'act_eng', type: 'ACTION', title: 'Uruchom Tax Engine', subtitle: 'Przelicz podatek krypto', icon: <Play size={18} />, action: () => onNavigate(ViewState.TAX_ENGINE) },
+  ];
+
+  const currentItems = query ? results : quickActions;
+
+  const handleKeyDownInput = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % currentItems.length);
+      scrollSelectedIntoView((selectedIndex + 1) % currentItems.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + currentItems.length) % currentItems.length);
+      scrollSelectedIntoView((selectedIndex - 1 + currentItems.length) % currentItems.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (currentItems[selectedIndex]) {
+        handleSelect(currentItems[selectedIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+    }
+  };
+
+  const scrollSelectedIntoView = (index: number) => {
+    if (listRef.current) {
+        const item = listRef.current.children[index] as HTMLElement;
+        if (item) {
+            item.scrollIntoView({ block: 'nearest' });
+        }
+    }
+  };
+
+  const handleSelect = (item: any) => {
+    onClose();
+    if (item.action) {
+      item.action();
+    } else if (item.targetView) {
+      onNavigate(item.targetView);
+    }
   };
 
   const getIcon = (type: string) => {
@@ -61,65 +125,113 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onNavigate }) => {
       }
   };
 
-  return (
-    <div className="relative w-96" ref={wrapperRef}>
-      <div className="flex items-center bg-gray-100 rounded-lg px-3 py-2 border border-transparent focus-within:border-indigo-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
-        {loading ? <Loader2 size={18} className="text-indigo-600 animate-spin mr-2" /> : <Search size={18} className="text-gray-400 mr-2" />}
-        <input 
-            ref={inputRef}
-            type="text" 
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { if(query.length >= 2) setIsOpen(true); }}
-            placeholder="Szukaj faktur, klientów, widoków..." 
-            className="bg-transparent border-none outline-none text-sm w-full placeholder-gray-400"
-        />
-        {query && (
-            <button onClick={() => { setQuery(''); setIsOpen(false); inputRef.current?.focus(); }} className="text-gray-400 hover:text-gray-600">
-                <X size={16} />
-            </button>
-        )}
-      </div>
-
-      {/* Results Dropdown */}
+  // Render via Portal to attach to document.body (bypassing parent overflows)
+  return createPortal(
+    <AnimatePresence>
       {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              {results.length === 0 && !loading ? (
-                  <div className="p-4 text-center text-gray-500 text-sm">
-                      Brak wyników dla "{query}"
-                  </div>
-              ) : (
-                  <div className="max-h-[400px] overflow-y-auto">
-                      {/* Grouping logic could be added here, simplified for now */}
-                      <div className="py-2">
-                        <div className="px-3 py-1 text-xs font-bold text-gray-400 uppercase tracking-wider">Wyniki wyszukiwania</div>
-                        {results.map((result) => (
-                            <button 
-                                key={result.id} 
-                                onClick={() => handleSelect(result)}
-                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors text-left group border-b border-gray-50 last:border-0"
-                            >
-                                <div className="bg-white p-2 rounded-lg border border-gray-100 shadow-sm group-hover:border-indigo-200">
-                                    {getIcon(result.type)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-gray-900 truncate group-hover:text-indigo-700">{result.title}</p>
-                                    <p className="text-xs text-gray-500 truncate">{result.subtitle}</p>
-                                </div>
-                                <ArrowRight size={14} className="text-gray-300 group-hover:text-indigo-500 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-                            </button>
-                        ))}
-                      </div>
-                  </div>
-              )}
-              <div className="bg-gray-50 p-2 border-t border-gray-100 flex justify-between items-center text-[10px] text-gray-400 px-4">
-                  <div className="flex items-center gap-1">
-                      <Command size={10} /> <span>Nuffi Global Search</span>
-                  </div>
-                  <span>{results.length} wyników</span>
+        <div className="fixed inset-0 z-[99999] flex items-start justify-center pt-[10vh] px-4 font-sans">
+          {/* Backdrop */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
+
+          {/* Modal */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="relative w-full max-w-2xl bg-[#0F172A] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 ring-1 ring-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center px-4 py-4 border-b border-slate-700/50">
+              <Search className="text-slate-400 mr-3 shrink-0" size={20} />
+              <input 
+                ref={inputRef}
+                type="text" 
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDownInput}
+                placeholder="Szukaj dokumentów, klientów lub wpisz komendę..." 
+                className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-slate-500 font-medium h-full w-full"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
+              />
+              <div className="flex items-center gap-3 shrink-0">
+                {loading && <Loader2 className="animate-spin text-indigo-500" size={18} />}
+                <button 
+                    onClick={onClose} 
+                    className="text-slate-400 hover:text-white transition-colors bg-slate-800 px-2 py-1 rounded text-xs font-bold border border-slate-700"
+                >
+                    ESC
+                </button>
               </div>
-          </div>
+            </div>
+
+            {/* List */}
+            <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2" ref={listRef}>
+                {!query && (
+                    <div className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 mt-2">
+                        Sugerowane
+                    </div>
+                )}
+                
+                {currentItems.length > 0 ? (
+                    currentItems.map((item, idx) => (
+                        <div
+                            key={item.id || idx}
+                            onClick={() => handleSelect(item)}
+                            onMouseEnter={() => setSelectedIndex(idx)}
+                            className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${
+                                idx === selectedIndex 
+                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' 
+                                    : 'text-slate-300 hover:bg-slate-800/50'
+                            }`}
+                        >
+                            <div className={`p-2 rounded-lg shrink-0 ${idx === selectedIndex ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                                {item.icon || getIcon(item.type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-bold ${idx === selectedIndex ? 'text-white' : 'text-slate-200'}`}>{item.title}</p>
+                                <p className={`text-xs truncate ${idx === selectedIndex ? 'text-indigo-200' : 'text-slate-500'}`}>{item.subtitle}</p>
+                            </div>
+                            {idx === selectedIndex && (
+                                <ArrowRight size={16} className="text-white opacity-80 shrink-0" />
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    !loading && (
+                        <div className="py-12 text-center text-slate-500">
+                            <Search size={40} className="mx-auto mb-3 opacity-20" />
+                            <p className="text-sm">Brak wyników dla "{query}"</p>
+                        </div>
+                    )
+                )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 bg-slate-900/80 border-t border-slate-700/50 flex justify-between items-center text-[10px] text-slate-500 font-medium">
+                <div className="flex gap-4">
+                    <span className="flex items-center gap-1"><Command size={10} /> <strong>K</strong> otwórz</span>
+                    <span className="flex items-center gap-1"><strong>&uarr;&darr;</strong> nawigacja</span>
+                    <span className="flex items-center gap-1"><strong>Enter</strong> wybierz</span>
+                </div>
+                <div className="flex items-center gap-1 text-indigo-500/50">
+                    <Zap size={10} /> Nuffi Intelligence
+                </div>
+            </div>
+          </motion.div>
+        </div>
       )}
-    </div>
+    </AnimatePresence>,
+    document.body
   );
 };

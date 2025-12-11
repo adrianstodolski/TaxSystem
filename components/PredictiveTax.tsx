@@ -56,35 +56,35 @@ export const PredictiveTax: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Telescope className="text-indigo-600" /> Predictive Tax AI
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Telescope className="text-indigo-400" /> Predictive Tax AI
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Prognozowanie obciążeń podatkowych i symulacje scenariuszy biznesowych (What-If).
                     </p>
                 </div>
-                <div className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-100 font-medium text-sm">
+                <div className="flex items-center gap-2 bg-indigo-500/10 text-indigo-300 px-3 py-1.5 rounded-lg border border-indigo-500/20 font-medium text-sm">
                     <BrainCircuit size={16} /> Powered by Gemini AI
                 </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Forecast Chart */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div className="lg:col-span-2 glass-card rounded-2xl p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                        <h3 className="font-bold text-white flex items-center gap-2">
                             <TrendingUp size={20} className="text-slate-400" /> Prognoza Podatkowa (6 msc)
                         </h3>
                         <div className="flex items-center gap-4 text-xs font-bold">
-                            <span className="flex items-center gap-1 text-slate-500"><div className="w-2 h-2 rounded-full bg-slate-300"></div> Historia</span>
-                            <span className="flex items-center gap-1 text-indigo-600"><div className="w-2 h-2 rounded-full bg-indigo-500"></div> AI Prediction</span>
+                            <span className="flex items-center gap-1 text-slate-400"><div className="w-2 h-2 rounded-full bg-slate-500"></div> Historia</span>
+                            <span className="flex items-center gap-1 text-indigo-400"><div className="w-2 h-2 rounded-full bg-indigo-500"></div> AI Prediction</span>
                         </div>
                     </div>
 
                     <div className="h-80 w-full">
-                        {loading ? <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-indigo-600" /></div> : (
+                        {loading ? <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-indigo-500" /></div> : (
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={predictions} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                     <defs>
@@ -97,11 +97,11 @@ export const PredictiveTax: React.FC = () => {
                                             <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                                         </linearGradient>
                                     </defs>
-                                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v/1000}k`} />
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v/1000}k`} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                                     <Tooltip 
-                                        contentStyle={{borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                        contentStyle={{backgroundColor: '#0f172a', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff'}}
                                         formatter={(value: number) => formatCurrency(value)}
                                     />
                                     <ReferenceLine x="Nov" stroke="#64748B" strokeDasharray="3 3" label={{ position: 'top',  value: 'Dzisiaj', fill: '#64748B', fontSize: 10 }} />
@@ -114,7 +114,7 @@ export const PredictiveTax: React.FC = () => {
                 </div>
 
                 {/* Scenario Simulator */}
-                <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div className="glass-card-glow text-white rounded-2xl p-6 relative overflow-hidden">
                     <div className="relative z-10">
                         <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
                             <Sliders size={20} className="text-indigo-400" /> Symulator Scenariuszy
@@ -179,49 +179,49 @@ export const PredictiveTax: React.FC = () => {
             </div>
 
             {/* Legislative Radar */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
+            <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10 bg-slate-900/30 flex justify-between items-center">
+                    <h3 className="font-bold text-white flex items-center gap-2">
                         <ShieldAlert size={18} className="text-amber-500" /> Radar Legislacyjny (GovTech Scanner)
                     </h3>
-                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
                         <Info size={12} /> Skanuje: sejm.gov.pl, mf.gov.pl
                     </span>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-white/5">
                     {loading ? <div className="p-8 text-center text-slate-400">Skanowanie ustaw...</div> : alerts.map(alert => (
-                        <div key={alert.id} className="p-6 hover:bg-slate-50 transition-colors group">
+                        <div key={alert.id} className="p-6 hover:bg-white/5 transition-colors group">
                             <div className="flex items-start justify-between">
                                 <div className="flex gap-4">
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold shrink-0 ${
-                                        alert.impact === 'HIGH' ? 'bg-red-100 text-red-600' :
-                                        alert.impact === 'MEDIUM' ? 'bg-amber-100 text-amber-600' :
-                                        'bg-blue-100 text-blue-600'
+                                        alert.impact === 'HIGH' ? 'bg-rose-500/20 text-rose-500' :
+                                        alert.impact === 'MEDIUM' ? 'bg-amber-500/20 text-amber-500' :
+                                        'bg-blue-500/20 text-blue-500'
                                     }`}>
                                         !
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-slate-900 text-lg group-hover:text-indigo-700 transition-colors">{alert.title}</h4>
-                                        <p className="text-slate-600 text-sm mt-1 max-w-2xl">{alert.description}</p>
+                                        <h4 className="font-bold text-white text-lg group-hover:text-indigo-400 transition-colors">{alert.title}</h4>
+                                        <p className="text-slate-400 text-sm mt-1 max-w-2xl">{alert.description}</p>
                                         <div className="flex gap-3 mt-3">
-                                            <span className="text-xs font-mono bg-slate-100 text-slate-500 px-2 py-1 rounded">
+                                            <span className="text-xs font-mono bg-slate-800 text-slate-400 px-2 py-1 rounded">
                                                 Effective: {alert.effectiveDate}
                                             </span>
-                                            <span className="text-xs font-bold text-slate-400 px-2 py-1 uppercase border border-slate-200 rounded">
+                                            <span className="text-xs font-bold text-slate-500 px-2 py-1 uppercase border border-slate-700 rounded">
                                                 Source: {alert.source}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${
-                                        alert.impact === 'HIGH' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                        alert.impact === 'MEDIUM' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
-                                        'bg-blue-50 text-blue-700 border border-blue-100'
+                                    <span className={`text-xs font-bold px-2 py-1 rounded uppercase border ${
+                                        alert.impact === 'HIGH' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' :
+                                        alert.impact === 'MEDIUM' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                        'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                     }`}>
                                         {alert.impact} Impact
                                     </span>
-                                    <button className="block mt-4 text-sm font-bold text-indigo-600 hover:underline">
+                                    <button className="block mt-4 text-sm font-bold text-indigo-400 hover:underline">
                                         Analizuj wpływ &rarr;
                                     </button>
                                 </div>

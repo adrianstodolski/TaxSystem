@@ -1,4 +1,3 @@
-
 import {
     ForensicsSummary, UserProfile, TaxReturn, Invoice, RecurringInvoice, RecurringSuggestion,
     NbpTable, Asset, Contractor, WhiteListStatus, FinancialReport, CalendarEvent, Budget,
@@ -16,7 +15,7 @@ import {
     AccountVerification, Transaction, DirectDebitMandate, OssTransaction, OssCountryReport,
     IntrastatThreshold, TaxBreakdown, CryptoTaxReport, InvoiceItem, CryptoExchange,
     DeFiProtocol, GoldRushTx, NFTAsset, ExchangeRate, FxPosition, LedgerEntry,
-    SubscriptionPlan, GusData
+    SubscriptionPlan, GusData, AssetCategory
 } from '../types';
 import { TaxEngine, TaxSimulator } from '../utils/taxUtils';
 
@@ -44,7 +43,7 @@ export const NuffiService = {
             }
         };
     },
-    login: async (email: string, pass: string) => { await delay(500); return { token: 'mock-token', plan: SubscriptionPlan.PRO, user: { firstName: 'Jan', lastName: 'Kowalski', email, companyName: 'Software House SP. Z O.O.', nip: '5213123123', taxationForm: 'FLAT_RATE', kycStatus: 'VERIFIED' } as UserProfile }; },
+    login: async (email: string, pass: string): Promise<{ token: string, plan: SubscriptionPlan, user: UserProfile }> => { await delay(500); return { token: 'mock-token', plan: SubscriptionPlan.PRO, user: { firstName: 'Jan', lastName: 'Kowalski', email, companyName: 'Software House SP. Z O.O.', nip: '5213123123', taxationForm: 'FLAT_RATE', kycStatus: 'VERIFIED', pesel: '90010112345', taxOfficeCode: '1431', cryptoStrategy: 'FIFO', companyAddress: 'Prosta 20, 00-850 Warszawa' } }; },
     register: async (nip: string, email: string) => { await delay(1000); return { status: 'OK' }; },
     fetchUserProfile: async () => ({ firstName: 'Jan', lastName: 'Kowalski', email: 'jan@example.com', nip: '5213123123', pesel: '90010112345', taxOfficeCode: '1431', taxationForm: 'FLAT_RATE', cryptoStrategy: 'FIFO', kycStatus: 'VERIFIED', companyName: 'Software House SP. Z O.O.', companyAddress: 'Prosta 20, 00-850 Warszawa' } as UserProfile),
     updateUserProfile: async (profile: UserProfile) => { await delay(500); return profile; },
@@ -149,7 +148,7 @@ export const NuffiService = {
     fetchHistory: async () => ([] as TaxReturn[]),
     runSimulation: (params: SimulationParams) => TaxSimulator.simulateExpense(params),
     fetchAssets: async () => ([
-        { id: 'a1', name: 'MacBook Pro', category: 'Komputery i elektronika', purchaseDate: '2023-01-15', initialValue: 12000, currentValue: 9000, amortizationRate: 0.30, schedule: [] }
+        { id: 'a1', name: 'MacBook Pro', category: AssetCategory.COMPUTER, purchaseDate: '2023-01-15', initialValue: 12000, currentValue: 9000, amortizationRate: 0.30, schedule: [] }
     ] as Asset[]),
     addAsset: async (name: string, cat: string, val: number, date: string) => { await delay(500); },
     fetchContractors: async () => ([
@@ -200,7 +199,7 @@ export const NuffiService = {
     verifyAccountOwnership: async (iban: string, name: string) => { await delay(1000); return { matchStatus: 'MATCH', confidenceScore: 99 } as AccountVerification; },
     
     verifyNftAccess: async (wallet: string) => { await delay(1000); return true; },
-    fetchGusData: async (nip: string): Promise<GusData | null> => { await delay(1000); return { name: 'Test Company', street: 'Testowa', propertyNumber: '1', city: 'Warszawa', zipCode: '00-001', vatStatus: 'ACTIVE', regon: '123456789' } as GusData; },
+    fetchGusData: async (nip: string): Promise<GusData | null> => { await delay(1000); return { name: 'Test Company', street: 'Testowa', propertyNumber: '1', city: 'Warszawa', zipCode: '00-001', vatStatus: 'ACTIVE', regon: '123456789', nip: nip } as GusData; },
     createStripeCheckout: async (plan: string) => { await delay(1000); return 'https://stripe.com'; },
     
     searchCeidgAndWhiteList: async (q: string) => ([

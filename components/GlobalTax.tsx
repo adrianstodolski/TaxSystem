@@ -53,12 +53,12 @@ export const GlobalTax: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Globe className="text-indigo-600" /> Nuffi Global (Cross-Border)
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Globe className="text-indigo-400" /> Nuffi Global (Cross-Border)
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Rozliczenia dochodów zagranicznych, PIT-ZG i optymalizacja rezydencji.
                     </p>
                 </div>
@@ -66,23 +66,23 @@ export const GlobalTax: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Input Panel */}
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <div className="glass-card p-8 rounded-2xl border border-white/10">
+                    <h3 className="font-bold text-white mb-6 flex items-center gap-2">
                         <Map size={20} className="text-slate-400" /> Konfiguracja Źródła
                     </h3>
 
                     <div className="space-y-6">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Kraj Źródła Dochodu</label>
+                            <label className="block text-sm font-bold text-slate-400 mb-2">Kraj Źródła Dochodu</label>
                             <div className="grid grid-cols-3 gap-3">
                                 {countries.map(c => (
                                     <button 
                                         key={c.countryCode}
                                         onClick={() => setSelectedCountry(c.countryCode)}
-                                        className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all ${selectedCountry === c.countryCode ? 'bg-indigo-50 border-indigo-600 ring-1 ring-indigo-600' : 'bg-white border-slate-200 hover:border-indigo-300'}`}
+                                        className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all ${selectedCountry === c.countryCode ? 'bg-indigo-600/20 border-indigo-500 ring-1 ring-indigo-500' : 'bg-slate-900 border-slate-700 hover:border-slate-500'}`}
                                     >
                                         <span className="text-2xl mb-1">{c.flag}</span>
-                                        <span className="text-xs font-bold text-slate-700">{c.name}</span>
+                                        <span className="text-xs font-bold text-white">{c.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -90,29 +90,29 @@ export const GlobalTax: React.FC = () => {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Dochód Brutto</label>
+                                <label className="block text-sm font-bold text-slate-400 mb-2">Dochód Brutto</label>
                                 <div className="relative">
                                     <input 
                                         type="number" 
                                         value={incomeAmount}
                                         onChange={e => setIncomeAmount(e.target.value)}
-                                        className="w-full pl-4 pr-12 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                                        className="w-full pl-4 pr-12 py-3 bg-slate-800 border border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-white"
                                     />
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">
                                         {selectedCountry === 'UK' ? 'GBP' : selectedCountry === 'US' ? 'USD' : 'EUR'}
                                     </span>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Podatek Zapłacony</label>
+                                <label className="block text-sm font-bold text-slate-400 mb-2">Podatek Zapłacony</label>
                                 <div className="relative">
                                     <input 
                                         type="number" 
                                         value={taxPaid}
                                         onChange={e => setTaxPaid(e.target.value)}
-                                        className="w-full pl-4 pr-12 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                                        className="w-full pl-4 pr-12 py-3 bg-slate-800 border border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-white"
                                     />
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">
                                         {selectedCountry === 'UK' ? 'GBP' : selectedCountry === 'US' ? 'USD' : 'EUR'}
                                     </span>
                                 </div>
@@ -120,16 +120,16 @@ export const GlobalTax: React.FC = () => {
                         </div>
 
                         {currentCountry && (
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm">
+                            <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 text-sm">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-slate-500">Metoda unikania (UPO):</span>
-                                    <span className="font-bold text-indigo-700">
+                                    <span className="text-slate-400">Metoda unikania (UPO):</span>
+                                    <span className="font-bold text-indigo-400">
                                         {currentCountry.dttMethod === 'EXEMPTION_WITH_PROGRESSION' ? 'Wyłączenie z Progresją' : 'Odliczenie Proporcjonalne'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-500">Stawka CIT (Lokalna):</span>
-                                    <span className="font-bold text-slate-900">{currentCountry.taxRateCorporate}%</span>
+                                    <span className="text-slate-400">Stawka CIT (Lokalna):</span>
+                                    <span className="font-bold text-white">{currentCountry.taxRateCorporate}%</span>
                                 </div>
                             </div>
                         )}
@@ -137,7 +137,7 @@ export const GlobalTax: React.FC = () => {
                         <button 
                             onClick={handleCalculate}
                             disabled={calculating}
-                            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg"
+                            className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-900/50"
                         >
                             {calculating ? <Loader2 className="animate-spin" /> : <><Calculator size={18} /> Symuluj Podatek (PL + Zagranica)</>}
                         </button>
@@ -145,49 +145,49 @@ export const GlobalTax: React.FC = () => {
                 </div>
 
                 {/* Result Panel */}
-                <div className={`p-8 rounded-2xl border transition-all relative overflow-hidden ${result ? 'bg-white border-slate-200 shadow-xl' : 'bg-slate-50 border-dashed border-slate-300 flex items-center justify-center'}`}>
+                <div className={`p-8 rounded-2xl border transition-all relative overflow-hidden ${result ? 'bg-slate-900 border-slate-700 shadow-xl' : 'bg-slate-900/50 border-dashed border-slate-800 flex items-center justify-center'}`}>
                     {!result ? (
-                        <div className="text-center text-slate-400">
+                        <div className="text-center text-slate-500">
                             <Globe size={48} className="mx-auto mb-4 opacity-20" />
                             <p>Wprowadź dane, aby zobaczyć symulację.</p>
                         </div>
                     ) : (
                         <div className="relative z-10 animate-in fade-in">
-                            <h3 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <Scale size={20} className="text-indigo-600" /> Wynik Symulacji
+                            <h3 className="font-bold text-white mb-6 flex items-center gap-2">
+                                <Scale size={20} className="text-indigo-400" /> Wynik Symulacji
                             </h3>
 
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                            <div className="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-6">
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-slate-500 text-sm">Metoda</span>
-                                    <span className="font-bold text-indigo-600 text-sm bg-white px-2 py-1 rounded border border-indigo-100">{result.methodUsed}</span>
+                                    <span className="text-slate-400 text-sm">Metoda</span>
+                                    <span className="font-bold text-indigo-400 text-sm bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">{result.methodUsed}</span>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-600">Dochód Zagraniczny (PLN)</span>
-                                    <span className="font-mono font-bold text-slate-900">{formatCurrency(result.foreignTaxBasePln)}</span>
+                                    <span className="text-slate-400">Dochód Zagraniczny (PLN)</span>
+                                    <span className="font-mono font-bold text-white">{formatCurrency(result.foreignTaxBasePln)}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-600">Podatek zapłacony za granicą</span>
+                                    <span className="text-slate-400">Podatek zapłacony za granicą</span>
                                     <span className="font-mono text-slate-500">{formatCurrency(result.foreignTaxPaidPln)}</span>
                                 </div>
-                                <div className="w-full border-t border-slate-200 my-2"></div>
+                                <div className="w-full border-t border-white/10 my-2"></div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-600">Efektywna stawka (Stopa %)</span>
-                                    <span className="font-mono font-bold text-indigo-600">{(result.effectiveRate * 100).toFixed(2)}%</span>
+                                    <span className="text-slate-400">Efektywna stawka (Stopa %)</span>
+                                    <span className="font-mono font-bold text-indigo-400">{(result.effectiveRate * 100).toFixed(2)}%</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-600">Dopłata w Polsce (PIT-ZG)</span>
-                                    <span className={`font-mono font-bold text-xl ${result.additionalPaymentPl > 0 ? 'text-rose-600' : 'text-green-600'}`}>
+                                    <span className="text-slate-400">Dopłata w Polsce (PIT-ZG)</span>
+                                    <span className={`font-mono font-bold text-xl ${result.additionalPaymentPl > 0 ? 'text-rose-400' : 'text-green-400'}`}>
                                         {formatCurrency(result.additionalPaymentPl)}
                                     </span>
                                 </div>
                             </div>
 
                             {result.additionalPaymentPl > 0 && (
-                                <div className="mt-6 bg-amber-50 p-3 rounded-lg border border-amber-100 flex items-start gap-3 text-xs text-amber-800">
+                                <div className="mt-6 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20 flex items-start gap-3 text-xs text-amber-400">
                                     <Info size={16} className="shrink-0 mt-0.5" />
                                     <p>
                                         Występuje obowiązek dopłaty różnicy podatkowej w Polsce (metoda odliczenia proporcjonalnego). 
@@ -198,7 +198,7 @@ export const GlobalTax: React.FC = () => {
                         </div>
                     )}
                     {/* Deco */}
-                    {result && <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>}
+                    {result && <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>}
                 </div>
             </div>
         </div>

@@ -31,30 +31,30 @@ export const Cards: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <CreditCard className="text-indigo-600" /> Karty Firmowe
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <CreditCard className="text-indigo-400" /> Karty Firmowe
                     </h2>
-                    <p className="text-slate-500 mt-1">Wydawaj wirtualne karty dla pracowników i subskrypcji.</p>
+                    <p className="text-slate-400 mt-1">Wydawaj wirtualne karty dla pracowników i subskrypcji.</p>
                 </div>
                 <button 
                     onClick={() => toast.success('Nowa karta', 'Karta wirtualna została utworzona i jest gotowa do użycia.')}
-                    className="bg-slate-900 text-white px-4 py-2 rounded-xl font-bold hover:bg-slate-800 flex items-center gap-2 shadow-sm"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 flex items-center gap-2 shadow-lg shadow-indigo-900/50 transition-all"
                 >
                     <Plus size={18} /> Wydaj Kartę
                 </button>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {loading ? [1,2,3].map(i => <div key={i} className="h-64 bg-slate-100 rounded-2xl animate-pulse" />) : 
+                {loading ? [1,2,3].map(i => <div key={i} className="h-64 bg-slate-800/50 rounded-2xl animate-pulse" />) : 
                     cards.map(card => (
                         <div key={card.id} className="group relative">
                             {/* Card Visual */}
-                            <div className={`aspect-[1.586/1] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden transition-transform duration-300 group-hover:-translate-y-2 ${card.color} ${card.status === 'FROZEN' ? 'grayscale opacity-75' : ''}`}>
+                            <div className={`aspect-[1.586/1] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden transition-transform duration-300 group-hover:-translate-y-2 border border-white/10 ${card.color} ${card.status === 'FROZEN' ? 'grayscale opacity-75' : ''}`}>
                                 <div className="relative z-10 flex flex-col justify-between h-full">
                                     <div className="flex justify-between items-start">
-                                        <div className="bg-white/20 backdrop-blur-md px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">
+                                        <div className="bg-black/20 backdrop-blur-md px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase border border-white/10">
                                             {card.type}
                                         </div>
                                         <span className="font-bold italic text-lg opacity-80">{card.brand}</span>
@@ -62,7 +62,7 @@ export const Cards: React.FC = () => {
                                     
                                     <div className="space-y-1">
                                         {card.status === 'FROZEN' && (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-20 rounded-2xl">
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-20 rounded-2xl border border-white/10">
                                                 <Lock size={32} className="text-white" />
                                             </div>
                                         )}
@@ -89,17 +89,17 @@ export const Cards: React.FC = () => {
                             </div>
 
                             {/* Controls */}
-                            <div className="mt-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                            <div className="mt-4 glass-card rounded-xl p-4">
                                 <div className="flex justify-between items-center mb-3">
-                                    <div className="text-xs text-slate-500">
-                                        Limit: <span className="font-bold text-slate-900">{formatCurrency(card.limitMonthly)}</span>
+                                    <div className="text-xs text-slate-400">
+                                        Limit: <span className="font-bold text-white">{formatCurrency(card.limitMonthly)}</span>
                                     </div>
-                                    <div className="text-xs text-slate-500">
-                                        Wydano: <span className="font-bold text-indigo-600">{formatCurrency(card.spentMonthly)}</span>
+                                    <div className="text-xs text-slate-400">
+                                        Wydano: <span className="font-bold text-indigo-400">{formatCurrency(card.spentMonthly)}</span>
                                     </div>
                                 </div>
-                                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-4">
-                                    <div className="bg-indigo-600 h-full rounded-full" style={{width: `${(card.spentMonthly / card.limitMonthly) * 100}%`}}></div>
+                                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-4 border border-slate-700">
+                                    <div className="bg-indigo-500 h-full rounded-full shadow-[0_0_8px_#6366f1]" style={{width: `${(card.spentMonthly / card.limitMonthly) * 100}%`}}></div>
                                 </div>
 
                                 <div className="flex gap-2">
@@ -107,13 +107,13 @@ export const Cards: React.FC = () => {
                                         onClick={() => toggleFreeze(card)}
                                         className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center gap-1 ${
                                             card.status === 'FROZEN' 
-                                                ? 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800' 
-                                                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                                ? 'bg-slate-700 text-white border-slate-600 hover:bg-slate-600' 
+                                                : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
                                         }`}
                                     >
                                         {card.status === 'FROZEN' ? <><Unlock size={12} /> Odblokuj</> : <><Lock size={12} /> Zamroź</>}
                                     </button>
-                                    <button className="flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-1">
+                                    <button className="flex-1 py-2 rounded-lg text-xs font-bold border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 flex items-center justify-center gap-1">
                                         Zmień limit
                                     </button>
                                 </div>

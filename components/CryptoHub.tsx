@@ -1,107 +1,120 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { NuffiService } from '../services/api';
-import { CryptoExchange, CryptoTransaction, CryptoTaxReport, DeFiReward, TaxHarvestingOpp, NFTAsset, CryptoAnalytics, WalletRiskProfile, ImpermanentLossResult, GoldRushTx, WalletDna, StreamEvent, TokenGodMode, TokenAllowance, NftCollectionStat, DeFiProtocol } from '../types';
+import { CryptoExchange, CryptoTransaction, CryptoTaxReport, NFTAsset, AssetBubble } from '../types';
 import { CryptoEngine } from '../utils/cryptoEngine';
-import { Bitcoin, RefreshCw, Key, Shield, AlertTriangle, FileText, TrendingUp, TrendingDown, DollarSign, Download, Plus, Layers, Zap, ArrowRight, Wallet, Image, BarChart2, Calculator, ShieldCheck, Activity, X, Server, Database, Code, Box, Eye, Fingerprint, Lock, Search, CheckCircle2, Network, Radio, Coins } from 'lucide-react';
-import { Modal } from './ui/Modal';
+import { Bitcoin, RefreshCw, Layers, ShieldCheck, Activity, Image, Radio, FileText, Calculator, TrendingDown, Coins, CircleDollarSign, LayoutGrid } from 'lucide-react';
 import { toast } from './ui/Toast';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { DataTable } from './ui/DataTable';
+import { ColumnDef } from '@tanstack/react-table';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Mock Bubble Data
+const MOCK_BUBBLES: AssetBubble[] = [
+    { id: '1', symbol: 'BTC', name: 'Bitcoin', price: 45000, change24h: 2.5, marketCap: 850000000000, volume24h: 35000000000, rank: 1 },
+    { id: '2', symbol: 'ETH', name: 'Ethereum', price: 2400, change24h: -1.2, marketCap: 280000000000, volume24h: 15000000000, rank: 2 },
+    { id: '3', symbol: 'SOL', name: 'Solana', price: 95, change24h: 8.5, marketCap: 40000000000, volume24h: 4000000000, rank: 5 },
+    { id: '4', symbol: 'BNB', name: 'BNB', price: 310, change24h: 0.5, marketCap: 48000000000, volume24h: 1000000000, rank: 4 },
+    { id: '5', symbol: 'XRP', name: 'XRP', price: 0.55, change24h: -0.8, marketCap: 30000000000, volume24h: 1200000000, rank: 6 },
+    { id: '6', symbol: 'ADA', name: 'Cardano', price: 0.50, change24h: 1.1, marketCap: 18000000000, volume24h: 500000000, rank: 8 },
+    { id: '7', symbol: 'AVAX', name: 'Avalanche', price: 35, change24h: 12.4, marketCap: 13000000000, volume24h: 800000000, rank: 9 },
+    { id: '8', symbol: 'DOGE', name: 'Dogecoin', price: 0.08, change24h: -3.5, marketCap: 11000000000, volume24h: 600000000, rank: 10 },
+];
 
 export const CryptoHub: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'TAX' | 'DEFI' | 'NFT' | 'ANALYTICS' | 'RISK' | 'HARVESTING' | 'GOLDRUSH' | 'NANSEN' | 'STREAMS' | 'GODMODE' | 'ALLOWANCES' | 'NFT_PARADISE' | 'LIVE_ANALYZER'>('TAX');
-    
-    // Data States
+    const [activeTab, setActiveTab] = useState<'BUBBLES' | 'TAX' | 'NFT_PARADISE' | 'DEFI'>('BUBBLES');
     const [transactions, setTransactions] = useState<CryptoTransaction[]>([]);
     const [report, setReport] = useState<CryptoTaxReport | null>(null);
-    const [defiProtocols, setDeFiProtocols] = useState<DeFiProtocol[]>([]); 
-    const [goldRushData, setGoldRushData] = useState<GoldRushTx[]>([]);
-    const [nfts, setNfts] = useState<NFTAsset[]>([]); // New NFT state
-    
+    const [nfts, setNfts] = useState<NFTAsset[]>([]);
     const [loading, setLoading] = useState(false);
-    const [exchangeStatus, setExchangeStatus] = useState<Record<string, boolean>>({});
     
-    // IL Calculator
-    const [ilOpen, setIlOpen] = useState(false);
-    
+    // Bubble State
+    const [bubbles, setBubbles] = useState(MOCK_BUBBLES);
+
+    // Load Data Logic... (Same as before, simplified for brevity)
     const loadData = async () => {
         setLoading(true);
         try {
-            const exStatus = await NuffiService.getExchangeConnectionStatus();
-            setExchangeStatus(exStatus);
-
-            const [txs, defiData, grData, nftData] = await Promise.all([
+            const [txs, nftData] = await Promise.all([
                 NuffiService.fetchCryptoTransactions(),
-                NuffiService.fetchDeFiProtocols(),
-                NuffiService.fetchGoldRushData('0xMyWallet'),
-                NuffiService.fetchNFTs(),
+                NuffiService.fetchNFTs()
             ]);
             setTransactions(txs);
-            setDeFiProtocols(defiData);
-            setGoldRushData(grData);
             setNfts(nftData);
-            
-            // Calculate Tax Logic
-            const taxReport = CryptoEngine.calculateTax(txs, 'FIFO');
-            setReport(taxReport);
-            
+            setReport(CryptoEngine.calculateTax(txs, 'FIFO'));
         } catch (e) {
-            toast.error('Błąd synchronizacji', 'Nie udało się pobrać danych.');
+            toast.error('Błąd', 'Nie udało się pobrać danych.');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        loadData();
-    }, []);
+    useEffect(() => { loadData(); }, []);
+
+    // TanStack Table Columns (Same as before)
+    const columns = useMemo<ColumnDef<CryptoTransaction>[]>(() => [
+        {
+            accessorKey: 'timestamp',
+            header: 'Data',
+            cell: info => <span className="font-mono text-xs text-slate-400">{new Date(info.getValue() as string).toLocaleString()}</span>
+        },
+        {
+            accessorKey: 'exchange',
+            header: 'Giełda',
+            cell: info => (
+                <span className="text-[10px] font-bold px-2 py-1 rounded text-white bg-slate-600">
+                    {info.getValue() as string}
+                </span>
+            )
+        },
+        {
+            accessorKey: 'pair',
+            header: 'Para',
+            cell: info => <span className="font-bold text-white">{info.getValue() as string}</span>
+        },
+        {
+            accessorKey: 'type',
+            header: 'Typ',
+            cell: info => <span className="text-[10px] font-bold uppercase">{info.getValue() as string}</span>
+        },
+        {
+            accessorKey: 'totalFiat',
+            header: 'Wartość',
+            cell: info => <span className="font-bold font-mono text-white">{(info.getValue() as number).toFixed(2)} PLN</span>
+        }
+    ], []);
 
     const formatFiat = (val: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val);
-    const formatUsd = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-    const formatEth = (val: number) => `${val.toFixed(3)} ETH`;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            {/* Header */}
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+        <div className="space-y-6 animate-in fade-in duration-500 pb-20">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Bitcoin className="text-orange-500" /> Crypto Hub
                     </h2>
-                    <p className="text-slate-500 mt-1">Kompleksowe zarządzanie aktywami cyfrowymi.</p>
+                    <p className="text-slate-400 mt-1">Zarządzanie aktywami, analiza rynku i podatki.</p>
                 </div>
                 <div className="flex gap-2 items-center">
-                    {/* Active Connection Indicators */}
-                    <div className="flex gap-1 mr-2">
-                        {exchangeStatus[CryptoExchange.MEXC] && <span className="text-[10px] font-bold bg-[#2B77F9] text-white px-2 py-1 rounded flex items-center gap-1 shadow-sm"><CheckCircle2 size={10} /> MEXC</span>}
-                        {exchangeStatus[CryptoExchange.BYBIT] && <span className="text-[10px] font-bold bg-[#F7A600] text-black px-2 py-1 rounded flex items-center gap-1 shadow-sm"><CheckCircle2 size={10} /> BYBIT</span>}
-                    </div>
-
-                    <button 
-                        onClick={loadData}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-sm transition-all"
-                    >
-                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> {loading ? 'Pobieranie...' : 'Sync Live'}
+                    <button onClick={loadData} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 flex items-center gap-2 shadow-lg transition-all text-sm">
+                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} /> Sync Wallets
                     </button>
                 </div>
             </header>
 
-            {/* Navigation Tabs - Enhanced */}
-            <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 inline-flex overflow-x-auto max-w-full">
+            {/* Navigation Pills */}
+            <div className="flex gap-2 mb-6">
                 {[
-                    { id: 'TAX', label: 'Podatki', icon: FileText },
-                    { id: 'LIVE_ANALYZER', label: 'Live Blockchain', icon: Radio },
-                    { id: 'DEFI', label: 'DeFi Archeology', icon: Layers },
-                    { id: 'NFT_PARADISE', label: 'NFT Paradise', icon: Image },
-                    { id: 'RISK', label: 'Risk', icon: ShieldCheck },
+                    { id: 'BUBBLES', label: 'Market Overview', icon: LayoutGrid },
+                    { id: 'TAX', label: 'Tax Engine', icon: FileText },
+                    { id: 'NFT_PARADISE', label: 'NFT Gallery', icon: Image },
+                    { id: 'DEFI', label: 'DeFi Portfolio', icon: Layers },
                 ].map(tab => (
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
-                        className={`px-4 py-2.5 text-sm font-bold rounded-lg transition-all flex items-center gap-2 whitespace-nowrap ${
-                            activeTab === tab.id 
-                                ? 'bg-slate-900 text-white shadow-md' 
-                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        className={`px-4 py-2 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${
+                            activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' : 'bg-slate-900 text-slate-400 hover:text-white border border-white/5'
                         }`}
                     >
                         <tab.icon size={16} /> {tab.label}
@@ -109,258 +122,105 @@ export const CryptoHub: React.FC = () => {
                 ))}
             </div>
 
-            {/* NFT PARADISE - TAX ENGINE */}
-            {activeTab === 'NFT_PARADISE' && (
-                <div className="space-y-6 animate-in fade-in">
-                    <div className="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
-                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div>
-                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">NFT Portfolio Value</p>
-                                <h3 className="text-4xl font-bold tracking-tight">{formatEth(nfts.filter(n => n.status === 'HELD').reduce((acc, n) => acc + n.floorPrice, 0))}</h3>
-                                <p className="text-xs text-purple-300 mt-2">Est. Floor Price Value</p>
-                            </div>
-                            <div className="border-l border-white/10 pl-8">
-                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">Realized Gains (YTD)</p>
-                                <h3 className="text-4xl font-bold tracking-tight text-green-400">
-                                    {formatEth(nfts.reduce((acc, n) => acc + (n.realizedPnL || 0), 0))}
-                                </h3>
-                                <p className="text-xs text-purple-300 mt-2">Taxable Income (Opodatkowane)</p>
-                            </div>
-                            <div className="border-l border-white/10 pl-8">
-                                <p className="text-purple-200 text-xs font-bold uppercase tracking-wider mb-2">Gas Spent (KUP)</p>
-                                <h3 className="text-4xl font-bold tracking-tight text-red-300">
-                                    {formatEth(nfts.reduce((acc, n) => acc + n.gasFee, 0))}
-                                </h3>
-                                <p className="text-xs text-purple-300 mt-2">Koszty uzyskania przychodu</p>
-                            </div>
+            <AnimatePresence mode="wait">
+                {/* 1. BUBBLES VIEW (CryptoBubbles.net Style) */}
+                {activeTab === 'BUBBLES' && (
+                    <motion.div 
+                        key="BUBBLES"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="h-[600px] bg-slate-900/50 rounded-2xl border border-white/10 relative overflow-hidden p-8 flex items-center justify-center"
+                    >
+                        <div className="absolute top-4 left-4 z-10 flex gap-4">
+                            <span className="text-xs font-bold text-slate-400 uppercase">Top 100 Coins</span>
+                            <span className="text-xs font-bold text-slate-400 uppercase">Performance: 24h</span>
                         </div>
-                        {/* Background Art */}
-                        <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-10 translate-y-10">
-                            <Image size={250} />
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {nfts.map((nft) => (
-                            <div key={nft.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group relative">
-                                <div className="aspect-square relative overflow-hidden bg-slate-100">
-                                    <img src={nft.imageUrl} alt={nft.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                    <div className="absolute top-2 right-2">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm ${nft.status === 'HELD' ? 'bg-white/90 text-slate-900' : 'bg-green-50 text-white'}`}>
-                                            {nft.status}
+                        {/* Simulated Bubble Layout (CSS Grid/Flex hybrid) */}
+                        <div className="flex flex-wrap gap-4 justify-center content-center w-full h-full">
+                            {bubbles.map((bubble, i) => {
+                                // Scale size by market cap (simplified log scale)
+                                const size = Math.max(80, Math.log10(bubble.marketCap) * 12); 
+                                const color = bubble.change24h > 0 
+                                    ? `rgba(34, 197, 94, ${Math.min(0.9, 0.3 + (bubble.change24h / 20))})` // Green opacity based on %
+                                    : `rgba(244, 63, 94, ${Math.min(0.9, 0.3 + (Math.abs(bubble.change24h) / 20))})`; // Red opacity
+
+                                return (
+                                    <motion.div
+                                        key={bubble.id}
+                                        layoutId={bubble.id}
+                                        className="rounded-full flex flex-col items-center justify-center text-white shadow-xl cursor-pointer hover:scale-110 transition-transform relative group border border-white/10 backdrop-blur-md"
+                                        style={{ 
+                                            width: size, 
+                                            height: size, 
+                                            backgroundColor: color 
+                                        }}
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: i * 0.05 }}
+                                    >
+                                        <span className="font-bold text-sm drop-shadow-md">{bubble.symbol}</span>
+                                        <span className="text-xs font-mono font-bold drop-shadow-md">{bubble.change24h > 0 ? '+' : ''}{bubble.change24h}%</span>
+                                        <span className="text-[10px] opacity-0 group-hover:opacity-100 absolute bottom-4 transition-opacity font-mono">
+                                            ${bubble.price.toLocaleString()}
                                         </span>
-                                    </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* 2. TAX VIEW (Koinly Style) */}
+                {activeTab === 'TAX' && (
+                    <motion.div 
+                        key="TAX"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-6"
+                    >
+                        {report && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-indigo-500">
+                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Dochód do opodatkowania</p>
+                                    <h3 className="text-3xl font-bold text-white font-mono">{formatFiat(report.spotIncomeTaxBase + report.futuresIncomeTaxBase)}</h3>
+                                </div>
+                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-rose-500">
+                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Koszty (Fees + Straty)</p>
+                                    <h3 className="text-3xl font-bold text-white font-mono">{formatFiat(report.spotCost + report.futuresCost)}</h3>
+                                </div>
+                                <div className="glass-card bg-slate-900 p-6 rounded-2xl border-l-4 border-green-500">
+                                    <p className="text-slate-400 text-xs font-bold uppercase mb-1">Podatek Należny (19%)</p>
+                                    <h3 className="text-3xl font-bold text-green-400 font-mono">{formatFiat(report.totalTaxDue)}</h3>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="glass-card rounded-2xl p-6">
+                            <h3 className="font-bold text-white mb-4">Pełny Rejestr Operacji</h3>
+                            <DataTable columns={columns} data={transactions} />
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* 3. NFT PARADISE */}
+                {activeTab === 'NFT_PARADISE' && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {nfts.map((nft, i) => (
+                            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-2xl overflow-hidden group">
+                                <div className="aspect-square bg-slate-800 relative">
+                                    <img src={nft.imageUrl} alt={nft.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="p-4">
-                                    <h4 className="font-bold text-slate-900 mb-1">{nft.name}</h4>
-                                    <p className="text-xs text-slate-500 mb-4">{nft.collection}</p>
-                                    
-                                    <div className="space-y-2 text-xs">
-                                        <div className="flex justify-between">
-                                            <span className="text-slate-500">Cost Basis (Buy + Gas)</span>
-                                            <span className="font-mono font-bold text-slate-700">{formatEth(nft.purchasePrice + nft.gasFee)}</span>
-                                        </div>
-                                        {nft.status === 'HELD' ? (
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-500">Current Floor</span>
-                                                <span className="font-mono font-bold text-indigo-600">{formatEth(nft.floorPrice)}</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex justify-between">
-                                                <span className="text-slate-500">Sold Price</span>
-                                                <span className="font-mono font-bold text-green-600">{formatEth(nft.soldPrice || 0)}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {nft.status === 'SOLD' && nft.realizedPnL && (
-                                        <div className="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center bg-green-50/50 p-2 rounded-lg">
-                                            <span className="text-xs font-bold text-green-800">Zysk (Taxable)</span>
-                                            <span className="font-mono font-bold text-green-600 text-sm">+{formatEth(nft.realizedPnL)}</span>
-                                        </div>
-                                    )}
+                                    <h4 className="font-bold text-white">{nft.name}</h4>
+                                    <p className="text-xs text-slate-400 font-mono mt-1">Floor: {nft.floorPrice} ETH</p>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
+                        {nfts.length === 0 && <div className="col-span-3 text-center py-20 text-slate-500">Brak NFT w połączonym portfelu.</div>}
                     </div>
-                </div>
-            )}
-
-            {/* LIVE BLOCKCHAIN ANALYZER */}
-            {activeTab === 'LIVE_ANALYZER' && (
-                <div className="space-y-6 animate-in fade-in">
-                    <div className="bg-[#0F172A] p-6 rounded-2xl border border-slate-800 text-white relative overflow-hidden">
-                        <div className="relative z-10">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold flex items-center gap-2">
-                                        <Activity className="text-green-400" /> Live Blockchain Tax Analyzer
-                                    </h3>
-                                    <p className="text-slate-400 text-sm mt-1">Analiza mempoolu i bloków w czasie rzeczywistym. Natychmiastowa klasyfikacja podatkowa.</p>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs font-mono text-green-400 bg-green-900/20 px-3 py-1 rounded border border-green-900/50">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Connected: ETH Mainnet
-                                </div>
-                            </div>
-
-                            <div className="h-64 flex flex-col justify-end space-y-2 font-mono text-xs overflow-hidden relative">
-                                {/* Simulated Stream */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] to-transparent z-10 pointer-events-none"></div>
-                                <div className="space-y-2 opacity-80">
-                                    <div className="flex gap-4 text-slate-500">
-                                        <span>[BLOCK 18452001]</span>
-                                        <span className="text-blue-400">Uniswap V3 Swap</span>
-                                        <span className="text-slate-300">0x7a... -> 0xd8...</span>
-                                        <span className="text-green-500">Tax Event: DISPOSAL</span>
-                                    </div>
-                                    <div className="flex gap-4 text-slate-500">
-                                        <span>[BLOCK 18452001]</span>
-                                        <span className="text-purple-400">Aave V3 Supply</span>
-                                        <span className="text-slate-300">0xMy... -> 0x87...</span>
-                                        <span className="text-slate-400">Tax Event: NON-TAXABLE</span>
-                                    </div>
-                                    <div className="flex gap-4 text-slate-500">
-                                        <span>[MEMPOOL]</span>
-                                        <span className="text-amber-400">Pending Approval</span>
-                                        <span className="text-slate-300">USDT -> Spender...</span>
-                                        <span className="text-slate-400">Gas: 45 Gwei</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* DEFI ARCHEOLOGY */}
-            {activeTab === 'DEFI' && (
-                <div className="space-y-6 animate-in fade-in">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {defiProtocols.map((proto, idx) => (
-                            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden group">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h4 className="font-bold text-slate-900 text-lg">{proto.name}</h4>
-                                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded font-bold uppercase">{proto.chain}</span>
-                                    </div>
-                                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:scale-110 transition-transform">
-                                        <Layers size={24} />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Balance</span>
-                                        <span className="font-bold font-mono">{formatUsd(proto.userBalanceUsd)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Rewards</span>
-                                        <span className="font-bold font-mono text-green-600">+{formatUsd(proto.unclaimedRewardsUsd)}</span>
-                                    </div>
-                                </div>
-                                <div className="mt-4 pt-4 border-t border-slate-100 text-center">
-                                    <button className="text-xs font-bold text-indigo-600 hover:underline">Pobierz historię transakcji</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* TAX TAB (Existing) */}
-            {activeTab === 'TAX' && (
-                <div className="space-y-6 animate-in fade-in">
-                    {/* Tax Summary */}
-                    {report && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-xl">
-                                <p className="text-slate-400 font-medium text-sm">Podatek Należny (19%)</p>
-                                <h3 className="text-4xl font-bold mt-2">{formatFiat(report.totalTaxDue)}</h3>
-                                <p className="text-xs text-slate-500 mt-2">Rok podatkowy: {report.year}</p>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                <p className="text-xs font-bold text-slate-500 uppercase">Dochód (Spot + Futures)</p>
-                                <h3 className="text-3xl font-bold text-green-600 mt-2">{formatFiat(report.spotIncomeTaxBase + report.futuresIncomeTaxBase)}</h3>
-                                <div className="mt-4 flex gap-2">
-                                    <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">Spot: {formatFiat(report.spotIncomeTaxBase)}</span>
-                                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">Futures: {formatFiat(report.futuresIncomeTaxBase)}</span>
-                                </div>
-                            </div>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                <p className="text-xs font-bold text-slate-500 uppercase">Koszty (Fees + Loss)</p>
-                                <h3 className="text-3xl font-bold text-red-600 mt-2">{formatFiat(report.spotCost + report.futuresCost)}</h3>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Transaction List */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 className="font-bold text-slate-900">Historia Transakcji (Live Feed)</h3>
-                            <span className="text-xs text-slate-500">{transactions.length} operacji</span>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-6 py-3">Data</th>
-                                        <th className="px-6 py-3">Giełda</th>
-                                        <th className="px-6 py-3">Para</th>
-                                        <th className="px-6 py-3">Typ</th>
-                                        <th className="px-6 py-3 text-right">Ilość</th>
-                                        <th className="px-6 py-3 text-right">Cena</th>
-                                        <th className="px-6 py-3 text-right">Wartość (Fiat)</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {transactions.map(tx => (
-                                        <tr key={tx.id} className="hover:bg-slate-50">
-                                            <td className="px-6 py-4 font-mono text-xs text-slate-500">
-                                                {new Date(tx.timestamp).toLocaleString()}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`text-[10px] font-bold px-2 py-1 rounded text-white ${
-                                                    tx.exchange === CryptoExchange.MEXC ? 'bg-[#2B77F9]' : 
-                                                    tx.exchange === CryptoExchange.BYBIT ? 'bg-[#F7A600]' : 
-                                                    'bg-slate-500'
-                                                }`}>
-                                                    {tx.exchange}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 font-bold text-slate-900">{tx.pair}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`text-[10px] font-bold uppercase ${
-                                                    tx.type.includes('BUY') ? 'text-green-600' :
-                                                    tx.type.includes('SELL') ? 'text-red-600' :
-                                                    'text-indigo-600'
-                                                }`}>
-                                                    {tx.type.replace('_', ' ')}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right font-mono">{tx.amount}</td>
-                                            <td className="px-6 py-4 text-right font-mono text-slate-500">{tx.price}</td>
-                                            <td className="px-6 py-4 text-right font-bold font-mono">{formatFiat(tx.totalFiat)}</td>
-                                        </tr>
-                                    ))}
-                                    {transactions.length === 0 && (
-                                        <tr>
-                                            <td colSpan={7} className="text-center py-8 text-slate-400">
-                                                Brak transakcji. Podłącz klucze API w ustawieniach (MEXC / Bybit).
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <Modal isOpen={ilOpen} onClose={() => setIlOpen(false)} title="Kalkulator IL">
-                 <div className="space-y-4 p-4">
-                     <p>Oblicz stratę nietrwałą.</p>
-                     <button onClick={() => {}} className="w-full bg-indigo-600 text-white py-2 rounded">Oblicz</button>
-                 </div>
-            </Modal>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

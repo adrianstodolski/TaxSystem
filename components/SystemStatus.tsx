@@ -39,19 +39,19 @@ export const SystemStatus: React.FC = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <header className="flex justify-between items-center border-b border-slate-200 pb-6">
+            <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <Activity className="text-indigo-600" /> System Status
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                        <Activity className="text-indigo-400" /> System Status
                     </h2>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-slate-400 mt-1">
                         Monitoring dostępności usług Nuffi Cloud.
                     </p>
                 </div>
             </header>
 
             {/* Global Status Banner */}
-            <div className={`p-6 rounded-2xl text-white flex items-center gap-4 shadow-lg ${statusData.globalStatus === 'OPERATIONAL' ? 'bg-green-600' : 'bg-amber-500'}`}>
+            <div className={`p-6 rounded-2xl text-white flex items-center gap-4 shadow-lg border border-white/10 ${statusData.globalStatus === 'OPERATIONAL' ? 'bg-green-600/80 backdrop-blur-md' : 'bg-amber-500/80 backdrop-blur-md'}`}>
                 {statusData.globalStatus === 'OPERATIONAL' ? <CheckCircle2 size={32} /> : <AlertTriangle size={32} />}
                 <div>
                     <h3 className="text-2xl font-bold">
@@ -62,30 +62,30 @@ export const SystemStatus: React.FC = () => {
             </div>
 
             {/* Components Grid */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
+            <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10 bg-slate-900/30">
+                    <h3 className="font-bold text-white flex items-center gap-2">
                         <Server size={18} className="text-slate-400" /> Komponenty Systemu
                     </h3>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-white/5">
                     {statusData.components.map((comp, idx) => (
-                        <div key={idx} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div key={idx} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors">
                             <div>
-                                <h4 className="font-bold text-slate-900">{comp.name}</h4>
-                                <p className="text-xs text-slate-500 mt-1">{comp.description}</p>
+                                <h4 className="font-bold text-white">{comp.name}</h4>
+                                <p className="text-xs text-slate-400 mt-1">{comp.description}</p>
                             </div>
                             <div className="text-right">
                                 <div className="flex items-center justify-end gap-2 mb-1">
                                     <span className={`font-bold text-sm ${
-                                        comp.status === 'OPERATIONAL' ? 'text-green-600' : 
-                                        comp.status === 'DEGRADED' ? 'text-amber-600' : 'text-red-600'
+                                        comp.status === 'OPERATIONAL' ? 'text-green-400' : 
+                                        comp.status === 'DEGRADED' ? 'text-amber-400' : 'text-red-400'
                                     }`}>
                                         {getStatusText(comp.status)}
                                     </span>
                                     <div className={`w-3 h-3 rounded-full ${getStatusColor(comp.status)}`}></div>
                                 </div>
-                                <span className="text-xs text-slate-400 font-mono">Uptime: {comp.uptime}%</span>
+                                <span className="text-xs text-slate-500 font-mono">Uptime: {comp.uptime}%</span>
                             </div>
                         </div>
                     ))}
@@ -94,24 +94,24 @@ export const SystemStatus: React.FC = () => {
 
             {/* Incident History */}
             <div className="space-y-4">
-                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                <h3 className="font-bold text-white text-lg flex items-center gap-2">
                     <Clock size={20} className="text-slate-400" /> Past Incidents
                 </h3>
                 
                 {statusData.incidents.length === 0 ? (
-                    <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500 text-sm">
+                    <div className="bg-slate-900/50 p-8 rounded-xl border border-slate-700 text-center text-slate-500 text-sm">
                         No incidents reported in the last 90 days.
                     </div>
                 ) : (
                     statusData.incidents.map(inc => (
-                        <div key={inc.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                            <div className="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-start">
+                        <div key={inc.id} className="bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden">
+                            <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-start">
                                 <div>
-                                    <h4 className="font-bold text-slate-900">{inc.title}</h4>
-                                    <p className="text-xs text-slate-500 mt-1">{new Date(inc.createdAt).toLocaleString()}</p>
+                                    <h4 className="font-bold text-white">{inc.title}</h4>
+                                    <p className="text-xs text-slate-400 mt-1">{new Date(inc.createdAt).toLocaleString()}</p>
                                 </div>
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
-                                    inc.status === 'RESOLVED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase border ${
+                                    inc.status === 'RESOLVED' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
                                 }`}>
                                     {inc.status}
                                 </span>
@@ -119,10 +119,10 @@ export const SystemStatus: React.FC = () => {
                             <div className="p-4 space-y-4">
                                 {inc.updates.map((update, idx) => (
                                     <div key={idx} className="flex gap-3 text-sm">
-                                        <div className="w-24 shrink-0 text-slate-400 text-xs pt-0.5">
+                                        <div className="w-24 shrink-0 text-slate-500 text-xs pt-0.5">
                                             {new Date(update.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                         </div>
-                                        <div className="text-slate-700">
+                                        <div className="text-slate-300">
                                             {update.message}
                                         </div>
                                     </div>

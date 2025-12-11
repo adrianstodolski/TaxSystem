@@ -4,23 +4,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
     <title>Nuffi OS | Enterprise Finance Terminal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Load Tailwind via CDN to ensure styles work without build step -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              slate: {
+                850: '#151e32',
+                900: '#0f172a',
+                950: '#020617',
+              },
+              indigo: {
+                450: '#818cf8',
+                550: '#4f46e5',
+                950: '#1e1b4b',
+              }
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            boxShadow: {
+              'glow': '0 0 20px -5px rgba(99, 102, 241, 0.4)',
+              'glow-lg': '0 0 30px -5px rgba(99, 102, 241, 0.6)',
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Custom CSS from index.css inlined for safety -->
     <style>
       :root {
         --bg-depth: #020617;
         --glass-border: rgba(255, 255, 255, 0.08);
+        --neon-primary: #6366f1;
       }
+
       body {
-        font-family: 'Inter', sans-serif;
         background-color: var(--bg-depth);
-        color: #e2e8f0;
         overflow-x: hidden;
+        color: #e2e8f0; /* Default text color slate-200 */
       }
-      .font-mono {
-        font-family: 'JetBrains Mono', monospace;
-      }
+
       /* Custom Scrollbar for Dark Mode */
       ::-webkit-scrollbar {
         width: 6px;
@@ -36,45 +69,85 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #475569; 
       }
+
       .glass-panel {
         background: rgba(15, 23, 42, 0.6);
         backdrop-filter: blur(12px);
         border: 1px solid var(--glass-border);
       }
-    </style>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              slate: {
-                850: '#151e32',
-                900: '#0f172a',
-                950: '#020617',
-              }
-            }
-          }
-        }
+
+      /* Unified Card Style - The "Command Center" Look with Glow */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.7); /* slate-900 with opacity */
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
       }
-    </script>
+
+      /* Delikatne świecenie ramek */
+      .glass-card:hover, .glass-card-glow {
+        border-color: rgba(99, 102, 241, 0.4); /* Indigo border */
+        box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.25); /* Glow effect */
+      }
+
+      .mesh-bg {
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%), 
+          radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+          radial-gradient(#1e293b 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 30px 30px;
+      }
+
+      /* Inputs Override for Dark Mode */
+      input, select, textarea {
+        background-color: rgba(15, 23, 42, 0.5) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+      }
+      input:focus, select:focus, textarea:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+        outline: none !important;
+      }
+      
+      /* Table Overrides */
+      th {
+        color: #94a3b8 !important; /* slate-400 */
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+      }
+      td {
+        color: #e2e8f0 !important; /* slate-200 */
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+      }
+      tr:hover td {
+        background-color: rgba(255,255,255,0.03) !important;
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.2",
-    "vite": "https://aistudiocdn.com/vite@^7.2.7",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0"
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
+    "recharts": "https://esm.sh/recharts@^3.5.1",
+    "vite": "https://esm.sh/vite@^7.2.7",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "jspdf": "https://esm.sh/jspdf@^3.0.4",
+    "lightweight-charts": "https://esm.sh/lightweight-charts@4.1.3",
+    "@tanstack/react-table": "https://esm.sh/@tanstack/react-table@^8.21.3",
+    "zod": "https://esm.sh/zod@^4.1.13",
+    "zustand": "https://esm.sh/zustand@^5.0.9",
+    "@hookform/resolvers/": "https://esm.sh/@hookform/resolvers@^5.2.2/",
+    "react-hook-form": "https://esm.sh/react-hook-form@^7.68.0",
+    "react-dom": "https://esm.sh/react-dom@^19.2.1"
   }
 }
 </script>
 </head>
-  <body>
+  <body class="bg-slate-950 text-slate-200 antialiased selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
   </body>

@@ -32,12 +32,12 @@ export const DataExport: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       <header className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Download className="text-indigo-600" /> Eksport Danych
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Download className="text-indigo-400" /> Eksport Danych
           </h2>
-          <p className="text-gray-500">Generowanie oficjalnych plików kontrolnych (JPK) i raportów księgowych.</p>
+          <p className="text-slate-400">Generowanie oficjalnych plików kontrolnych (JPK) i raportów księgowych.</p>
         </div>
-        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600">
+        <div className="flex items-center gap-2 bg-slate-900 border border-white/10 px-3 py-2 rounded-lg text-sm text-slate-300">
             <Calendar size={16} />
             <span className="font-medium">Październik 2023</span>
         </div>
@@ -46,22 +46,22 @@ export const DataExport: React.FC = () => {
       {/* Export Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* JPK_V7 */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group hover:border-indigo-300 transition-colors">
+          <div className="glass-card p-6 rounded-2xl relative overflow-hidden group hover:border-indigo-500/50 transition-colors">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <FileCode size={80} className="text-indigo-600" />
+                  <FileCode size={80} className="text-indigo-500" />
               </div>
               <div className="relative z-10">
-                  <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl flex items-center justify-center mb-4">
                       <FileCode size={24} />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">JPK_V7M (XML)</h3>
-                  <p className="text-sm text-gray-500 mb-6 mt-1">
+                  <h3 className="text-lg font-bold text-white">JPK_V7M (XML)</h3>
+                  <p className="text-sm text-slate-400 mb-6 mt-1">
                       Jednolity Plik Kontrolny dla VAT. Wymagany do comiesięcznej wysyłki do MF. Zawiera rejestr sprzedaży i zakupów.
                   </p>
                   <button 
                     onClick={() => handleExport(ExportFormat.JPK_V7)}
                     disabled={!!processing}
-                    className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-70 flex items-center justify-center gap-2 transition-all"
+                    className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-500 disabled:opacity-70 flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-900/30"
                   >
                       {processing === ExportFormat.JPK_V7 ? <Loader2 className="animate-spin" /> : <><Download size={18} /> Generuj XML</>}
                   </button>
@@ -69,30 +69,30 @@ export const DataExport: React.FC = () => {
           </div>
 
           {/* KPiR */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group hover:border-green-300 transition-colors">
+          <div className="glass-card p-6 rounded-2xl relative overflow-hidden group hover:border-green-500/50 transition-colors">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <FileText size={80} className="text-green-600" />
+                  <FileText size={80} className="text-green-500" />
               </div>
               <div className="relative z-10">
-                  <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-green-500/20 text-green-400 border border-green-500/30 rounded-xl flex items-center justify-center mb-4">
                       <FileText size={24} />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Podatkowa Księga (KPiR)</h3>
-                  <p className="text-sm text-gray-500 mb-6 mt-1">
+                  <h3 className="text-lg font-bold text-white">Podatkowa Księga (KPiR)</h3>
+                  <p className="text-sm text-slate-400 mb-6 mt-1">
                       Zestawienie przychodów i rozchodów w formacie PDF lub Excel. Podstawa do wyliczenia zaliczki PIT.
                   </p>
                   <div className="flex gap-2">
                       <button 
                         onClick={() => handleExport(ExportFormat.KPIR_PDF)}
                         disabled={!!processing}
-                        className="flex-1 bg-white border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 disabled:opacity-70 flex items-center justify-center gap-2"
+                        className="flex-1 bg-slate-800 border border-slate-600 text-white py-3 rounded-xl font-bold hover:bg-slate-700 disabled:opacity-70 flex items-center justify-center gap-2"
                       >
                           {processing === ExportFormat.KPIR_PDF ? <Loader2 className="animate-spin" /> : 'PDF'}
                       </button>
                       <button 
                         onClick={() => handleExport(ExportFormat.KPIR_CSV)}
                         disabled={!!processing}
-                        className="flex-1 bg-white border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 disabled:opacity-70 flex items-center justify-center gap-2"
+                        className="flex-1 bg-slate-800 border border-slate-600 text-white py-3 rounded-xl font-bold hover:bg-slate-700 disabled:opacity-70 flex items-center justify-center gap-2"
                       >
                           {processing === ExportFormat.KPIR_CSV ? <Loader2 className="animate-spin" /> : 'Excel'}
                       </button>
@@ -102,7 +102,7 @@ export const DataExport: React.FC = () => {
       </div>
 
       {/* Accountant Package */}
-      <div className="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 text-white relative overflow-hidden border border-white/10">
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
                   <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
@@ -126,8 +126,8 @@ export const DataExport: React.FC = () => {
       </div>
 
       {/* Preview Section (Simulated XML) */}
-      <div className="bg-gray-900 rounded-xl p-6 font-mono text-xs text-gray-400 overflow-x-auto border border-gray-800">
-          <p className="text-gray-500 mb-2 uppercase font-bold tracking-wider text-[10px]">Podgląd struktury JPK (Live)</p>
+      <div className="bg-[#0B1120] rounded-xl p-6 font-mono text-xs text-slate-400 overflow-x-auto border border-white/10 shadow-inner">
+          <p className="text-slate-500 mb-2 uppercase font-bold tracking-wider text-[10px]">Podgląd struktury JPK (Live)</p>
           <pre className="text-green-400/80">
 {`<JPK xmlns="http://jpk.mf.gov.pl/wzor/2020/05/08/05081/">
   <Naglowek>

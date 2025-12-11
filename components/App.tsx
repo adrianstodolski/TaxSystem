@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { Integrations } from './components/Integrations';
-import { TaxCommandCenter } from './components/TaxCommandCenter';
+import { TaxCommandCenter } from './components/TaxCommandCenter'; // Replaced TaxWizard & TaxEngine view
 import { Documents } from './components/Documents';
 import { Settings } from './components/Settings';
 import { CryptoHub } from './components/CryptoHub';
@@ -68,7 +68,7 @@ import { Marketplace } from './components/Marketplace';
 import { DevPortal } from './components/DevPortal';
 import { SystemStatus } from './components/SystemStatus';
 import { HelpCenter } from './components/HelpCenter';
-import { DesignSystemPreview } from './components/DesignSystemPreview';
+import { DesignSystemPreview } from './components/DesignSystemPreview'; // NEW
 
 // Legacy / Extras / Tools
 import { Assets } from './components/Assets';
@@ -201,7 +201,7 @@ export default function App() {
         case ViewState.DEV_PORTAL: Component = DevPortal; break;
         case ViewState.SYSTEM_STATUS: Component = SystemStatus; break;
         case ViewState.HELP_CENTER: Component = HelpCenter; break;
-        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break; // REGISTERED HERE
+        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break; // NEW
 
         // Extras / Legacy Mappings
         case ViewState.INTEGRATIONS: Component = Integrations; break;
