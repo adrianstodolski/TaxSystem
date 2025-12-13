@@ -51,10 +51,10 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4">
-      <div className="rounded-xl overflow-hidden border border-white/10 glass-card">
+      <div className="rounded-xl overflow-hidden border border-white/10 bg-transparent">
         <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-slate-300">
-            <thead className="bg-slate-900/50 text-slate-400 text-xs uppercase border-b border-white/10">
+            <table className="w-full text-sm text-left text-[#E1E1E3]">
+            <thead className="bg-black/40 text-zinc-500 text-xs uppercase border-b border-white/10">
                 {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
@@ -70,8 +70,8 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                             )}
                             {{
-                            asc: <ChevronUp size={14} className="text-indigo-400" />,
-                            desc: <ChevronDown size={14} className="text-indigo-400" />,
+                            asc: <ChevronUp size={14} className="text-[#D4AF37]" />,
+                            desc: <ChevronDown size={14} className="text-[#D4AF37]" />,
                             }[header.column.getIsSorted() as string] ?? (
                                 header.column.getCanSort() ? <ArrowUpDown size={12} className="opacity-30" /> : null
                             )}
@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
+                    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
                     onClick={() => onRowClick && onRowClick(row.original)}
                     className={`transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                     >
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
                 <tr>
                     <td
                     colSpan={columns.length}
-                    className="h-24 text-center text-slate-500"
+                    className="h-24 text-center text-zinc-500"
                     >
                     Brak danych.
                     </td>
@@ -120,33 +120,33 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination Controls */}
       <div className="flex items-center justify-between px-2">
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-zinc-500">
             Strona {table.getState().pagination.pageIndex + 1} z {table.getPageCount()}
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronsLeft size={16} />
           </button>
           <button
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft size={16} />
           </button>
           <button
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <ChevronRight size={16} />
           </button>
           <button
-            className="p-2 rounded-lg hover:bg-white/10 text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-2 rounded-lg hover:bg-white/10 text-zinc-400 disabled:opacity-30 disabled:hover:bg-transparent"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >

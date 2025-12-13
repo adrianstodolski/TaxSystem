@@ -4,7 +4,8 @@ import { LucideIcon } from 'lucide-react';
 // --- WORKSPACES ---
 export enum Workspace {
     BUSINESS = 'BUSINESS', // Firma, VAT, CIT, Kadry
-    INVESTOR = 'INVESTOR'  // Krypto, Giełda, Majątek, Belka
+    INVESTOR = 'INVESTOR', // Krypto, Giełda, Majątek (Wealth)
+    WALLET = 'WALLET'      // Hardware & Web Wallet Control Center
 }
 
 // --- ENUMS & CORE TYPES ---
@@ -20,86 +21,75 @@ export enum ViewState {
     INTEGRATIONS = 'INTEGRATIONS',
     MARKETPLACE = 'MARKETPLACE',
     HISTORY = 'HISTORY',
-    DESIGN_SYSTEM = 'DESIGN_SYSTEM', // <--- NEW: Test Lab
+    DESIGN_SYSTEM = 'DESIGN_SYSTEM',
+    DESIGN_LAB_TEST = 'DESIGN_LAB_TEST',
     
     // === BUSINESS WORKSPACE (Firma) ===
-    // 1. HQ / Intelligence
     PREDICTIVE_TAX = 'PREDICTIVE_TAX',
     RISK_CENTER = 'RISK_CENTER',
     ESG = 'ESG',
-    
-    // 2. Finance (Money In/Out)
-    YAPILY_CONNECT = 'YAPILY_CONNECT', // Accounts
+    YAPILY_CONNECT = 'YAPILY_CONNECT',
     TREASURY = 'TREASURY',
     SMART_TREASURY = 'SMART_TREASURY',
-    NUFFI_PAY = 'NUFFI_PAY', // Payment Gateway
+    NUFFI_PAY = 'NUFFI_PAY',
     LOANS = 'LOANS',
     CARDS = 'CARDS',
     CASH_REGISTER = 'CASH_REGISTER',
-    
-    // 3. Revenue (Sales)
-    DOCUMENTS = 'DOCUMENTS', // Invoices
-    CONTRACTORS = 'CONTRACTORS', // CRM
+    DOCUMENTS = 'DOCUMENTS',
+    CONTRACTORS = 'CONTRACTORS',
     ECOMMERCE = 'ECOMMERCE',
     PRICE_CALCULATOR = 'PRICE_CALCULATOR',
     DEBT_COLLECTOR = 'DEBT_COLLECTOR',
-    
-    // 4. Operations (Cost)
     SUBSCRIPTIONS = 'SUBSCRIPTIONS',
-    PROJECTS = 'PROJECTS', // Controlling
+    PROJECTS = 'PROJECTS',
     WAREHOUSE = 'WAREHOUSE',
     ASSETS = 'ASSETS',
     VEHICLES = 'VEHICLES',
     CONTRACTS = 'CONTRACTS',
-    
-    // 5. HR
     PAYROLL = 'PAYROLL',
     TIME_TRACKER = 'TIME_TRACKER',
     BUSINESS_TRAVEL = 'BUSINESS_TRAVEL',
-    
-    // 6. Accounting (Compliance)
     TAX_WIZARD = 'TAX_WIZARD',
     GENERAL_LEDGER = 'GENERAL_LEDGER',
     INTERNATIONAL = 'INTERNATIONAL',
     AUDIT_DEFENDER = 'AUDIT_DEFENDER',
     REPORTS = 'REPORTS',
     CAP_TABLE = 'CAP_TABLE',
-    AUDIT_SNAPSHOTS = 'AUDIT_SNAPSHOTS', // Extra
+    AUDIT_SNAPSHOTS = 'AUDIT_SNAPSHOTS',
 
-    // === INVESTOR WORKSPACE (Prywatne) ===
-    // 1. HQ
+    // === INVESTOR WORKSPACE (Prywatne / Krypto) ===
     WAR_ROOM = 'WAR_ROOM',
     LEDGERVERSE = 'LEDGERVERSE',
-    
-    // 2. Crypto & DeFi
     CRYPTO_HUB = 'CRYPTO_HUB',
     YIELD_SCOUT = 'YIELD_SCOUT',
     DEFI_ARCHEOLOGY = 'DEFI_ARCHEOLOGY',
     TOKEN_SCANNER = 'TOKEN_SCANNER',
-    
-    // 3. TradFi
-    WEALTH = 'WEALTH', // Stocks
+    WEALTH = 'WEALTH',
     DERIVATIVES = 'DERIVATIVES',
     BONDS = 'BONDS',
     REAL_ESTATE = 'REAL_ESTATE',
-    
-    // 4. Intel
     WHALE_WATCHER = 'WHALE_WATCHER',
     MARKET_INTEL = 'MARKET_INTEL',
-    
-    // 5. Tax
     TAX_ENGINE = 'TAX_ENGINE',
     TAX_OPTIMIZER = 'TAX_OPTIMIZER',
     GLOBAL_TAX = 'GLOBAL_TAX',
     DIVIDENDS = 'DIVIDENDS',
-    FOREX = 'FOREX', // Legacy/Shared
-    COMMODITIES = 'COMMODITIES', // Legacy
-    TAX_OPTIMIZER_PRO = 'TAX_OPTIMIZER', // Alias
+    FOREX = 'FOREX',
+    COMMODITIES = 'COMMODITIES',
+    TAX_OPTIMIZER_PRO = 'TAX_OPTIMIZER',
     
-    // Legacy / Extras (To be refactored or kept as hidden utilities)
+    // === WALLET WORKSPACE (Hardware/Web3 Direct) ===
+    WALLET_DASHBOARD = 'WALLET_DASHBOARD',
+    WALLET_SEND = 'WALLET_SEND',
+    WALLET_RECEIVE = 'WALLET_RECEIVE',
+    WALLET_SWAP = 'WALLET_SWAP',
+    WALLET_BRIDGE = 'WALLET_BRIDGE',
+    WALLET_DEVICE = 'WALLET_DEVICE',
+    
+    // Legacy / Extras
     EXPORT = 'EXPORT',
-    B2B_NETWORK = 'B2B_NETWORK', // Merged into Contractors logic ideally
-    FORENSICS = 'FORENSICS', // Part of Crypto Hub
+    B2B_NETWORK = 'B2B_NETWORK', 
+    FORENSICS = 'FORENSICS', 
     ACCOUNTANT_DASHBOARD = 'ACCOUNTANT_DASHBOARD',
     AI_CLASSIFIER = 'AI_CLASSIFIER',
     SMART_RULES = 'SMART_RULES',
@@ -153,20 +143,20 @@ export enum ApiProvider {
     TRUELAYER = 'TRUELAYER'
 }
 
-// --- MARKET INTEL TYPES (FastBull/Kavout) ---
+// --- MARKET INTEL TYPES ---
 export interface MarketNews {
     id: string;
     source: string;
     title: string;
     sentiment: 'BULLISH' | 'BEARISH' | 'NEUTRAL';
-    impactScore: number; // 0-100 (FastBull logic)
+    impactScore: number; // 0-100
     time: string;
     tickers: string[];
 }
 
 export interface CapitalFlow {
-    from: string; // e.g., 'USD'
-    to: string;   // e.g., 'BTC'
+    from: string;
+    to: string;
     amount24h: number;
     trend: 'UP' | 'DOWN';
 }
@@ -180,6 +170,10 @@ export interface AssetBubble {
     marketCap: number;
     volume24h: number;
     rank: number;
+    // Extended properties for pro view
+    rsi?: number;
+    fdv?: number;
+    smartMoneyFlow?: 'INFLOW' | 'OUTFLOW';
 }
 
 // --- CORE ENGINE TYPES ---
@@ -188,7 +182,7 @@ export interface TaxLot {
     id: string;
     date: string;
     amount: number;
-    costBasis: number; // Price per unit
+    costBasis: number;
     remaining: number;
     sourceTxId: string;
     asset: string;
@@ -206,9 +200,9 @@ export interface EngineSnapshot {
 // --- BEHAVIORAL / FORENSICS ---
 
 export interface InvestmentDNA {
-    fomoScore: number; // 0-100
-    panicSellRate: number; // %
-    diamondHandsScore: number; // 0-100
+    fomoScore: number;
+    panicSellRate: number;
+    diamondHandsScore: number;
     riskTolerance: 'CONSERVATIVE' | 'MODERATE' | 'DEGEN';
     topBadHabit: string;
 }

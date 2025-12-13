@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraphNode, GraphLink } from '../types';
-import { Network, ZoomIn, ZoomOut, Maximize, Wallet, Building, FileText, ArrowRight, Zap, RefreshCw, Lock, AlertOctagon, History } from 'lucide-react';
+import { Network, ZoomIn, ZoomOut, Maximize, Wallet, Building, FileText, ArrowRight, Zap, RefreshCw, Lock, History, AlertOctagon } from 'lucide-react';
 import { toast } from './ui/Toast';
 
 const INITIAL_NODES: GraphNode[] = [
@@ -33,7 +33,7 @@ export const Ledgerverse: React.FC = () => {
     
     const getNodeColor = (type: string) => {
         switch(type) {
-            case 'BANK': return '#3B82F6'; // Blue
+            case 'BANK': return '#D4AF37'; // Gold
             case 'WALLET': return '#F97316'; // Orange
             case 'EXCHANGE': return '#F59E0B'; // Amber
             case 'CONTRACT': return '#8B5CF6'; // Purple
@@ -58,7 +58,7 @@ export const Ledgerverse: React.FC = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-80px)] bg-void relative overflow-hidden rounded-2xl border border-white/5 flex flex-col shadow-2xl">
+        <div className="h-[calc(100vh-80px)] bg-transparent relative overflow-hidden rounded-2xl border border-white/5 flex flex-col shadow-2xl neo-card">
             {/* Header / HUD */}
             <div className="absolute top-0 left-0 w-full p-6 z-20 flex justify-between items-start pointer-events-none">
                 <div>
@@ -82,14 +82,6 @@ export const Ledgerverse: React.FC = () => {
                     className="absolute inset-0 transition-transform duration-200 ease-out origin-center"
                     style={{ transform: `scale(${scale})` }}
                 >
-                    {/* Grid Background */}
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" 
-                         style={{ 
-                             backgroundImage: 'radial-gradient(#4F46E5 1px, transparent 1px)', 
-                             backgroundSize: '40px 40px' 
-                         }} 
-                    />
-
                     {/* SVG Layer for Links */}
                     <svg className="absolute inset-0 w-full h-full pointer-events-none">
                         <defs>

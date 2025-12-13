@@ -1,11 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
-import { UserProfile, UserRole, ApiVaultStatus, ApiProvider, CryptoExchange } from '../types';
+import { UserProfile, CryptoExchange } from '../types';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { User, Shield, Briefcase, Save, Loader2, Key, Users, Plus, Lock, CheckCircle2, RefreshCw, XCircle, AlertTriangle, MoreHorizontal } from 'lucide-react';
+import { User, Shield, Briefcase, Save, Loader2, Key, Users, Plus, CheckCircle2, RefreshCw, MoreHorizontal } from 'lucide-react';
 import { toast } from './ui/Toast';
 import { Modal } from './ui/Modal';
 import { useStore } from '../store/useStore';
@@ -85,7 +85,7 @@ export const Settings: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Navigation */}
+        {/* Navigation - Glass Pills */}
         <div className="space-y-2">
             {[
                 { id: 'PROFILE', label: 'Profil', icon: User },
@@ -98,8 +98,8 @@ export const Settings: React.FC = () => {
                 <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                    activeTab === tab.id ? 'bg-gold/10 text-gold border border-gold/20' : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-sm ${
+                    activeTab === tab.id ? 'bg-gold/10 text-gold border border-gold/20 shadow-[0_0_15px_-5px_rgba(212,175,55,0.2)]' : 'text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent'
                     }`}
                 >
                     <tab.icon size={18} /> {tab.label}
@@ -107,7 +107,7 @@ export const Settings: React.FC = () => {
             ))}
         </div>
 
-        {/* Content Area */}
+        {/* Content Area - Neo Card */}
         <motion.div 
             key={activeTab}
             initial={{ opacity: 0, x: 20 }}
@@ -120,28 +120,28 @@ export const Settings: React.FC = () => {
               <h3 className="text-lg font-bold text-white border-b border-white/10 pb-4">Dane Osobowe</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Imię</label>
-                  <input {...register('firstName')} className="neo-input w-full px-4 py-3 rounded-xl focus:ring-0" />
-                  {errors.firstName && <span className="text-red-400 text-xs">{errors.firstName.message}</span>}
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Imię</label>
+                  <input {...register('firstName')} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+                  {errors.firstName && <span className="text-rose-500 text-xs">{errors.firstName.message}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Nazwisko</label>
-                  <input {...register('lastName')} className="neo-input w-full px-4 py-3 rounded-xl focus:ring-0" />
-                  {errors.lastName && <span className="text-red-400 text-xs">{errors.lastName.message}</span>}
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Nazwisko</label>
+                  <input {...register('lastName')} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+                  {errors.lastName && <span className="text-rose-500 text-xs">{errors.lastName.message}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">Email</label>
-                  <input {...register('email')} className="neo-input w-full px-4 py-3 rounded-xl focus:ring-0" />
-                  {errors.email && <span className="text-red-400 text-xs">{errors.email.message}</span>}
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Email</label>
+                  <input {...register('email')} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+                  {errors.email && <span className="text-rose-500 text-xs">{errors.email.message}</span>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">NIP</label>
-                  <input {...register('nip')} className="neo-input w-full px-4 py-3 rounded-xl focus:ring-0" />
-                  {errors.nip && <span className="text-red-400 text-xs">{errors.nip.message}</span>}
+                  <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">NIP</label>
+                  <input {...register('nip')} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+                  {errors.nip && <span className="text-rose-500 text-xs">{errors.nip.message}</span>}
                 </div>
               </div>
-              <div className="flex justify-end pt-4">
-                  <button type="submit" disabled={isSubmitting} className="bg-gold text-black px-6 py-2.5 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center gap-2 shadow-lg disabled:opacity-50">
+              <div className="flex justify-end pt-6 border-t border-white/5">
+                  <button type="submit" disabled={isSubmitting} className="bg-gold text-black px-8 py-3 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center gap-2 shadow-lg shadow-gold/20 disabled:opacity-50">
                       {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <><Save size={18} /> Zapisz zmiany</>}
                   </button>
               </div>
@@ -158,16 +158,16 @@ export const Settings: React.FC = () => {
                     {Object.keys(CryptoExchange).map((key) => {
                         const isConnected = exchangeStatus[key];
                         return (
-                            <motion.div variants={itemVariants} key={key} className={`p-5 rounded-2xl border transition-all ${isConnected ? 'bg-green-500/10 border-green-500/30' : 'bg-white/5 border-white/10'}`}>
+                            <motion.div variants={itemVariants} key={key} className={`p-5 rounded-2xl border transition-all ${isConnected ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-white/5 border-white/5 hover:border-gold/20'}`}>
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-xl bg-onyx flex items-center justify-center font-bold text-white shadow-sm border border-white/10">{key[0]}</div>
                                         <div>
                                             <h4 className="font-bold text-white">{key}</h4>
-                                            {isConnected ? <span className="text-green-400 text-xs font-bold flex items-center gap-1"><CheckCircle2 size={12}/> Connected</span> : <span className="text-zinc-500 text-xs">Disconnected</span>}
+                                            {isConnected ? <span className="text-emerald-400 text-xs font-bold flex items-center gap-1"><CheckCircle2 size={12}/> Connected</span> : <span className="text-zinc-500 text-xs">Disconnected</span>}
                                         </div>
                                     </div>
-                                    <button onClick={() => { setSelectedProvider(key); setApiModalOpen(true); }} className="bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/10 hover:bg-white/20 transition-colors">
+                                    <button onClick={() => { setSelectedProvider(key); setApiModalOpen(true); }} className="bg-onyx text-white px-4 py-2 rounded-lg text-sm font-bold border border-white/10 hover:bg-white/10 transition-colors">
                                         {isConnected ? 'Edytuj' : 'Połącz'}
                                     </button>
                                 </div>
@@ -185,7 +185,7 @@ export const Settings: React.FC = () => {
                         <h3 className="text-lg font-bold text-white">Zarządzanie Zespołem</h3>
                         <p className="text-sm text-zinc-400">Uprawnienia dostępu i role (RBAC).</p>
                     </div>
-                    <button onClick={() => toast.success('Zaproszenie wysłane', 'Mail z linkiem aktywacyjnym został wysłany.')} className="bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-white/20 flex items-center gap-2 border border-white/10 transition-colors">
+                    <button onClick={() => toast.success('Zaproszenie wysłane', 'Mail z linkiem aktywacyjnym został wysłany.')} className="bg-white/5 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-white/10 flex items-center gap-2 border border-white/10 transition-colors">
                         <Plus size={16} /> Zaproś
                     </button>
                 </div>
@@ -207,7 +207,7 @@ export const Settings: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className="text-xs font-mono bg-black/40 px-2 py-1 rounded text-zinc-300 border border-white/10">{member.role}</span>
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${member.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${member.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
                                     {member.status}
                                 </span>
                                 <button className="text-zinc-500 hover:text-white p-2 hover:bg-white/5 rounded-lg"><MoreHorizontal size={16} /></button>
@@ -229,9 +229,9 @@ export const Settings: React.FC = () => {
       <Modal isOpen={apiModalOpen} onClose={() => setApiModalOpen(false)} title="Konfiguracja API">
           <div className="space-y-4">
               <p className="text-sm text-zinc-400">Wprowadź klucze dla <strong>{selectedProvider}</strong>.</p>
-              <input type="text" placeholder="API Key" value={apiKeyInput} onChange={e => setApiKeyInput(e.target.value)} className="neo-input w-full px-4 py-3 rounded-lg focus:ring-0" />
-              <input type="password" placeholder="API Secret" value={apiSecretInput} onChange={e => setApiSecretInput(e.target.value)} className="neo-input w-full px-4 py-3 rounded-lg focus:ring-0" />
-              <button onClick={handleUpdateApiKey} className="w-full bg-gold text-black py-3 rounded-xl font-bold hover:bg-[#FCD34D] transition-colors">Zapisz</button>
+              <input type="text" placeholder="API Key" value={apiKeyInput} onChange={e => setApiKeyInput(e.target.value)} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+              <input type="password" placeholder="API Secret" value={apiSecretInput} onChange={e => setApiSecretInput(e.target.value)} className="neo-input w-full px-4 py-3 rounded-xl text-sm" />
+              <button onClick={handleUpdateApiKey} className="w-full bg-gold text-black py-3 rounded-xl font-bold hover:bg-[#FCD34D] transition-colors shadow-lg">Zapisz</button>
           </div>
       </Modal>
     </div>

@@ -48,8 +48,6 @@ export const TaxCommandCenter: React.FC = () => {
         toast.success('Przyjęto', 'Status 200. Pobrano UPO.');
     };
 
-    const isBusiness = activeWorkspace === Workspace.BUSINESS;
-
     return (
         <div className="space-y-8 pb-20">
             <header className="flex flex-col md:flex-row justify-between items-end border-b border-white/5 pb-6 gap-4">

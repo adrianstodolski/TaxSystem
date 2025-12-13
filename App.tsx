@@ -31,6 +31,9 @@ import { MarketIntel } from './components/MarketIntel';
 import { Ledgerverse } from './components/Ledgerverse';
 import { WarRoom } from './components/WarRoom';
 
+// Wallet Controller
+import { WalletCommand } from './components/WalletCommand';
+
 // Finance OS
 import { YapilyConnect } from './components/YapilyConnect';
 import { NuffiPay } from './components/NuffiPay';
@@ -112,9 +115,15 @@ export default function App() {
       return () => window.removeEventListener('nuffi:open-welcome', handleOpenWelcome);
   }, []);
 
-  // Reset View when switching workspaces to avoid confusion
+  // Sync View with Workspace Switch
   useEffect(() => {
-      setCurrentView(ViewState.DASHBOARD);
+      if (activeWorkspace === Workspace.WALLET) {
+          // If switching TO Wallet workspace, default to Wallet Dashboard
+          setCurrentView(ViewState.WALLET_DASHBOARD);
+      } else {
+          // Otherwise default to main Dashboard
+          setCurrentView(ViewState.DASHBOARD);
+      }
   }, [activeWorkspace]);
 
   // Global Keydown for Search
@@ -142,6 +151,30 @@ export default function App() {
   };
 
   const renderContent = () => {
+    // 1. Wallet Workspace Views Handing
+    // Intercepts any view starting with WALLET_ and renders WalletCommand
+    if (
+        currentView === ViewState.WALLET_DASHBOARD ||
+        currentView === ViewState.WALLET_SEND ||
+        currentView === ViewState.WALLET_RECEIVE ||
+        currentView === ViewState.WALLET_SWAP ||
+        currentView === ViewState.WALLET_BRIDGE ||
+        currentView === ViewState.WALLET_DEVICE
+    ) {
+        return (
+            <motion.div
+                key="wallet-command"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full"
+            >
+                <WalletCommand view={currentView} />
+            </motion.div>
+        );
+    }
+
     let Component;
     switch (currentView) {
         // Intelligence & Dashboard
@@ -253,11 +286,13 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen font-sans bg-[#020617] text-slate-200 overflow-hidden relative selection:bg-indigo-500 selection:text-white">
-      {/* Mesh Gradient Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-20 mesh-bg"></div>
+    <div className="flex min-h-screen font-sans bg-[#050505] text-[#E1E1E3] overflow-hidden relative selection:bg-[#D4AF37] selection:text-black">
+      <div className="grid-bg"></div>
+      <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-0 right-0 w-[800px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[100px]"></div>
+      </div>
 
-      {/* Global Modals - Rendered at root level via Props */}
       <GlobalSearch 
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
@@ -273,7 +308,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
+              className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm"
               onClick={() => setSidebarOpen(false)}
             ></motion.div>
         )}
@@ -288,25 +323,24 @@ export default function App() {
       />
 
       <main className="flex-1 lg:ml-72 flex flex-col h-screen relative z-10 w-full transition-all duration-300">
-        <header className="h-16 bg-slate-950/50 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative">
+        <header className="h-16 bg-transparent backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative">
           <div className="flex items-center gap-4">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-slate-400 hover:text-white p-2 -ml-2">
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-zinc-400 hover:text-white p-2 -ml-2">
                   <Menu size={24} />
               </button>
               
-              {/* Functional Search Trigger */}
               <div 
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden md:flex items-center gap-3 w-96 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-slate-400 hover:bg-white/10 hover:border-white/20 transition-all cursor-text group"
+                className="hidden md:flex items-center gap-3 w-96 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:border-[#D4AF37]/30 hover:bg-white/10 transition-all cursor-text group"
               >
-                 <Search size={16} className="group-hover:text-indigo-400 transition-colors" />
+                 <Search size={16} className="group-hover:text-[#D4AF37] transition-colors" />
                  <input 
                     type="text" 
-                    placeholder={activeWorkspace === Workspace.BUSINESS ? "Szukaj faktur, klientów..." : "Szukaj tickerów, aktywów..."}
-                    className="bg-transparent border-none outline-none text-slate-200 placeholder-slate-500 w-full cursor-pointer pointer-events-none"
+                    placeholder={activeWorkspace === Workspace.WALLET ? "Szukaj TxHash / Bloku..." : "Szukaj..."}
+                    className="bg-transparent border-none outline-none text-[#E1E1E3] placeholder-zinc-600 w-full cursor-pointer pointer-events-none"
                     readOnly
                  />
-                 <div className="ml-auto flex items-center gap-1 text-[10px] bg-black/30 px-1.5 py-0.5 rounded text-slate-500 font-mono border border-white/5">
+                 <div className="ml-auto flex items-center gap-1 text-[10px] bg-white/5 px-1.5 py-0.5 rounded text-zinc-500 font-mono border border-white/5">
                     <Command size={10} /> K
                  </div>
               </div>
@@ -316,12 +350,12 @@ export default function App() {
             <NotificationCenter onNavigate={setCurrentView} />
             <div className="flex items-center gap-3 pl-4 md:pl-6 border-l border-white/5">
                 <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold text-slate-200">{currentUser?.firstName} {currentUser?.lastName}</p>
-                    <p className="text-xs text-slate-500 truncate max-w-[150px]">{currentUser?.companyName}</p>
+                    <p className="text-sm font-bold text-[#E1E1E3]">{currentUser?.firstName} {currentUser?.lastName}</p>
+                    <p className="text-xs text-zinc-500 truncate max-w-[150px]">{currentUser?.companyName}</p>
                 </div>
                 <div 
                     onClick={() => setCurrentView(ViewState.SETTINGS)}
-                    className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20 cursor-pointer hover:scale-105 transition-transform border border-white/10"
+                    className="w-9 h-9 bg-[#141419] rounded-lg flex items-center justify-center text-white font-bold shadow-md border border-white/10 cursor-pointer hover:border-[#D4AF37]/50 transition-colors"
                 >
                     {currentUser?.firstName.charAt(0)}{currentUser?.lastName.charAt(0)}
                 </div>

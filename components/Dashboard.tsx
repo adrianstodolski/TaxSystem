@@ -4,7 +4,8 @@ import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, Tooltip } fr
 import { 
     TrendingUp, ShieldCheck, Activity, Zap, 
     Wallet, Briefcase, FileText, AlertTriangle,
-    PieChart as PieChartIcon, ArrowUpRight, Building, Landmark
+    PieChart as PieChartIcon, ArrowUpRight, Building, Landmark,
+    Gem, Coins
 } from 'lucide-react';
 import { ViewState, Workspace } from '../types';
 import { useStore } from '../store/useStore';
@@ -14,26 +15,30 @@ interface DashboardProps {
   onNavigate: (view: ViewState) => void;
 }
 
-const COLORS = ['#D4AF37', '#E1E1E3', '#3f3f46', '#18181b'];
+const COLORS = ['#D4AF37', '#64748B', '#3f3f46', '#18181b'];
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [data, setData] = useState<any[]>([]);
   const [metric1, setMetric1] = useState(0); 
   const [metric2, setMetric2] = useState(0); 
   const [loading, setLoading] = useState(true);
+  
+  // CRITICAL: Use the store to determine which mode we are in
   const { activeWorkspace } = useStore();
+  const isBusiness = activeWorkspace === Workspace.BUSINESS;
 
   useEffect(() => {
       setLoading(true);
+      // Simulate data fetch switch based on workspace
       const timer = setTimeout(() => {
-          if (activeWorkspace === Workspace.BUSINESS) {
+          if (isBusiness) {
               setData([
-                  { name: 'Sty', value: 4000, cost: 2400 },
-                  { name: 'Lut', value: 3000, cost: 1398 },
-                  { name: 'Mar', value: 2000, cost: 9800 },
-                  { name: 'Kwi', value: 2780, cost: 3908 },
-                  { name: 'Maj', value: 1890, cost: 4800 },
-                  { name: 'Cze', value: 2390, cost: 3800 },
+                  { name: 'Sty', value: 4000 },
+                  { name: 'Lut', value: 3000 },
+                  { name: 'Mar', value: 2000 },
+                  { name: 'Kwi', value: 2780 },
+                  { name: 'Maj', value: 1890 },
+                  { name: 'Cze', value: 2390 },
               ]);
               setMetric1(124500); 
               setMetric2(18500); 
@@ -50,12 +55,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               setMetric2(45000); 
           }
           setLoading(false);
-      }, 800);
+      }, 600);
       return () => clearTimeout(timer);
-  }, [activeWorkspace]);
+  }, [activeWorkspace, isBusiness]);
 
-  // Updated Card component using neo-card class
-  const Card = ({ children, className, colSpan = 1, rowSpan = 1, delay = 0, glow = false }: any) => (
+  const Card = ({ children, className, colSpan = 1, rowSpan = 1, delay = 0 }: any) => (
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -67,35 +71,33 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       </motion.div>
   );
 
-  const allocationData = activeWorkspace === Workspace.BUSINESS 
+  const allocationData = isBusiness 
     ? [{ name: 'Usługi IT', value: 60 }, { name: 'Konsulting', value: 30 }, { name: 'Produkty', value: 10 }]
     : [{ name: 'Akcje', value: 40 }, { name: 'Krypto', value: 30 }, { name: 'Nieruchomości', value: 20 }, { name: 'Gotówka', value: 10 }];
 
-  const isBusiness = activeWorkspace === Workspace.BUSINESS;
-
   return (
-    <div className="p-2 space-y-6 pb-20">
+    <div className="space-y-6 pb-20">
         <header className="flex justify-between items-end mb-8">
             <div>
                 <h2 className="text-3xl font-bold text-white tracking-tight font-mono">
                     {isBusiness ? 'Company' : 'Wealth'}<span className="text-gold">OS</span>
                 </h2>
                 <p className="text-zinc-400 mt-1">
-                    {isBusiness ? 'Centrum zarządzania operacyjnego firmą.' : 'Globalny panel inwestycyjny.'}
+                    {isBusiness ? 'Centrum zarządzania operacyjnego firmą.' : 'Globalny panel inwestycyjny i podatkowy.'}
                 </p>
             </div>
             <div className="flex gap-4">
                 <button 
                     onClick={() => onNavigate(isBusiness ? ViewState.DOCUMENTS : ViewState.WAR_ROOM)}
-                    className="bg-[#D4AF37] hover:bg-[#FCD34D] text-black px-4 py-2 rounded-lg font-bold text-sm shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all flex items-center gap-2"
+                    className="bg-gold hover:bg-[#FCD34D] text-black px-4 py-2 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all flex items-center gap-2"
                 >
-                    <Zap size={16} /> {isBusiness ? 'Nowa Faktura' : 'War Room'}
+                    <Zap size={16} /> {isBusiness ? 'Nowa Faktura' : 'War Room (Live)'}
                 </button>
             </div>
         </header>
 
         {/* BENTO GRID LAYOUT */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[180px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[180px]">
             
             {/* 1. Main Metric (Large) */}
             <Card colSpan={2} rowSpan={2} className="flex flex-col justify-between" delay={0}>
@@ -108,13 +110,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                             {loading ? '...' : (metric1).toLocaleString('pl-PL')} <span className="text-xl text-zinc-600">PLN</span>
                         </h3>
                     </div>
-                    <div className="bg-white/5 border border-white/10 p-2 rounded-lg text-gold">
-                        {isBusiness ? <Building size={24} /> : <Landmark size={24} />}
+                    <div className="bg-white/5 border border-white/10 p-3 rounded-xl text-gold">
+                        {isBusiness ? <Building size={32} /> : <Landmark size={32} />}
                     </div>
                 </div>
                 
                 <div className="h-48 w-full mt-4 -mb-4 -mx-4">
-                    {!loading && data.length > 0 && (
+                    {!loading && (
                         <div style={{ width: '100%', height: '100%', minHeight: '150px' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={data}>
@@ -125,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                                         </linearGradient>
                                     </defs>
                                     <Tooltip 
-                                        contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                        contentStyle={{ backgroundColor: '#0A0A0C', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                                         itemStyle={{ color: '#fff' }}
                                     />
                                     <Area type="monotone" dataKey="value" stroke="#D4AF37" strokeWidth={2} fillOpacity={1} fill="url(#colorMain)" />
@@ -137,8 +139,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </Card>
 
             {/* 2. Secondary Metric (Medium) */}
-            <Card colSpan={1} rowSpan={2} className="relative flex flex-col items-center justify-center" delay={0.1}>
-                <div className="absolute top-4 left-4 text-zinc-500 flex items-center gap-2">
+            <Card colSpan={1} rowSpan={2} className="relative flex flex-col items-center justify-center bg-gradient-to-b from-[#0A0A0C] to-[#141419]" delay={0.1}>
+                <div className="absolute top-6 left-6 text-zinc-500 flex items-center gap-2">
                     <ShieldCheck size={20} />
                     <span className="font-bold text-xs uppercase">{isBusiness ? 'Est. Podatek' : 'PnL Niezrealizowany'}</span>
                 </div>
@@ -154,10 +156,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                 </div>
                 
-                <p className="mt-6 text-sm text-zinc-400 text-center max-w-[200px]">
-                    {isBusiness ? 'Termin płatności: 20-go.' : 'Wzrost portfela o 12%.'} <br/> 
-                    <span className="text-gold cursor-pointer hover:underline text-xs" onClick={() => onNavigate(isBusiness ? ViewState.TAX_WIZARD : ViewState.WEALTH)}>Szczegóły &rarr;</span>
-                </p>
+                <div className="mt-8 w-full px-6">
+                    <button 
+                        onClick={() => onNavigate(isBusiness ? ViewState.TAX_WIZARD : ViewState.WEALTH)}
+                        className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-bold text-white transition-colors border border-white/5"
+                    >
+                        Szczegóły
+                    </button>
+                </div>
             </Card>
 
             {/* 3. Operational Stat (Small) */}
@@ -168,7 +174,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
                 <h3 className="text-2xl font-bold text-white mt-2 font-mono">12,450 PLN</h3>
                 <div className="mt-4 flex items-center gap-2 text-xs text-zinc-400 font-medium">
-                    <ArrowUpRight size={12} /> {isBusiness ? '+2.4% m/m' : 'Dostępne T+0'}
+                    <ArrowUpRight size={12} className="text-emerald-500" /> {isBusiness ? '+2.4% m/m' : 'Dostępne T+0'}
                 </div>
             </Card>
 
@@ -223,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
             </Card>
 
-            {/* 6. Tasks / Notifications */}
+            {/* 6. Action Items (Context Aware) */}
             <Card colSpan={2} className="overflow-y-auto custom-scrollbar" delay={0.5}>
                 <h4 className="text-white font-bold mb-4 flex items-center gap-2">
                     <AlertTriangle size={16} className="text-zinc-400" /> Action Required
@@ -259,10 +265,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                                 <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-white transition-colors" />
                             </div>
                             <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-gold/30 transition-all cursor-pointer group">
-                                <div className="bg-white/10 p-2 rounded text-white"><Wallet size={16} /></div>
+                                <div className="bg-white/10 p-2 rounded text-white"><Gem size={16} /></div>
                                 <div className="flex-1">
-                                    <p className="text-sm font-bold text-white group-hover:text-gold transition-colors">Dywidenda (Apple)</p>
-                                    <p className="text-xs text-zinc-500">Wpłynęło: $12.50 (Wymaga rozliczenia)</p>
+                                    <p className="text-sm font-bold text-white group-hover:text-gold transition-colors">Nowy Yield Farm</p>
+                                    <p className="text-xs text-zinc-500">Arbitrum: 24% APY Stable</p>
                                 </div>
                                 <ArrowUpRight size={16} className="text-zinc-600 group-hover:text-white transition-colors" />
                             </div>

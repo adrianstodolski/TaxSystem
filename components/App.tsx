@@ -1,97 +1,88 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Dashboard } from './components/Dashboard';
-import { Integrations } from './components/Integrations';
-import { TaxCommandCenter } from './components/TaxCommandCenter';
-import { Documents } from './components/Documents';
-import { Settings } from './components/Settings';
-import { CryptoHub } from './components/CryptoHub';
-import { Treasury } from './components/Treasury';
-import { Wealth } from './components/Wealth';
-import { Reports } from './components/Reports';
-import { Auth } from './components/Auth';
-import { Toaster } from './components/ui/Toast';
-import { NotificationCenter } from './components/NotificationCenter';
-import { AIChat } from './components/AIChat';
-import { ViewState, SubscriptionPlan, UserProfile, Workspace } from './types';
+// Assuming App.tsx is in components/, these should be sibling imports
+import { Sidebar } from './Sidebar';
+import { Dashboard } from './Dashboard';
+import { Integrations } from './Integrations';
+import { TaxCommandCenter } from './TaxCommandCenter';
+import { Documents } from './Documents';
+import { Settings } from './Settings';
+import { CryptoHub } from './CryptoHub';
+import { Treasury } from './Treasury';
+import { Wealth } from './Wealth';
+import { Reports } from './Reports';
+import { Auth } from './Auth';
+import { Toaster } from './ui/Toast';
+import { NotificationCenter } from './NotificationCenter';
+import { AIChat } from './AIChat';
+import { ViewState, SubscriptionPlan, UserProfile, Workspace } from '../types';
 import { Menu, Search, Command } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useStore } from './store/useStore';
+import { useStore } from '../store/useStore';
 
 // Global Search & Modals
-import { GlobalSearch } from './components/GlobalSearch';
-import { WelcomeModal } from './components/WelcomeModal';
+import { GlobalSearch } from './GlobalSearch';
+import { WelcomeModal } from './WelcomeModal';
 
-// Intelligence HQ
-import { PredictiveTax } from './components/PredictiveTax';
-import { RiskCenter } from './components/RiskCenter';
-import { ESG } from './components/ESG';
-import { MarketIntel } from './components/MarketIntel';
-import { Ledgerverse } from './components/Ledgerverse';
-import { WarRoom } from './components/WarRoom';
-
-// Finance OS
-import { YapilyConnect } from './components/YapilyConnect';
-import { NuffiPay } from './components/NuffiPay';
-import { Cards } from './components/Cards';
-import { Subscriptions } from './components/Subscriptions';
-import { SmartTreasury } from './components/SmartTreasury';
-import { Loans } from './components/Loans';
-
-// Investment Deck
-import { Derivatives } from './components/Derivatives';
-import { Bonds } from './components/Bonds';
-import { RealEstate } from './components/RealEstate';
-import { DeFiArcheology } from './components/DeFiArcheology';
-import { WhaleWatcher } from './components/WhaleWatcher';
-import { YieldScout } from './components/YieldScout';
-import { TokenScanner } from './components/TokenScanner';
-
-// Accounting Core
-import { GeneralLedger } from './components/GeneralLedger';
-import { TaxOptimizer } from './components/TaxOptimizer';
-import { TaxAuditDefender } from './components/TaxAuditDefender';
-import { AuditSnapshots } from './components/AuditSnapshots';
-
-// Operations
-import { Contractors } from './components/Contractors';
-import { Projects } from './components/Projects';
-import { Payroll } from './components/Payroll';
-import { Warehouse } from './components/Warehouse';
-import { Vehicles } from './components/Vehicles';
-import { BusinessTravel } from './components/BusinessTravel';
-import { Ecommerce } from './components/Ecommerce';
-import { Contracts } from './components/Contracts';
-import { Marketplace } from './components/Marketplace';
-
-// Tools & Settings
-import { DevPortal } from './components/DevPortal';
-import { SystemStatus } from './components/SystemStatus';
-import { HelpCenter } from './components/HelpCenter';
-import { DesignSystemPreview } from './components/DesignSystemPreview';
-
-// Legacy / Extras / Tools
-import { Assets } from './components/Assets';
-import { Budgeting } from './components/Budgeting';
-import { DataExport } from './components/DataExport';
-import { B2BNetwork } from './components/B2BNetwork';
-import { InternationalTax } from './components/InternationalTax';
-import { AiClassifier } from './components/AiClassifier';
-import { SmartRules } from './components/SmartRules';
-import { ImportWizard } from './components/ImportWizard';
-import { TimeTracker } from './components/TimeTracker';
-import { Mailbox } from './components/Mailbox';
-import { PriceCalculator } from './components/PriceCalculator';
-import { DebtCollector } from './components/DebtCollector';
-import { CapTable } from './components/CapTable';
-import { CashRegister } from './components/CashRegister';
-import { History } from './components/History';
-import { Dividends } from './components/Dividends';
-import { Forensics } from './components/Forensics';
-import { GlobalTax } from './components/GlobalTax';
-import { AccountantDashboard } from './components/AccountantDashboard';
-import { ScenarioPlanner } from './components/ScenarioPlanner';
+// Modules
+import { PredictiveTax } from './PredictiveTax';
+import { RiskCenter } from './RiskCenter';
+import { ESG } from './ESG';
+import { MarketIntel } from './MarketIntel';
+import { Ledgerverse } from './Ledgerverse';
+import { WarRoom } from './WarRoom';
+import { WalletCommand } from './WalletCommand';
+import { YapilyConnect } from './YapilyConnect';
+import { NuffiPay } from './NuffiPay';
+import { Cards } from './Cards';
+import { Subscriptions } from './Subscriptions';
+import { SmartTreasury } from './SmartTreasury';
+import { Loans } from './Loans';
+import { Derivatives } from './Derivatives';
+import { Bonds } from './Bonds';
+import { RealEstate } from './RealEstate';
+import { DeFiArcheology } from './DeFiArcheology';
+import { WhaleWatcher } from './WhaleWatcher';
+import { YieldScout } from './YieldScout';
+import { TokenScanner } from './TokenScanner';
+import { GeneralLedger } from './GeneralLedger';
+import { TaxOptimizer } from './TaxOptimizer';
+import { TaxAuditDefender } from './TaxAuditDefender';
+import { AuditSnapshots } from './AuditSnapshots';
+import { Contractors } from './Contractors';
+import { Projects } from './Projects';
+import { Payroll } from './Payroll';
+import { Warehouse } from './Warehouse';
+import { Vehicles } from './Vehicles';
+import { BusinessTravel } from './BusinessTravel';
+import { Ecommerce } from './Ecommerce';
+import { Contracts } from './Contracts';
+import { Marketplace } from './Marketplace';
+import { DevPortal } from './DevPortal';
+import { SystemStatus } from './SystemStatus';
+import { HelpCenter } from './HelpCenter';
+import { DesignSystemPreview } from './DesignSystemPreview';
+import { DesignLabTest } from './DesignLabTest';
+import { Assets } from './Assets';
+import { Budgeting } from './Budgeting';
+import { DataExport } from './DataExport';
+import { B2BNetwork } from './B2BNetwork';
+import { InternationalTax } from './InternationalTax';
+import { AiClassifier } from './AiClassifier';
+import { SmartRules } from './SmartRules';
+import { ImportWizard } from './ImportWizard';
+import { TimeTracker } from './TimeTracker';
+import { Mailbox } from './Mailbox';
+import { PriceCalculator } from './PriceCalculator';
+import { DebtCollector } from './DebtCollector';
+import { CapTable } from './CapTable';
+import { CashRegister } from './CashRegister';
+import { History } from './History';
+import { Dividends } from './Dividends';
+import { Forensics } from './Forensics';
+import { GlobalTax } from './GlobalTax';
+import { AccountantDashboard } from './AccountantDashboard';
+import { ScenarioPlanner } from './ScenarioPlanner';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -110,8 +101,15 @@ export default function App() {
       return () => window.removeEventListener('nuffi:open-welcome', handleOpenWelcome);
   }, []);
 
+  // Sync View with Workspace Switch
   useEffect(() => {
-      setCurrentView(ViewState.DASHBOARD);
+      if (activeWorkspace === Workspace.WALLET) {
+          // If switching TO Wallet workspace, default to Wallet Dashboard
+          setCurrentView(ViewState.WALLET_DASHBOARD);
+      } else {
+          // Otherwise default to main Dashboard
+          setCurrentView(ViewState.DASHBOARD);
+      }
   }, [activeWorkspace]);
 
   useEffect(() => {
@@ -119,6 +117,10 @@ export default function App() {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
+      }
+      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+        e.preventDefault();
+        setIsSearchOpen(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -133,38 +135,70 @@ export default function App() {
   };
 
   const renderContent = () => {
+    // Handling Wallet Views via Wrapper to pass 'view' prop
+    if (
+        currentView === ViewState.WALLET_DASHBOARD ||
+        currentView === ViewState.WALLET_SEND ||
+        currentView === ViewState.WALLET_RECEIVE ||
+        currentView === ViewState.WALLET_SWAP ||
+        currentView === ViewState.WALLET_BRIDGE ||
+        currentView === ViewState.WALLET_DEVICE
+    ) {
+        return (
+            <motion.div
+                key="wallet-command"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full"
+            >
+                <WalletCommand view={currentView} />
+            </motion.div>
+        );
+    }
+
     let Component;
     switch (currentView) {
+        // --- INVESTOR WORKSPACE ---
         case ViewState.DASHBOARD: Component = Dashboard; break;
-        case ViewState.LEDGERVERSE: Component = Ledgerverse; break;
         case ViewState.WAR_ROOM: Component = WarRoom; break;
+        case ViewState.CRYPTO_HUB: Component = CryptoHub; break;
+        case ViewState.WEALTH: Component = Wealth; break;
+        case ViewState.LEDGERVERSE: Component = Ledgerverse; break;
+        case ViewState.YIELD_SCOUT: Component = YieldScout; break;
+        case ViewState.DEFI_ARCHEOLOGY: Component = DeFiArcheology; break;
+        case ViewState.WHALE_WATCHER: Component = WhaleWatcher; break;
+        case ViewState.TOKEN_SCANNER: Component = TokenScanner; break;
+        case ViewState.DERIVATIVES: Component = Derivatives; break;
+        case ViewState.BONDS: Component = Bonds; break;
+        case ViewState.REAL_ESTATE: Component = RealEstate; break;
+        case ViewState.TAX_ENGINE: 
+        case ViewState.TAX_WIZARD: 
+            Component = TaxCommandCenter; 
+            break;
+        case ViewState.DIVIDENDS: Component = Dividends; break;
+        case ViewState.FORENSICS: Component = Forensics; break;
+        case ViewState.GLOBAL_TAX: Component = GlobalTax; break;
+        case ViewState.FOREX: 
+        case ViewState.TREASURY: Component = Treasury; break;
+        case ViewState.COMMODITIES: Component = Wealth; break;
+        
+        // Business
+        case ViewState.DOCUMENTS: Component = Documents; break;
         case ViewState.PREDICTIVE_TAX: Component = PredictiveTax; break;
         case ViewState.RISK_CENTER: Component = RiskCenter; break;
         case ViewState.ESG: Component = ESG; break;
         case ViewState.MARKET_INTEL: Component = MarketIntel; break;
         case ViewState.YAPILY_CONNECT: Component = YapilyConnect; break;
-        case ViewState.TREASURY: Component = Treasury; break;
         case ViewState.SMART_TREASURY: Component = SmartTreasury; break;
         case ViewState.NUFFI_PAY: Component = NuffiPay; break;
         case ViewState.CARDS: Component = Cards; break;
         case ViewState.SUBSCRIPTIONS: Component = Subscriptions; break;
         case ViewState.LOANS: Component = Loans; break;
-        case ViewState.CRYPTO_HUB: Component = CryptoHub; break;
-        case ViewState.YIELD_SCOUT: Component = YieldScout; break;
-        case ViewState.WEALTH: Component = Wealth; break;
-        case ViewState.DERIVATIVES: Component = Derivatives; break;
-        case ViewState.BONDS: Component = Bonds; break;
-        case ViewState.REAL_ESTATE: Component = RealEstate; break;
-        case ViewState.DEFI_ARCHEOLOGY: Component = DeFiArcheology; break;
-        case ViewState.WHALE_WATCHER: Component = WhaleWatcher; break;
-        case ViewState.TOKEN_SCANNER: Component = TokenScanner; break;
-        case ViewState.TAX_WIZARD:
-        case ViewState.TAX_ENGINE:
-            Component = TaxCommandCenter; 
-            break;
         case ViewState.GENERAL_LEDGER: Component = GeneralLedger; break;
-        case ViewState.DOCUMENTS: Component = Documents; break;
-        case ViewState.TAX_OPTIMIZER: Component = TaxOptimizer; break;
+        case ViewState.TAX_OPTIMIZER: 
+        case ViewState.TAX_OPTIMIZER_PRO: Component = TaxOptimizer; break;
         case ViewState.AUDIT_DEFENDER: Component = TaxAuditDefender; break;
         case ViewState.REPORTS: Component = Reports; break;
         case ViewState.AUDIT_SNAPSHOTS: Component = AuditSnapshots; break;
@@ -177,12 +211,6 @@ export default function App() {
         case ViewState.ECOMMERCE: Component = Ecommerce; break;
         case ViewState.CONTRACTS: Component = Contracts; break;
         case ViewState.MARKETPLACE: Component = Marketplace; break;
-        case ViewState.SETTINGS: Component = Settings; break;
-        case ViewState.DEV_PORTAL: Component = DevPortal; break;
-        case ViewState.SYSTEM_STATUS: Component = SystemStatus; break;
-        case ViewState.HELP_CENTER: Component = HelpCenter; break;
-        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break;
-        case ViewState.INTEGRATIONS: Component = Integrations; break;
         case ViewState.ASSETS: Component = Assets; break;
         case ViewState.BUDGETS: Component = Budgeting; break;
         case ViewState.EXPORT: Component = DataExport; break;
@@ -198,11 +226,19 @@ export default function App() {
         case ViewState.CAP_TABLE: Component = CapTable; break;
         case ViewState.CASH_REGISTER: Component = CashRegister; break;
         case ViewState.HISTORY: Component = History; break;
-        case ViewState.DIVIDENDS: Component = Dividends; break;
-        case ViewState.FORENSICS: Component = Forensics; break;
-        case ViewState.GLOBAL_TAX: Component = GlobalTax; break;
         case ViewState.ACCOUNTANT_DASHBOARD: Component = AccountantDashboard; break;
         case ViewState.SCENARIOS: Component = ScenarioPlanner; break;
+
+        // Shared
+        case ViewState.SETTINGS: Component = Settings; break;
+        case ViewState.DEV_PORTAL: Component = DevPortal; break;
+        case ViewState.SYSTEM_STATUS: Component = SystemStatus; break;
+        case ViewState.HELP_CENTER: Component = HelpCenter; break;
+        case ViewState.INTEGRATIONS: Component = Integrations; break;
+        case ViewState.NOTIFICATIONS: Component = Dashboard; break;
+        case ViewState.DESIGN_SYSTEM: Component = DesignSystemPreview; break;
+        case ViewState.DESIGN_LAB_TEST: Component = DesignLabTest; break;
+
         default: Component = Dashboard;
     }
 
@@ -229,21 +265,12 @@ export default function App() {
       );
   }
 
-  // --- DESIGN SYSTEM: VOID BLACK (DESIGN LABORATORY) ---
-  // Replaced bg-[#020617] with #050505 and added global atmosphere layer
   return (
     <div className="flex min-h-screen font-sans bg-[#050505] text-[#E1E1E3] overflow-hidden relative selection:bg-[#D4AF37] selection:text-black">
-      
-      {/* 1. ATMOSPHERE - COPIED FROM ONBOARDING (AUTH.TSX) */}
+      <div className="grid-bg"></div>
       <div className="fixed inset-0 pointer-events-none z-0">
-          {/* Grid */}
-          <div className="absolute inset-0" style={{ 
-              backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)', 
-              backgroundSize: '50px 50px',
-              maskImage: 'radial-gradient(circle at center, black 40%, transparent 100%)'
-          }}></div>
-          {/* Gold Glow Only */}
-          <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[100px]"></div>
+          <div className="absolute top-0 right-0 w-[800px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[100px]"></div>
       </div>
 
       <GlobalSearch 
@@ -276,7 +303,6 @@ export default function App() {
       />
 
       <main className="flex-1 lg:ml-72 flex flex-col h-screen relative z-10 w-full transition-all duration-300">
-        {/* Header - Transparent Glass */}
         <header className="h-16 bg-transparent backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 relative">
           <div className="flex items-center gap-4">
               <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-zinc-400 hover:text-white p-2 -ml-2">
@@ -285,12 +311,12 @@ export default function App() {
               
               <div 
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden md:flex items-center gap-3 w-96 bg-[#0F0F12]/80 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:border-[#D4AF37]/30 hover:bg-[#141419] transition-all cursor-text group"
+                className="hidden md:flex items-center gap-3 w-96 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-zinc-400 hover:border-[#D4AF37]/30 hover:bg-white/10 transition-all cursor-text group"
               >
                  <Search size={16} className="group-hover:text-[#D4AF37] transition-colors" />
                  <input 
                     type="text" 
-                    placeholder={activeWorkspace === Workspace.BUSINESS ? "Szukaj faktur..." : "Szukaj aktywów..."}
+                    placeholder={activeWorkspace === Workspace.WALLET ? "Szukaj TxHash / Bloku..." : "Szukaj..."}
                     className="bg-transparent border-none outline-none text-[#E1E1E3] placeholder-zinc-600 w-full cursor-pointer pointer-events-none"
                     readOnly
                  />

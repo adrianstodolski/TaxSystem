@@ -136,22 +136,22 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onN
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* Modal */}
+          {/* Modal - UPDATED BACKGROUND */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="relative w-full max-w-2xl bg-[#0F172A] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 ring-1 ring-white/10"
+            className="relative w-full max-w-2xl bg-[#0A0A0C] border border-white/10 rounded-2xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col z-10"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center px-4 py-4 border-b border-slate-700/50">
-              <Search className="text-slate-400 mr-3 shrink-0" size={20} />
+            <div className="flex items-center px-4 py-4 border-b border-white/5 bg-white/5">
+              <Search className="text-[#D4AF37] mr-3 shrink-0" size={20} />
               <input 
                 ref={inputRef}
                 type="text" 
@@ -159,16 +159,16 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onN
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDownInput}
                 placeholder="Szukaj dokumentów, klientów lub wpisz komendę..." 
-                className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-slate-500 font-medium h-full w-full"
+                className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-zinc-500 font-medium h-full w-full"
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck="false"
               />
               <div className="flex items-center gap-3 shrink-0">
-                {loading && <Loader2 className="animate-spin text-indigo-500" size={18} />}
+                {loading && <Loader2 className="animate-spin text-[#D4AF37]" size={18} />}
                 <button 
                     onClick={onClose} 
-                    className="text-slate-400 hover:text-white transition-colors bg-slate-800 px-2 py-1 rounded text-xs font-bold border border-slate-700"
+                    className="text-zinc-400 hover:text-white transition-colors bg-white/5 px-2 py-1 rounded text-xs font-bold border border-white/5"
                 >
                     ESC
                 </button>
@@ -178,7 +178,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onN
             {/* List */}
             <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2" ref={listRef}>
                 {!query && (
-                    <div className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 mt-2">
+                    <div className="px-3 py-2 text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 mt-2">
                         Sugerowane
                     </div>
                 )}
@@ -191,25 +191,25 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onN
                             onMouseEnter={() => setSelectedIndex(idx)}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${
                                 idx === selectedIndex 
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' 
-                                    : 'text-slate-300 hover:bg-slate-800/50'
+                                    ? 'bg-white/10 text-white shadow-lg border border-white/5' 
+                                    : 'text-zinc-400 hover:bg-white/5'
                             }`}
                         >
-                            <div className={`p-2 rounded-lg shrink-0 ${idx === selectedIndex ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                            <div className={`p-2 rounded-lg shrink-0 ${idx === selectedIndex ? 'bg-[#D4AF37] text-black' : 'bg-black/40 text-zinc-500 border border-white/5'}`}>
                                 {item.icon || getIcon(item.type)}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-bold ${idx === selectedIndex ? 'text-white' : 'text-slate-200'}`}>{item.title}</p>
-                                <p className={`text-xs truncate ${idx === selectedIndex ? 'text-indigo-200' : 'text-slate-500'}`}>{item.subtitle}</p>
+                                <p className={`text-sm font-bold ${idx === selectedIndex ? 'text-white' : 'text-zinc-200'}`}>{item.title}</p>
+                                <p className={`text-xs truncate ${idx === selectedIndex ? 'text-zinc-300' : 'text-zinc-500'}`}>{item.subtitle}</p>
                             </div>
                             {idx === selectedIndex && (
-                                <ArrowRight size={16} className="text-white opacity-80 shrink-0" />
+                                <ArrowRight size={16} className="text-[#D4AF37] opacity-80 shrink-0" />
                             )}
                         </div>
                     ))
                 ) : (
                     !loading && (
-                        <div className="py-12 text-center text-slate-500">
+                        <div className="py-12 text-center text-zinc-500">
                             <Search size={40} className="mx-auto mb-3 opacity-20" />
                             <p className="text-sm">Brak wyników dla "{query}"</p>
                         </div>
@@ -218,13 +218,13 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose, onN
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-3 bg-slate-900/80 border-t border-slate-700/50 flex justify-between items-center text-[10px] text-slate-500 font-medium">
+            <div className="px-4 py-3 bg-[#050505] border-t border-white/5 flex justify-between items-center text-[10px] text-zinc-500 font-medium">
                 <div className="flex gap-4">
                     <span className="flex items-center gap-1"><Command size={10} /> <strong>K</strong> otwórz</span>
                     <span className="flex items-center gap-1"><strong>&uarr;&darr;</strong> nawigacja</span>
                     <span className="flex items-center gap-1"><strong>Enter</strong> wybierz</span>
                 </div>
-                <div className="flex items-center gap-1 text-indigo-500/50">
+                <div className="flex items-center gap-1 text-[#D4AF37]/50">
                     <Zap size={10} /> Nuffi Intelligence
                 </div>
             </div>

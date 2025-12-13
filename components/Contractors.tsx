@@ -57,7 +57,7 @@ export const Contractors: React.FC = () => {
       </header>
 
       {/* WHITE LIST CHECKER TOOL */}
-      <div className="neo-card rounded-2xl p-6 relative overflow-hidden border border-white/5">
+      <div className="neo-card rounded-2xl p-6 relative overflow-hidden border border-white/5 bg-[#0F0F12]">
           <div className="relative z-10 flex flex-col md:flex-row gap-8">
               <div className="flex-1">
                   <h3 className="text-lg font-bold flex items-center gap-2 mb-2 text-white">

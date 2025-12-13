@@ -4,7 +4,6 @@ import { NuffiService } from '../services/api';
 import { Vehicle } from '../types';
 import { Car, Truck, Fuel, Calendar, MapPin, Plus, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from './ui/Toast';
-import { Modal } from './ui/Modal';
 
 export const Vehicles: React.FC = () => {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);

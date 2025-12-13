@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { Employee, PayrollEntry } from '../types';
-import { Users, Briefcase, FileText, Download, CheckCircle2, AlertTriangle, Calculator, ChevronRight, Play, Loader2, DollarSign } from 'lucide-react';
+import { Users, Calculator, ChevronRight, Play, Loader2, DollarSign, Download, FileText } from 'lucide-react';
 import { toast } from './ui/Toast';
 import { Modal } from './ui/Modal';
 

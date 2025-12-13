@@ -31,4 +31,3 @@ export const useStore = create<AppState>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
   setWorkspace: (workspace) => set({ activeWorkspace: workspace }),
 }));
-    

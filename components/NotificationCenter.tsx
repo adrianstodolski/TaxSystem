@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Bell, CheckCircle2, AlertTriangle, Info, X, Clock, ChevronRight } from 'lucide-react';
 import { Notification, ViewState } from '../types';
 import { NuffiService } from '../services/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NotificationCenterProps {
   onNavigate: (view: ViewState) => void;
@@ -57,9 +58,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onNaviga
 
   const getIcon = (type: string) => {
       switch(type) {
-          case 'SUCCESS': return <CheckCircle2 size={16} className="text-green-600" />;
-          case 'WARNING': return <AlertTriangle size={16} className="text-amber-600" />;
-          case 'INFO': return <Info size={16} className="text-blue-600" />;
+          case 'SUCCESS': return <CheckCircle2 size={16} className="text-emerald-400" />;
+          case 'WARNING': return <AlertTriangle size={16} className="text-amber-400" />;
+          case 'INFO': return <Info size={16} className="text-blue-400" />;
           default: return <Info size={16} />;
       }
   };
@@ -68,67 +69,78 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ onNaviga
     <div className="relative" ref={wrapperRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 rounded-full transition-colors ${isOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+        className={`relative p-2 rounded-xl transition-all border ${isOpen ? 'bg-white/10 text-white border-white/10' : 'text-zinc-400 hover:text-white border-transparent hover:bg-white/5'}`}
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_5px_#ef4444] animate-pulse"></span>
         )}
       </button>
 
-      {isOpen && (
-          <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 origin-top-right">
-              <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                  <h3 className="font-bold text-gray-900 text-sm">Powiadomienia</h3>
-                  {unreadCount > 0 && (
-                      <button onClick={markAllAsRead} className="text-xs text-indigo-600 font-medium hover:text-indigo-800">
-                          Oznacz wszystkie
-                      </button>
-                  )}
-              </div>
+      <AnimatePresence>
+        {isOpen && (
+            <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-full right-0 mt-3 w-80 bg-[#0A0A0C]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden origin-top-right"
+            >
+                <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <h3 className="font-bold text-white text-sm">Powiadomienia</h3>
+                    {unreadCount > 0 && (
+                        <button onClick={markAllAsRead} className="text-[10px] text-gold font-bold uppercase hover:text-[#FCD34D] tracking-wider border border-gold/20 px-2 py-0.5 rounded bg-gold/5 transition-colors">
+                            Oznacz wszystkie
+                        </button>
+                    )}
+                </div>
 
-              <div className="max-h-[400px] overflow-y-auto">
-                  {notifications.length === 0 ? (
-                      <div className="p-8 text-center text-gray-400 text-sm">
-                          Brak nowych powiadomień
-                      </div>
-                  ) : (
-                      <div className="divide-y divide-gray-50">
-                          {notifications.map(n => (
-                              <div key={n.id} className={`p-4 hover:bg-gray-50 transition-colors ${!n.read ? 'bg-indigo-50/30' : ''}`}>
-                                  <div className="flex gap-3 items-start">
-                                      <div className={`mt-0.5 p-1.5 rounded-full shrink-0 ${
-                                          n.type === 'SUCCESS' ? 'bg-green-100' : 
-                                          n.type === 'WARNING' ? 'bg-amber-100' : 'bg-blue-100'
-                                      }`}>
-                                          {getIcon(n.type)}
-                                      </div>
-                                      <div className="flex-1">
-                                          <div className="flex justify-between items-start">
-                                              <h4 className={`text-sm ${!n.read ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>{n.title}</h4>
-                                              <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2 flex items-center gap-1">
-                                                  <Clock size={10} /> {n.timestamp}
-                                              </span>
-                                          </div>
-                                          <p className="text-xs text-gray-500 mt-1 leading-relaxed">{n.message}</p>
-                                          
-                                          {n.action && (
-                                              <button 
-                                                onClick={() => handleAction(n)}
-                                                className="mt-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 flex items-center gap-1 transition-colors"
-                                              >
-                                                  {n.action.label} <ChevronRight size={12} />
-                                              </button>
-                                          )}
-                                      </div>
-                                  </div>
-                              </div>
-                          ))}
-                      </div>
-                  )}
-              </div>
-          </div>
-      )}
+                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                    {notifications.length === 0 ? (
+                        <div className="p-8 text-center text-zinc-500 text-sm">
+                            Brak nowych powiadomień
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-white/5">
+                            {notifications.map(n => (
+                                <div key={n.id} className={`p-4 hover:bg-white/5 transition-colors group ${!n.read ? 'bg-white/[0.02]' : ''}`}>
+                                    <div className="flex gap-3 items-start">
+                                        <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 border ${
+                                            n.type === 'SUCCESS' ? 'bg-emerald-500/10 border-emerald-500/20' : 
+                                            n.type === 'WARNING' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-blue-500/10 border-blue-500/20'
+                                        }`}>
+                                            {getIcon(n.type)}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <h4 className={`text-sm ${!n.read ? 'font-bold text-white' : 'font-medium text-zinc-300'}`}>{n.title}</h4>
+                                                <span className="text-[10px] text-zinc-500 whitespace-nowrap ml-2 flex items-center gap-1 font-mono">
+                                                    {n.timestamp}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{n.message}</p>
+                                            
+                                            {n.action && (
+                                                <button 
+                                                  onClick={() => handleAction(n)}
+                                                  className="mt-2 text-xs font-bold text-gold bg-gold/10 px-3 py-1.5 rounded-lg hover:bg-gold/20 flex items-center gap-1 transition-colors border border-gold/20 w-full justify-center"
+                                                >
+                                                    {n.action.label} <ChevronRight size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        {!n.read && (
+                                            <div className="w-1.5 h-1.5 rounded-full bg-gold shrink-0 mt-2"></div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

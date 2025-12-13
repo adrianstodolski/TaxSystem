@@ -8,7 +8,7 @@ import {
     BookOpen, PieChart, Leaf, FileBarChart, Calculator, BarChart2, BrainCircuit, Terminal, GraduationCap, 
     Settings, Zap, RefreshCw, TrendingUp, Bitcoin, Home, Search, Radar, Network, Gem, Swords, PiggyBank, BriefcaseBusiness,
     Building2, ShoppingCart, Landmark, ScrollText, Gavel, Scale, Repeat, Receipt, History, Activity, Box, Clock, Palette,
-    FileText, Magnet, Telescope, ShieldAlert
+    FileText, Magnet, Telescope, ShieldAlert, FlaskConical, Command, Send, Shuffle, Smartphone, Lock
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -115,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
           title: 'Aktywa Cyfrowe (Web3)',
           icon: Bitcoin,
           items: [
-              { view: ViewState.CRYPTO_HUB, label: 'Portfel Krypto', icon: Wallet },
+              { view: ViewState.CRYPTO_HUB, label: 'Rynek & Research', icon: Radar },
               { view: ViewState.YIELD_SCOUT, label: 'DeFi Yield', icon: Gem, badge: 'APY' },
               { view: ViewState.DEFI_ARCHEOLOGY, label: 'DeFi Explorer', icon: Search },
               { view: ViewState.TOKEN_SCANNER, label: 'Audyt Tokenów', icon: ShieldAlert },
@@ -156,49 +156,94 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
       }
   ];
 
-  const currentNav = activeWorkspace === Workspace.BUSINESS ? businessNav : investorNav;
+  // *** NEW: WALLET NAVIGATION ***
+  const walletNav: NavSection[] = [
+      {
+          id: 'WALLET_MAIN',
+          title: 'Urządzenie (Hardware)',
+          icon: Command,
+          items: [
+              { view: ViewState.WALLET_DASHBOARD, label: 'Pulpit Sterujący', icon: LayoutDashboard, badge: 'DEVICE' },
+              { view: ViewState.WALLET_DEVICE, label: 'Ustawienia Nuffi Key', icon: Settings },
+          ]
+      },
+      {
+          id: 'WALLET_OPS',
+          title: 'Operacje',
+          icon: RefreshCw,
+          items: [
+              { view: ViewState.WALLET_SEND, label: 'Wyślij', icon: Send },
+              { view: ViewState.WALLET_RECEIVE, label: 'Odbierz', icon: Wallet },
+              { view: ViewState.WALLET_SWAP, label: 'Swap', icon: Shuffle },
+              { view: ViewState.WALLET_BRIDGE, label: 'Bridge', icon: Globe },
+          ]
+      },
+      {
+          id: 'WALLET_SEC',
+          title: 'Bezpieczeństwo',
+          icon: ShieldCheck,
+          items: [
+              { view: ViewState.WALLET_DEVICE, label: 'Menadżer Kluczy', icon: Lock }, // Reuse view for now
+          ]
+      }
+  ];
+
+  let currentNav;
+  if (activeWorkspace === Workspace.BUSINESS) currentNav = businessNav;
+  else if (activeWorkspace === Workspace.WALLET) currentNav = walletNav;
+  else currentNav = investorNav;
 
   return (
-    // TRANSPARENT BACKGROUND WITH BLUR AND NEW COLORS
-    <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-transparent backdrop-blur-xl border-r border-white/5 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+    // PURE GLASS SIDEBAR - NO SOLID COLORS
+    <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-onyx/80 backdrop-blur-xl border-r border-white/5 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         
         {/* Header & Switcher */}
-        <div className="p-5 border-b border-white/5 space-y-5 bg-[#050505]/50">
+        <div className="p-5 border-b border-white/5 space-y-5 bg-transparent">
             {/* Logo Area */}
             <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#141419]/80 flex items-center justify-center border border-white/10 text-[#D4AF37] shadow-sm">
+                    <div className="w-8 h-8 rounded-lg bg-onyx-light flex items-center justify-center border border-white/10 text-gold shadow-sm">
                         <ShieldCheck size={18} />
                     </div>
                     <div>
-                        <h1 className="text-sm font-bold text-white tracking-tight font-mono leading-none">Nuffi<span className="text-[#D4AF37]">.OS</span></h1>
-                        <p className="text-[10px] text-zinc-500 font-medium">{activeWorkspace === Workspace.BUSINESS ? 'Enterprise' : 'Wealth'} Ed.</p>
+                        <h1 className="text-sm font-bold text-white tracking-tight font-mono leading-none">Nuffi<span className="text-gold">.OS</span></h1>
+                        <p className="text-[10px] text-zinc-500 font-medium">
+                            {activeWorkspace === Workspace.BUSINESS ? 'Enterprise Ed.' : activeWorkspace === Workspace.WALLET ? 'Hardware Ed.' : 'Wealth Ed.'}
+                        </p>
                     </div>
                 </div>
-                <span className="text-[9px] font-bold bg-[#D4AF37]/10 text-[#D4AF37] px-2 py-0.5 rounded border border-[#D4AF37]/20 tracking-wider">{plan}</span>
+                <span className="text-[9px] font-bold bg-gold/10 text-gold px-2 py-0.5 rounded border border-gold/20 tracking-wider">{plan}</span>
             </div>
 
-            {/* Futuristic Switcher */}
-            <div className="relative bg-[#0F0F12]/60 p-1 rounded-xl border border-white/5 flex backdrop-blur-sm">
+            {/* 3-WAY WORKSPACE SWITCHER */}
+            <div className="relative bg-black/40 p-1 rounded-xl border border-white/5 flex backdrop-blur-sm">
                 <motion.div 
-                    className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg shadow-sm z-0 bg-[#D4AF37]"
-                    animate={{ x: activeWorkspace === Workspace.BUSINESS ? 0 : '100%' }}
+                    className="absolute top-1 bottom-1 w-[calc(33.33%-3px)] rounded-lg shadow-sm z-0 bg-gold"
+                    animate={{ 
+                        x: activeWorkspace === Workspace.BUSINESS ? 0 : activeWorkspace === Workspace.INVESTOR ? '100%' : '200%' 
+                    }}
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    style={{ left: 4, width: 'calc(50% - 6px)' }}
+                    style={{ left: 4 }}
                 />
                 
                 <button 
                     onClick={() => setWorkspace(Workspace.BUSINESS)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold relative z-10 transition-colors ${activeWorkspace === Workspace.BUSINESS ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-lg text-[10px] font-bold relative z-10 transition-colors ${activeWorkspace === Workspace.BUSINESS ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
                 >
-                    <BriefcaseBusiness size={14} /> FIRMA
+                    <BriefcaseBusiness size={12} /> FIRMA
                 </button>
                 <button 
                     onClick={() => setWorkspace(Workspace.INVESTOR)}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold relative z-10 transition-colors ${activeWorkspace === Workspace.INVESTOR ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-lg text-[10px] font-bold relative z-10 transition-colors ${activeWorkspace === Workspace.INVESTOR ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
                 >
-                    <TrendingUp size={14} /> PORTFEL
+                    <TrendingUp size={12} /> PORTFEL
+                </button>
+                <button 
+                    onClick={() => setWorkspace(Workspace.WALLET)}
+                    className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-lg text-[10px] font-bold relative z-10 transition-colors ${activeWorkspace === Workspace.WALLET ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
+                >
+                    <Command size={12} /> N.KEY
                 </button>
             </div>
         </div>
@@ -218,16 +263,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
                                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-all relative group overflow-hidden ${currentView === item.view ? 'bg-white/5 text-white' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
                             >
                                 <div className="flex items-center gap-3 relative z-10">
-                                    <item.icon size={18} className={`transition-colors ${currentView === item.view ? 'text-[#D4AF37]' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
+                                    <item.icon size={18} className={`transition-colors ${currentView === item.view ? 'text-gold' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
                                     <span className="truncate font-medium">{item.label}</span>
                                 </div>
                                 
                                 {item.badge && (
                                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ml-2 relative z-10 ${
                                         item.badge === 'PRO' ? 'bg-purple-900/30 text-purple-400 border-purple-500/30' : 
-                                        item.badge === 'AI' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' :
+                                        item.badge === 'AI' ? 'bg-gold/10 text-gold border-gold/20' :
                                         item.badge === 'CORE' ? 'bg-orange-900/30 text-orange-400 border-orange-500/30' :
                                         item.badge === 'LIVE' ? 'bg-red-900/30 text-red-400 border-red-500/30 animate-pulse' :
+                                        item.badge === 'APY' ? 'bg-green-900/30 text-green-400 border-green-500/30' :
+                                        item.badge === 'DEVICE' ? 'bg-blue-900/30 text-blue-400 border-blue-500/30' :
                                         'bg-zinc-800 text-zinc-400 border-zinc-700'
                                     }`}>
                                         {item.badge}
@@ -237,7 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
                                 {currentView === item.view && (
                                     <motion.div 
                                         layoutId="activeIndicator"
-                                        className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-[#D4AF37]" 
+                                        className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-gold" 
                                     />
                                 )}
                             </button>
@@ -265,6 +312,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
                 <button onClick={() => onChangeView(ViewState.DESIGN_SYSTEM)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5 ${currentView === ViewState.DESIGN_SYSTEM ? 'bg-white/5 text-white' : ''}`}>
                     <Palette size={18} /> Design Lab
                 </button>
+                <button onClick={() => onChangeView(ViewState.DESIGN_LAB_TEST)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5 ${currentView === ViewState.DESIGN_LAB_TEST ? 'bg-white/5 text-white' : ''}`}>
+                    <FlaskConical size={18} className="text-gold" /> Test Designu
+                </button>
                 <button onClick={() => onChangeView(ViewState.HELP_CENTER)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5 ${currentView === ViewState.HELP_CENTER ? 'bg-white/5 text-white' : ''}`}>
                     <GraduationCap size={18} /> Akademia & AI
                 </button>
@@ -272,13 +322,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
         </div>
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-white/5 bg-[#050505]/50 backdrop-blur-md">
+        <div className="p-4 border-t border-white/5 bg-transparent">
             <button onClick={() => onChangeView(ViewState.SETTINGS)} className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors group">
-                <div className="w-10 h-10 rounded-full bg-[#141419] flex items-center justify-center text-white font-bold border border-white/10 ring-2 ring-transparent group-hover:ring-[#D4AF37]/30 transition-all">
+                <div className="w-10 h-10 rounded-full bg-onyx-light flex items-center justify-center text-white font-bold border border-white/10 ring-2 ring-transparent group-hover:ring-gold/30 transition-all">
                     JD
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors truncate">Jan Doe</p>
+                    <p className="text-sm font-bold text-white group-hover:text-gold transition-colors truncate">Jan Doe</p>
                     <p className="text-xs text-zinc-500 truncate">jan@nuffi.io</p>
                 </div>
                 <Settings size={18} className="text-zinc-500 group-hover:text-white transition-colors" />

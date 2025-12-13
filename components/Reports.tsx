@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { FinancialReport, CalendarEvent } from '../types';
-import { FileBarChart, Calendar as CalendarIcon, Download, Printer, TrendingUp, DollarSign, Clock, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { FileBarChart, Download, Loader2 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { toast } from './ui/Toast';
 

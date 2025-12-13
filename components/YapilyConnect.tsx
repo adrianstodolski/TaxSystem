@@ -5,17 +5,7 @@ import { BankAccount, Transaction, TransferRequest, DirectDebitMandate, BulkPaym
 import { RefreshCw, Search, CheckCircle2, ArrowRight, Wallet, LineChart, PieChart, Plus, Send, Copy, CreditCard, Building, Lock, ShieldCheck, Loader2, MoreHorizontal, User, Globe, Repeat, XCircle, Users, Layers, Zap, Activity, AlertCircle } from 'lucide-react';
 import { toast } from './ui/Toast';
 import { Modal } from './ui/Modal';
-
-const BANKS = [
-  { id: 'mbank', name: 'mBank', color: 'bg-gradient-to-br from-red-600 to-red-700', logo: 'M' },
-  { id: 'pko', name: 'PKO BP', color: 'bg-gradient-to-br from-blue-800 to-blue-900', logo: 'P' },
-  { id: 'pekao', name: 'Bank Pekao', color: 'bg-gradient-to-br from-red-800 to-red-900', logo: 'Ż' },
-  { id: 'ing', name: 'ING Bank', color: 'bg-gradient-to-br from-orange-500 to-orange-600', logo: 'L' },
-  { id: 'santander', name: 'Santander', color: 'bg-gradient-to-br from-red-600 to-red-800', logo: 'S' },
-  { id: 'millennium', name: 'Millennium', color: 'bg-gradient-to-br from-pink-700 to-purple-800', logo: 'M' },
-  { id: 'revolut', name: 'Revolut', color: 'bg-gradient-to-br from-blue-500 to-blue-600', logo: 'R' },
-  { id: 'railsr', name: 'Railsr (Embedded)', color: 'bg-gradient-to-br from-indigo-900 to-slate-900', logo: 'Railsr' },
-];
+import { motion } from 'framer-motion';
 
 export const YapilyConnect: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'ACCOUNTS' | 'DEBITS' | 'BULK' | 'VRP' | 'HEALTH' | 'VERIFY'>('ACCOUNTS');
@@ -35,9 +25,7 @@ export const YapilyConnect: React.FC = () => {
     // Modal State
     const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
     const [connectStep, setConnectStep] = useState<'PROVIDER' | 'SELECT' | 'CONSENT' | 'CONNECTING' | 'SUCCESS'>('PROVIDER');
-    const [selectedProvider, setSelectedProvider] = useState<string>('SALT_EDGE');
-    const [selectedBankId, setSelectedBankId] = useState<string | null>(null);
-
+    
     // Transfer State
     const [transferAmount, setTransferAmount] = useState('');
     const [recipient, setRecipient] = useState('');
@@ -85,7 +73,7 @@ export const YapilyConnect: React.FC = () => {
         try { return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr }).format(val); } catch (e) { return `${val.toLocaleString('pl-PL')} ${curr}`; }
     };
 
-    const closeConnectModal = () => { setIsConnectModalOpen(false); setConnectStep('PROVIDER'); setSelectedBankId(null); };
+    const closeConnectModal = () => { setIsConnectModalOpen(false); setConnectStep('PROVIDER'); };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -97,16 +85,16 @@ export const YapilyConnect: React.FC = () => {
                     <p className="text-zinc-400 mt-1">Open Banking Aggregation, PIS Bulk Payments & VRP.</p>
                 </div>
                 <div className="flex gap-2">
-                    <div className="bg-[#0A0A0C] p-1 rounded-lg flex overflow-x-auto border border-white/10">
-                        <button onClick={() => setActiveTab('ACCOUNTS')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'ACCOUNTS' ? 'bg-gold text-black shadow-glow' : 'text-zinc-400 hover:text-white'}`}>Konta</button>
-                        <button onClick={() => setActiveTab('BULK')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'BULK' ? 'bg-gold text-black shadow-glow' : 'text-zinc-400 hover:text-white'}`}>Masowe (Bulk)</button>
-                        <button onClick={() => setActiveTab('VRP')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'VRP' ? 'bg-gold text-black shadow-glow' : 'text-zinc-400 hover:text-white'}`}>Smart VRP</button>
-                        <button onClick={() => setActiveTab('HEALTH')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'HEALTH' ? 'bg-gold text-black shadow-glow' : 'text-zinc-400 hover:text-white'}`}>Kondycja</button>
-                        <button onClick={() => setActiveTab('VERIFY')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'VERIFY' ? 'bg-gold text-black shadow-glow' : 'text-zinc-400 hover:text-white'}`}>Weryfikacja IBAN</button>
+                    <div className="bg-onyx p-1 rounded-lg flex overflow-x-auto border border-white/10">
+                        <button onClick={() => setActiveTab('ACCOUNTS')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'ACCOUNTS' ? 'bg-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'text-zinc-400 hover:text-white'}`}>Konta</button>
+                        <button onClick={() => setActiveTab('BULK')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'BULK' ? 'bg-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'text-zinc-400 hover:text-white'}`}>Masowe (Bulk)</button>
+                        <button onClick={() => setActiveTab('VRP')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'VRP' ? 'bg-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'text-zinc-400 hover:text-white'}`}>Smart VRP</button>
+                        <button onClick={() => setActiveTab('HEALTH')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'HEALTH' ? 'bg-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'text-zinc-400 hover:text-white'}`}>Kondycja</button>
+                        <button onClick={() => setActiveTab('VERIFY')} className={`px-4 py-2 text-sm font-bold rounded-md transition-all whitespace-nowrap ${activeTab === 'VERIFY' ? 'bg-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'text-zinc-400 hover:text-white'}`}>Weryfikacja IBAN</button>
                     </div>
                     <button 
                         onClick={() => setIsConnectModalOpen(true)}
-                        className="bg-gold text-black px-4 py-2.5 rounded-lg font-medium hover:bg-[#FCD34D] flex items-center gap-2 shadow-lg shadow-gold/20 text-sm shrink-0"
+                        className="bg-gold text-black px-4 py-2.5 rounded-lg font-medium hover:bg-[#FCD34D] flex items-center gap-2 shadow-lg shadow-gold/20 text-sm shrink-0 transition-all"
                     >
                         <Plus size={16} /> Dodaj konto
                     </button>
@@ -118,14 +106,15 @@ export const YapilyConnect: React.FC = () => {
                     {/* LIQUID ASSETS & CARDS */}
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Total Balance Widget */}
-                        <div className="glass-card p-8 rounded-xl shadow-sm border border-white/10 flex flex-col justify-center relative overflow-hidden group">
+                        <div className="neo-card p-8 rounded-xl flex flex-col justify-center relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
                             <div className="relative z-10">
                                 <p className="text-zinc-400 font-bold uppercase tracking-wider text-xs mb-2">Płynność Finansowa</p>
                                 <h3 className="text-5xl font-bold text-white tracking-tight font-mono">
                                     {formatCurrency(accounts.reduce((acc, curr) => acc + (curr.currency === 'PLN' ? curr.balance : curr.balance * 4.3), 0), 'PLN')}
                                 </h3>
                                 <div className="flex gap-2 mt-6">
-                                    <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
                                         <ArrowRight size={12} className="-rotate-45" /> +12.5%
                                     </span>
                                 </div>
@@ -140,7 +129,7 @@ export const YapilyConnect: React.FC = () => {
                                         <div 
                                             key={acc.id}
                                             onClick={() => setSelectedAccount(acc)}
-                                            className={`min-w-[300px] h-[180px] rounded-xl p-6 relative overflow-hidden text-white shadow-lg cursor-pointer transition-all hover:-translate-y-1 ring-2 ${selectedAccount?.id === acc.id ? 'ring-offset-2 ring-gold ring-offset-[#0A0A0C]' : 'ring-transparent'} ${acc.colorTheme}`}
+                                            className={`min-w-[300px] h-[180px] rounded-xl p-6 relative overflow-hidden text-white shadow-lg cursor-pointer transition-all hover:-translate-y-1 ring-2 ${selectedAccount?.id === acc.id ? 'ring-offset-2 ring-gold ring-offset-[#0A0A0C]' : 'ring-transparent'} ${acc.colorTheme} border border-white/10`}
                                         >
                                             <div className="relative z-10 flex flex-col justify-between h-full">
                                                 <div className="flex justify-between items-start">
@@ -151,7 +140,7 @@ export const YapilyConnect: React.FC = () => {
                                                         </p>
                                                     </div>
                                                     {acc.aggregator && (
-                                                        <span className="text-[9px] bg-black/20 px-2 py-0.5 rounded font-bold uppercase">{acc.aggregator}</span>
+                                                        <span className="text-[9px] bg-black/20 px-2 py-0.5 rounded font-bold uppercase backdrop-blur-sm">{acc.aggregator}</span>
                                                     )}
                                                 </div>
                                                 <div className="flex justify-between items-end">
@@ -173,7 +162,7 @@ export const YapilyConnect: React.FC = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* TRANSFER HUB */}
-                        <div className="glass-card p-6 rounded-xl shadow-sm border border-white/10 lg:col-span-1">
+                        <div className="neo-card p-6 rounded-xl lg:col-span-1">
                             <h3 className="font-bold text-white mb-6 flex items-center gap-2 text-sm uppercase tracking-wide">
                                 <Send className="text-gold" size={16} /> Przelew Natychmiastowy
                             </h3>
@@ -181,16 +170,16 @@ export const YapilyConnect: React.FC = () => {
                             {selectedAccount ? (
                                 <div className="space-y-4">
                                     {/* Transfer Type Selector */}
-                                    <div className="flex bg-[#0A0A0C] p-1 rounded-lg border border-white/10">
-                                        <button onClick={() => setTransferType('DOMESTIC')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'DOMESTIC' ? 'bg-gold text-black' : 'text-zinc-400 hover:text-white'}`}>ELIXIR</button>
-                                        <button onClick={() => setTransferType('SEPA')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'SEPA' ? 'bg-gold text-black' : 'text-zinc-400 hover:text-white'}`}>SEPA</button>
-                                        <button onClick={() => setTransferType('SWIFT')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'SWIFT' ? 'bg-gold text-black' : 'text-zinc-400 hover:text-white'}`}>SWIFT</button>
+                                    <div className="flex bg-[#050505] p-1 rounded-lg border border-white/10">
+                                        <button onClick={() => setTransferType('DOMESTIC')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'DOMESTIC' ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white'}`}>ELIXIR</button>
+                                        <button onClick={() => setTransferType('SEPA')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'SEPA' ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white'}`}>SEPA</button>
+                                        <button onClick={() => setTransferType('SWIFT')} className={`flex-1 text-xs font-bold py-2 rounded ${transferType === 'SWIFT' ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white'}`}>SWIFT</button>
                                     </div>
 
                                     <div>
                                         <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Odbiorca</label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                                             <input 
                                                 type="text" 
                                                 value={recipient}
@@ -218,7 +207,7 @@ export const YapilyConnect: React.FC = () => {
                                     <button 
                                         onClick={handleTransfer}
                                         disabled={isTransferring || !transferAmount || !recipient}
-                                        className="w-full bg-gold text-black py-2.5 rounded-lg font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20 disabled:opacity-50 text-sm"
+                                        className="w-full bg-gold text-black py-2.5 rounded-lg font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20 disabled:opacity-50 text-sm mt-4"
                                     >
                                         {isTransferring ? <Loader2 className="animate-spin" /> : <>Wyślij {transferType} <ArrowRight size={16} /></>}
                                     </button>
@@ -231,19 +220,19 @@ export const YapilyConnect: React.FC = () => {
                         </div>
 
                         {/* UNIFIED FEED */}
-                        <div className="glass-card rounded-xl shadow-sm border border-white/10 lg:col-span-2 overflow-hidden flex flex-col">
+                        <div className="neo-card rounded-xl lg:col-span-2 overflow-hidden flex flex-col">
                             <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                                 <h3 className="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wide">
                                     <RefreshCw size={16} className="text-zinc-400" /> Ostatnie Operacje
                                 </h3>
                             </div>
-                            <div className="flex-1 overflow-y-auto max-h-[400px]">
+                            <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar">
                                 {loading ? [1,2,3].map(i => <div key={i} className="h-14 bg-white/5 m-4 rounded animate-pulse" />) :
                                     <div className="divide-y divide-white/5">
                                         {transactions.map(tx => (
                                             <div key={tx.id} className="p-4 hover:bg-white/5 transition-colors flex items-center justify-between group">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold ${tx.amount > 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#0A0A0C] text-zinc-400'}`}>
+                                                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold ${tx.amount > 0 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-white/5 text-zinc-400 border border-white/10'}`}>
                                                         {tx.amount > 0 ? <ArrowRight className="-rotate-45" size={16} /> : <CreditCard size={16} />}
                                                     </div>
                                                     <div>
@@ -268,19 +257,18 @@ export const YapilyConnect: React.FC = () => {
                 </>
             )}
 
-            {/* Other tabs... (Applying glass-card) */}
             {activeTab === 'HEALTH' && financialHealth && (
-                <div className="space-y-6 animate-in fade-in">
-                    <div className="glass-card text-white p-8 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-6">
+                    <div className="neo-card text-white p-8 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 border-l-4 border-l-gold">
                         <div className="flex items-center gap-6">
-                            <div className="relative w-32 h-32 rounded-full border-8 border-[#0A0A0C] flex items-center justify-center">
-                                <span className="text-4xl font-bold font-mono">{financialHealth.score}</span>
+                            <div className="relative w-32 h-32 rounded-full border-8 border-white/5 flex items-center justify-center">
+                                <span className="text-4xl font-bold font-mono text-white">{financialHealth.score}</span>
                                 <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="46" fill="none" stroke="#10b981" strokeWidth="8" strokeDasharray={`${(financialHealth.score / 1000) * 289} 289`} />
+                                    <circle cx="50" cy="50" r="46" fill="none" stroke="#D4AF37" strokeWidth="8" strokeDasharray={`${(financialHealth.score / 1000) * 289} 289`} strokeLinecap="round" />
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-2xl font-bold mb-1">Kondycja Finansowa</h3>
+                                <h3 className="text-2xl font-bold mb-1 text-white">Kondycja Finansowa</h3>
                                 <p className="text-zinc-400 text-sm mb-4">Na podstawie analizy transakcji Open Banking.</p>
                                 <div className="flex gap-3">
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${financialHealth.riskLevel === 'LOW' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400'}`}>
@@ -294,32 +282,32 @@ export const YapilyConnect: React.FC = () => {
                         </div>
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10 w-full max-w-sm">
                             <div className="flex justify-between mb-2 text-sm">
-                                <span className="text-zinc-300">Wolne środki (msc)</span>
-                                <span className="font-bold">{formatCurrency(financialHealth.monthlyDisposableIncome, 'PLN')}</span>
+                                <span className="text-zinc-400">Wolne środki (msc)</span>
+                                <span className="font-bold text-white">{formatCurrency(financialHealth.monthlyDisposableIncome, 'PLN')}</span>
                             </div>
-                            <div className="w-full bg-[#0A0A0C] h-2 rounded-full mb-4 overflow-hidden">
-                                <div className="bg-green-500 h-full" style={{width: '75%'}}></div>
+                            <div className="w-full bg-black/40 h-2 rounded-full mb-4 overflow-hidden">
+                                <div className="bg-emerald-500 h-full" style={{width: '75%'}}></div>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-zinc-300">Wskaźnik zadłużenia</span>
-                                <span className="font-bold">{(financialHealth.debtToIncomeRatio * 100).toFixed(1)}%</span>
+                                <span className="text-zinc-400">Wskaźnik zadłużenia</span>
+                                <span className="font-bold text-white">{(financialHealth.debtToIncomeRatio * 100).toFixed(1)}%</span>
                             </div>
-                            <div className="w-full bg-[#0A0A0C] h-2 rounded-full mt-2 overflow-hidden">
+                            <div className="w-full bg-black/40 h-2 rounded-full mt-2 overflow-hidden">
                                 <div className="bg-amber-500 h-full" style={{width: `${financialHealth.debtToIncomeRatio * 100}%`}}></div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {activeTab === 'VERIFY' && (
                 <div className="space-y-6 animate-in fade-in">
-                    <div className="glass-card p-8 rounded-2xl shadow-sm border border-white/10 max-w-2xl mx-auto">
-                        <div className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/30">
+                    <div className="neo-card p-8 rounded-2xl max-w-2xl mx-auto">
+                        <div className="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
                             <ShieldCheck size={32} />
                         </div>
                         <h3 className="text-2xl font-bold text-white mb-2 text-center">Weryfikacja Beneficjenta (CoP)</h3>
-                        <p className="text-zinc-400 mb-8 text-center">
+                        <p className="text-zinc-400 mb-8 text-center text-sm">
                             Sprawdź, czy podany numer IBAN faktycznie należy do osoby/firmy, której chcesz zapłacić. Chroni przed oszustwami.
                         </p>
 
@@ -347,7 +335,7 @@ export const YapilyConnect: React.FC = () => {
                             <button 
                                 onClick={handleVerifyBeneficiary}
                                 disabled={isVerifying || !verifyIban || !verifyName}
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-4"
                             >
                                 {isVerifying ? <Loader2 className="animate-spin" /> : 'Sprawdź Właściciela'}
                             </button>
@@ -375,7 +363,7 @@ export const YapilyConnect: React.FC = () => {
                 <div className="py-8 flex flex-col items-center">
                     <Loader2 className="animate-spin text-gold mb-4" size={32} />
                     <h3 className="font-bold text-white text-sm">Symulacja połączenia...</h3>
-                    <button onClick={closeConnectModal} className="mt-6 w-full bg-[#0A0A0C] text-white py-2.5 rounded-lg font-bold text-sm">Zamknij</button>
+                    <button onClick={closeConnectModal} className="mt-6 w-full bg-onyx text-white py-2.5 rounded-lg font-bold text-sm border border-white/10 hover:bg-white/5 transition-colors">Zamknij</button>
                 </div>
             </Modal>
         </div>

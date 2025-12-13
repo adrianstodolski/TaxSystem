@@ -1,3 +1,4 @@
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -9,24 +10,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        slate: {
-          850: '#151e32',
-          900: '#0f172a',
-          950: '#020617',
-        },
-        indigo: {
-          450: '#818cf8',
-          550: '#4f46e5'
-        }
+        // DESIGN LABORATORY PALETTE (Void Black)
+        void: '#050505',       // Pure Black
+        onyx: '#0A0A0C',       // Card Background
+        'onyx-light': '#141419',
+        gold: '#D4AF37',       // Primary Accent
+        'gold-dim': '#8A7018',
+        platinum: '#E1E1E3',   // Text Main
+        'platinum-dim': '#8E8E93',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       }
     },
-    fontFamily: {
-      sans: ['Inter', 'sans-serif'],
-      mono: ['JetBrains Mono', 'monospace'],
-    }
   },
   plugins: [],
 }

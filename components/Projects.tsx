@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { Project } from '../types';
-import { FolderKanban, TrendingUp, AlertTriangle, CheckCircle2, Clock, Calendar, PieChart, MoreHorizontal, Plus } from 'lucide-react';
+import { FolderKanban, AlertTriangle, MoreHorizontal, Plus } from 'lucide-react';
 import { toast } from './ui/Toast';
 
 export const Projects: React.FC = () => {
