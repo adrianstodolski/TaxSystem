@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { TaxReturn, TaxStatus } from '../types';
-import { Download, FileText, CheckCircle2, Search } from 'lucide-react';
+import { Download, FileText, Search } from 'lucide-react';
 
 export const History: React.FC = () => {
   const [history, setHistory] = useState<TaxReturn[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [yearFilter, setYearFilter] = useState('ALL');
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -25,6 +27,13 @@ export const History: React.FC = () => {
     }
   };
 
+  const filteredHistory = history.filter(item => {
+      const matchesSearch = item.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            item.type.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesYear = yearFilter === 'ALL' || item.year.toString() === yearFilter;
+      return matchesSearch && matchesYear;
+  });
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <header className="flex justify-between items-center">
@@ -40,15 +49,21 @@ export const History: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
                     type="text" 
-                    placeholder="Szukaj po roku lub typie..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Szukaj po ID lub typie..." 
                     className="w-full pl-10 pr-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
             </div>
-            <select className="px-4 py-2 border border-white/10 rounded-lg text-sm bg-slate-900 text-white focus:ring-2 focus:ring-indigo-500">
-                <option>Wszystkie lata</option>
-                <option>2023</option>
-                <option>2022</option>
-                <option>2021</option>
+            <select 
+                value={yearFilter}
+                onChange={(e) => setYearFilter(e.target.value)}
+                className="px-4 py-2 border border-white/10 rounded-lg text-sm bg-slate-900 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+            >
+                <option value="ALL">Wszystkie lata</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
             </select>
         </div>
 
@@ -70,7 +85,7 @@ export const History: React.FC = () => {
                 </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5 text-slate-300">
-                {history.map((item) => (
+                {filteredHistory.length > 0 ? filteredHistory.map((item) => (
                     <tr key={item.id} className="hover:bg-white/5 transition-colors group">
                     <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -84,7 +99,7 @@ export const History: React.FC = () => {
                         </div>
                     </td>
                     <td className="p-4 font-mono text-xs text-slate-500">{item.id}</td>
-                    <td className="p-4 text-sm text-slate-300">{item.submissionDate}</td>
+                    <td className="p-4 text-sm text-slate-300">{item.submissionDate || '-'}</td>
                     <td className="p-4 font-bold text-white">{item.taxDue.toLocaleString()} PLN</td>
                     <td className="p-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(item.status)}`}>
@@ -105,7 +120,13 @@ export const History: React.FC = () => {
                         </div>
                     </td>
                     </tr>
-                ))}
+                )) : (
+                    <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-500">
+                            Brak wyników spełniających kryteria wyszukiwania.
+                        </td>
+                    </tr>
+                )}
                 </tbody>
             </table>
             </div>

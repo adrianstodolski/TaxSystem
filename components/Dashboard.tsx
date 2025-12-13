@@ -5,11 +5,11 @@ import {
     TrendingUp, ShieldCheck, Activity, Zap, 
     Wallet, Briefcase, FileText, AlertTriangle,
     PieChart as PieChartIcon, ArrowUpRight, Building, Landmark,
-    Gem, Coins
+    Gem, CheckCircle2, Cpu, Server, Lock
 } from 'lucide-react';
 import { ViewState, Workspace } from '../types';
 import { useStore } from '../store/useStore';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DashboardProps {
   onNavigate: (view: ViewState) => void;
@@ -17,19 +17,62 @@ interface DashboardProps {
 
 const COLORS = ['#D4AF37', '#64748B', '#3f3f46', '#18181b'];
 
+const SystemBootCheck = ({ onComplete }: { onComplete: () => void }) => {
+    const steps = [
+        { id: 'core', label: 'Inicjalizacja Jądra Nuffi OS...' },
+        { id: 'sec', label: 'Weryfikacja Modułów Bezpieczeństwa (HSM)...' },
+        { id: 'ai', label: 'Ładowanie Modeli Gemini AI...' },
+        { id: 'net', label: 'Nawiązywanie połączenia z KSeF Gateway...' },
+    ];
+    const [currentStep, setCurrentStep] = useState(0);
+
+    useEffect(() => {
+        if (currentStep < steps.length) {
+            const timer = setTimeout(() => setCurrentStep(prev => prev + 1), 400);
+            return () => clearTimeout(timer);
+        } else {
+            const timer = setTimeout(onComplete, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [currentStep]);
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="mb-6 bg-black/40 border border-white/10 rounded-xl p-4 font-mono text-xs text-zinc-400 relative overflow-hidden"
+        >
+            <div className="absolute top-0 left-0 w-1 h-full bg-gold"></div>
+            {steps.map((step, i) => (
+                <div key={step.id} className={`flex items-center gap-3 mb-1 ${i > currentStep ? 'opacity-0' : 'opacity-100 transition-opacity'}`}>
+                    <span className={i < currentStep ? "text-green-500" : "text-gold"}>
+                        {i < currentStep ? "[OK]" : "[..]"}
+                    </span>
+                    <span className={i === currentStep ? "text-white animate-pulse" : "text-zinc-400"}>
+                        {step.label}
+                    </span>
+                </div>
+            ))}
+            {currentStep === steps.length && (
+                <div className="mt-2 text-green-400 font-bold">>> SYSTEM READY. WELCOME COMMANDER.</div>
+            )}
+        </motion.div>
+    );
+};
+
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [data, setData] = useState<any[]>([]);
   const [metric1, setMetric1] = useState(0); 
   const [metric2, setMetric2] = useState(0); 
   const [loading, setLoading] = useState(true);
+  const [showBoot, setShowBoot] = useState(true);
   
-  // CRITICAL: Use the store to determine which mode we are in
   const { activeWorkspace } = useStore();
   const isBusiness = activeWorkspace === Workspace.BUSINESS;
 
   useEffect(() => {
       setLoading(true);
-      // Simulate data fetch switch based on workspace
       const timer = setTimeout(() => {
           if (isBusiness) {
               setData([
@@ -77,7 +120,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-6 pb-20">
-        <header className="flex justify-between items-end mb-8">
+        <header className="flex justify-between items-end mb-4">
             <div>
                 <h2 className="text-3xl font-bold text-white tracking-tight font-mono">
                     {isBusiness ? 'Company' : 'Wealth'}<span className="text-gold">OS</span>
@@ -95,6 +138,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </button>
             </div>
         </header>
+
+        <AnimatePresence>
+            {showBoot && <SystemBootCheck onComplete={() => setShowBoot(false)} />}
+        </AnimatePresence>
 
         {/* BENTO GRID LAYOUT */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[180px]">

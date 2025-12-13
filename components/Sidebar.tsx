@@ -8,7 +8,7 @@ import {
     BookOpen, PieChart, Leaf, FileBarChart, Calculator, BarChart2, BrainCircuit, Terminal, GraduationCap, 
     Settings, Zap, RefreshCw, TrendingUp, Bitcoin, Home, Search, Radar, Network, Gem, Swords, PiggyBank, BriefcaseBusiness,
     Building2, ShoppingCart, Landmark, ScrollText, Gavel, Scale, Repeat, Receipt, History, Activity, Box, Clock, Palette,
-    FileText, Magnet, Telescope, ShieldAlert, FlaskConical, Command, Send, Shuffle, Smartphone, Lock
+    FileText, Magnet, Telescope, ShieldAlert, FlaskConical, Command, Send, Shuffle, Smartphone, Lock, Image, Link, Clock3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -156,34 +156,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, pla
       }
   ];
 
-  // *** NEW: WALLET NAVIGATION ***
+  // *** UPDATED: WALLET NAVIGATION ***
   const walletNav: NavSection[] = [
       {
-          id: 'WALLET_MAIN',
-          title: 'Urządzenie (Hardware)',
-          icon: Command,
+          id: 'WALLET_ASSETS',
+          title: 'Twoje Aktywa',
+          icon: Wallet,
           items: [
-              { view: ViewState.WALLET_DASHBOARD, label: 'Pulpit Sterujący', icon: LayoutDashboard, badge: 'DEVICE' },
-              { view: ViewState.WALLET_DEVICE, label: 'Ustawienia Nuffi Key', icon: Settings },
+              { view: ViewState.WALLET_DASHBOARD, label: 'Pulpit (Portfolio)', icon: LayoutDashboard, badge: 'DEVICE' },
+              { view: ViewState.WALLET_NFTS, label: 'Galeria NFT', icon: Image },
+              { view: ViewState.WALLET_HISTORY, label: 'Historia Tx', icon: Clock3 },
           ]
       },
       {
           id: 'WALLET_OPS',
-          title: 'Operacje',
+          title: 'Operacje On-Chain',
           icon: RefreshCw,
           items: [
               { view: ViewState.WALLET_SEND, label: 'Wyślij', icon: Send },
               { view: ViewState.WALLET_RECEIVE, label: 'Odbierz', icon: Wallet },
-              { view: ViewState.WALLET_SWAP, label: 'Swap', icon: Shuffle },
-              { view: ViewState.WALLET_BRIDGE, label: 'Bridge', icon: Globe },
+              { view: ViewState.WALLET_SWAP, label: 'Swap (DEX)', icon: Shuffle },
+              { view: ViewState.WALLET_BRIDGE, label: 'Bridge (Cross-chain)', icon: Globe },
+              { view: ViewState.WALLET_STAKING, label: 'Earn (Staking)', icon: Gem, badge: 'APY' },
           ]
       },
       {
           id: 'WALLET_SEC',
-          title: 'Bezpieczeństwo',
+          title: 'Device & Web3',
           icon: ShieldCheck,
           items: [
-              { view: ViewState.WALLET_DEVICE, label: 'Menadżer Kluczy', icon: Lock }, // Reuse view for now
+              { view: ViewState.WALLET_DAPPS, label: 'Połączone DApps', icon: Link },
+              { view: ViewState.WALLET_DEVICE, label: 'Menadżer Nuffi Key', icon: Settings },
           ]
       }
   ];

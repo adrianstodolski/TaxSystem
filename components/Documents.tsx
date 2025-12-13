@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { NuffiService } from '../services/api';
 import { Invoice, RecurringInvoice, RecurringSuggestion } from '../types';
-import { TrendingUp, UploadCloud, Loader2, Plus, Download, Eye, Sparkles, X, FileText, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { TrendingUp, UploadCloud, Loader2, Plus, Download, Eye, Sparkles, X, FileText, CheckCircle2, ArrowLeft, Wifi, Scan } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { toast } from './ui/Toast';
 import { DataTable } from './ui/DataTable';
@@ -167,14 +167,16 @@ export const Documents: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 animate-in fade-in duration-500">
       <header className="flex justify-between items-center border-b border-white/5 pb-6">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-            Dokumenty
-            <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] px-2 py-0.5 rounded font-mono uppercase tracking-wide">KSeF Live</span>
+            KSeF Registry
+            <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] px-2 py-0.5 rounded font-mono uppercase tracking-wide flex items-center gap-1">
+                <Wifi size={10} className="animate-pulse" /> Live
+            </span>
           </h2>
-          <p className="text-zinc-400 mt-1">Rejestr faktur (FA-2) zsynchronizowany z Ministerstwem Finansów.</p>
+          <p className="text-zinc-400 mt-1">Centralny Rejestr Faktur (Krajowy System e-Faktur).</p>
         </div>
         <div className="flex gap-3">
             <div className="bg-onyx p-1 rounded-xl border border-white/10 flex">
@@ -203,18 +205,21 @@ export const Documents: React.FC = () => {
 
       {activeTab === 'INVOICES' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-            {/* OCR Upload Zone */}
+            {/* OCR Upload Zone (Digital Ingestion) */}
             <div 
-                className="neo-card border-dashed border-zinc-800 rounded-2xl p-8 flex items-center justify-center gap-6 cursor-pointer hover:border-gold/30 hover:bg-white/[0.02] transition-all group mb-8"
+                className="neo-card border-dashed border-zinc-800 rounded-2xl p-8 flex items-center justify-center gap-6 cursor-pointer hover:border-gold/30 hover:bg-white/[0.02] transition-all group mb-8 relative overflow-hidden"
                 onClick={() => fileInputRef.current?.click()}
             >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".pdf,.jpg,.png" />
-                <div className="w-16 h-16 bg-onyx rounded-full flex items-center justify-center border border-white/10 text-zinc-400 group-hover:text-gold group-hover:border-gold/30 transition-all shadow-xl">
-                    {isUploading ? <Loader2 className="animate-spin" /> : <UploadCloud size={28} />}
+                <div className="w-16 h-16 bg-onyx rounded-full flex items-center justify-center border border-white/10 text-zinc-400 group-hover:text-gold group-hover:border-gold/30 transition-all shadow-xl relative z-10">
+                    {isUploading ? <Loader2 className="animate-spin" /> : <Scan size={28} />}
                 </div>
-                <div className="text-left">
-                    <h3 className="font-bold text-white text-lg group-hover:text-gold transition-colors">Import Spoza KSeF</h3>
-                    <p className="text-zinc-500 text-sm mt-1">Upuść faktury zagraniczne lub skany (OCR AI).</p>
+                <div className="text-left relative z-10">
+                    <h3 className="font-bold text-white text-lg group-hover:text-gold transition-colors flex items-center gap-2">
+                        Digital Ingestion <span className="text-xs bg-white/10 text-zinc-300 px-2 py-0.5 rounded border border-white/10 font-normal">OCR AI</span>
+                    </h3>
+                    <p className="text-zinc-500 text-sm mt-1">Upuść faktury zagraniczne lub skany. AI automatycznie rozpozna dane.</p>
                 </div>
             </div>
 

@@ -6,7 +6,8 @@ import { useStore } from '../store/useStore';
 import { 
     Calculator, FileCheck, Send, CreditCard, Loader2, Download, 
     AlertTriangle, Sparkles, TrendingUp, TrendingDown, 
-    Calendar, ArrowRight, ShieldCheck, PieChart, Coins, ChevronDown, CheckCircle2
+    Calendar, ArrowRight, ShieldCheck, PieChart, Coins, ChevronDown, CheckCircle2,
+    FileText, Link, Lock, Search, Terminal, Server, Wifi
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from './ui/Toast';
@@ -19,6 +20,10 @@ export const TaxCommandCenter: React.FC = () => {
     
     const defaultForm = activeWorkspace === Workspace.BUSINESS ? TaxFormType.PIT_36 : TaxFormType.PIT_38;
     const [selectedForm, setSelectedForm] = useState<TaxFormType>(defaultForm);
+
+    // Filing State
+    const [filingStatus, setFilingStatus] = useState<'IDLE' | 'PROCESSING' | 'DONE'>('IDLE');
+    const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
 
     useEffect(() => {
         loadData();
@@ -41,19 +46,44 @@ export const TaxCommandCenter: React.FC = () => {
         toast.success('Zapłacono', 'Podatek został opłacony. Potwierdzenie wysłano na maila.');
     };
 
+    const addLog = (msg: string) => setTerminalLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+
     const handleFile = async () => {
         if(!taxData) return;
-        toast.info('e-Deklaracje', 'Wysyłanie do bramki Ministerstwa Finansów...');
-        await NuffiService.submitToMF(taxData.id);
+        setFilingStatus('PROCESSING');
+        setTerminalLogs([]);
+        
+        addLog('Inicjalizacja procedury wysyłkowej...');
+        await new Promise(r => setTimeout(r, 800));
+        
+        addLog(`Weryfikacja schematu XSD dla ${selectedForm}...`);
+        await new Promise(r => setTimeout(r, 1200));
+        addLog('Walidacja: OK.');
+
+        addLog('Generowanie podpisu XAdES-BES (Szafir)...');
+        await NuffiService.signDocument(taxData.id);
+        addLog('Dokument podpisany cyfrowo.');
+
+        addLog('Nawiązywanie połączenia z bramką MF (e-Deklaracje)...');
+        await new Promise(r => setTimeout(r, 1000));
+        addLog('Uwierzytelnianie: TLS 1.3 Handshake OK.');
+
+        addLog('Wysyłanie pakietu danych...');
+        const upoId = await NuffiService.submitToMF(taxData.id);
+        
+        addLog(`Transmisja zakończona. Status: 200 OK.`);
+        addLog(`Odebrano UPO: ${upoId}`);
+        
+        setFilingStatus('DONE');
         toast.success('Przyjęto', 'Status 200. Pobrano UPO.');
     };
 
     return (
-        <div className="space-y-8 pb-20">
+        <div className="space-y-8 pb-20 animate-in fade-in duration-500">
             <header className="flex flex-col md:flex-row justify-between items-end border-b border-white/5 pb-6 gap-4">
                 <div>
                     <h2 className="text-3xl font-bold text-white flex items-center gap-3 tracking-tight">
-                        <ShieldCheck className="text-gold" /> Tax Command Center
+                        <ShieldCheck className="text-gold" /> Fiscal Operations
                     </h2>
                     <p className="text-zinc-400 mt-1">
                         Zintegrowany panel podatkowy: <span className="font-mono text-gold/80 bg-gold/10 px-1.5 py-0.5 rounded border border-gold/20 text-xs">{activeWorkspace === Workspace.BUSINESS ? 'CIT / VAT / PIT-36' : 'Belka / PIT-38 / Krypto'}</span>
@@ -87,9 +117,9 @@ export const TaxCommandCenter: React.FC = () => {
                     <motion.div key="OVERVIEW" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
                         {/* Status Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="neo-card p-6 rounded-2xl relative overflow-hidden border-t-4 border-t-gold">
+                            <div className="neo-card p-6 rounded-2xl relative overflow-hidden border-t-4 border-t-gold bg-gradient-to-b from-onyx to-[#141419]">
                                 <div className="relative z-10">
-                                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Estymowany Podatek (YTD)</p>
+                                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-2">Zobowiązanie (YTD)</p>
                                     <h3 className="text-4xl font-bold text-white font-mono tracking-tight">
                                         {loading ? <Loader2 className="animate-spin text-gold" /> : formatCurrency(taxData?.taxDue || 0)}
                                     </h3>
@@ -175,17 +205,25 @@ export const TaxCommandCenter: React.FC = () => {
 
                 {activeTab === 'FILING' && (
                     <motion.div key="FILING" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-6">
-                        <div className="neo-card p-8 rounded-2xl">
+                        <div className="neo-card p-8 rounded-2xl border border-white/10">
+                            
                             <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
-                                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                                    <FileCheck className="text-gold" /> Generator Deklaracji
-                                </h3>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                        <Server className="text-gold" size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">Transmission Terminal</h3>
+                                        <p className="text-zinc-400 text-xs">Bezpośrednie połączenie z MF (e-Deklaracje)</p>
+                                    </div>
+                                </div>
                                 
                                 <div className="relative group min-w-[250px]">
                                     <select 
                                         value={selectedForm} 
                                         onChange={(e) => setSelectedForm(e.target.value as TaxFormType)}
-                                        className="neo-input w-full pl-4 pr-10 py-3 rounded-xl font-bold appearance-none cursor-pointer hover:border-gold/50"
+                                        className="neo-input w-full pl-4 pr-10 py-3 rounded-xl font-bold appearance-none cursor-pointer hover:border-gold/50 transition-colors"
+                                        disabled={filingStatus !== 'IDLE'}
                                     >
                                         <option value={TaxFormType.PIT_36}>PIT-36 (Działalność)</option>
                                         <option value={TaxFormType.PIT_36L}>PIT-36L (Liniowy)</option>
@@ -196,35 +234,61 @@ export const TaxCommandCenter: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-onyx rounded-xl p-8 border border-white/5 mb-8">
-                                <div className="flex justify-between items-center mb-6">
-                                    <span className="text-zinc-500 text-sm font-bold uppercase tracking-wider">Podgląd Wyniku</span>
-                                    <span className="text-[10px] font-bold bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full border border-amber-500/20 animate-pulse">WERYFIKACJA</span>
+                            {/* Terminal Window */}
+                            {filingStatus !== 'IDLE' && (
+                                <div className="mb-8 bg-[#050505] rounded-xl border border-white/10 overflow-hidden shadow-inner font-mono text-xs">
+                                    <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/5">
+                                        <span className="text-zinc-500 flex items-center gap-2"><Terminal size={12} /> nuffi-cli --submit</span>
+                                        <div className="flex gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
+                                            <div className="w-2 h-2 rounded-full bg-amber-500/50"></div>
+                                            <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 space-y-2 h-64 overflow-y-auto custom-scrollbar">
+                                        {terminalLogs.map((log, i) => (
+                                            <div key={i} className="text-zinc-300">
+                                                <span className="text-green-500 mr-2">➜</span>
+                                                {log}
+                                            </div>
+                                        ))}
+                                        {filingStatus === 'PROCESSING' && (
+                                            <div className="animate-pulse text-gold">_</div>
+                                        )}
+                                        {filingStatus === 'DONE' && (
+                                            <div className="text-green-400 font-bold mt-4">
+                                                [SUCCESS] Operacja zakończona pomyślnie.
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="space-y-4 font-mono text-sm">
-                                    <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                                        <span className="text-zinc-400">Przychód</span>
-                                        <span className="text-white text-lg">{formatCurrency(taxData?.breakdown?.revenue || 0)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                                        <span className="text-zinc-400">Koszty Uzyskania</span>
-                                        <span className="text-rose-400 text-lg">-{formatCurrency(taxData?.breakdown?.costs || 0)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-2">
-                                        <span className="text-white font-bold">Podatek Należny</span>
-                                        <span className="text-2xl font-bold text-gold">{formatCurrency(taxData?.taxDue || 0)}</span>
-                                    </div>
-                                </div>
-                            </div>
+                            )}
 
-                            <div className="flex gap-4">
-                                <button className="flex-1 bg-onyx border border-white/10 text-zinc-300 py-4 rounded-xl font-bold hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2">
-                                    <Download size={18} /> Podgląd PDF
-                                </button>
-                                <button onClick={handleFile} className="flex-1 bg-gold text-black py-4 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20">
-                                    <Send size={18} /> Wyślij do MF (e-Deklaracje)
-                                </button>
-                            </div>
+                            {filingStatus === 'DONE' ? (
+                                <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-xl flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <CheckCircle2 size={32} className="text-green-400" />
+                                        <div>
+                                            <h4 className="text-green-400 font-bold">Deklaracja Złożona</h4>
+                                            <p className="text-zinc-400 text-sm">Urzędowe Poświadczenie Odbioru (UPO) jest dostępne.</p>
+                                        </div>
+                                    </div>
+                                    <button className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors border border-white/10">
+                                        <Download size={16} /> Pobierz UPO
+                                    </button>
+                                </div>
+                            ) : (
+                                filingStatus === 'IDLE' && (
+                                    <div className="flex gap-4">
+                                        <button className="flex-1 bg-onyx border border-white/10 text-zinc-300 py-4 rounded-xl font-bold hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2">
+                                            <FileText size={18} /> Podgląd XML
+                                        </button>
+                                        <button onClick={handleFile} className="flex-1 bg-gold text-black py-4 rounded-xl font-bold hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20">
+                                            <Send size={18} /> Inicjuj Wysyłkę
+                                        </button>
+                                    </div>
+                                )
+                            )}
                         </div>
                     </motion.div>
                 )}

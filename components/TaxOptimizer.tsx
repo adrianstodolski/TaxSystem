@@ -1,15 +1,19 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { NuffiService } from '../services/api';
 import { TaxOptimizationOpportunity } from '../types';
-import { Magnet, TrendingDown, ArrowRight, AlertTriangle, CheckCircle2, RefreshCw, Loader2, Coins, LineChart } from 'lucide-react';
+import { Magnet, TrendingDown, ArrowRight, AlertTriangle, CheckCircle2, RefreshCw, Loader2, Coins, LineChart, Calculator, X, Save } from 'lucide-react';
 import { toast } from './ui/Toast';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ReferenceLine } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const TaxOptimizer: React.FC = () => {
     const [opportunities, setOpportunities] = useState<TaxOptimizationOpportunity[]>([]);
     const [loading, setLoading] = useState(true);
-    const [simulating, setSimulating] = useState<string | null>(null);
+    
+    // Simulation State
+    const [harvestBasket, setHarvestBasket] = useState<string[]>([]); // IDs of selected assets
+    const [currentTaxLiability, setCurrentTaxLiability] = useState(15000); // Mock starting tax
 
     useEffect(() => {
         const load = async () => {
@@ -20,28 +24,40 @@ export const TaxOptimizer: React.FC = () => {
         load();
     }, []);
 
-    const handleSimulate = async (opp: TaxOptimizationOpportunity) => {
-        setSimulating(opp.id);
-        await new Promise(r => setTimeout(r, 1500));
-        setSimulating(null);
-        toast.success('Symulacja sprzedaży', `Sprzedaż ${opp.quantity} ${opp.asset} wygeneruje stratę ${opp.unrealizedLoss} PLN i obniży podatek o ${opp.potentialTaxSavings} PLN.`);
+    const toggleAssetInBasket = (id: string) => {
+        setHarvestBasket(prev => 
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleExecuteHarvest = async () => {
+        if (harvestBasket.length === 0) return;
+        toast.info('Przetwarzanie', 'Generowanie zleceń sprzedaży dla wybranych aktywów...');
+        await new Promise(r => setTimeout(r, 2000));
+        toast.success('Zrealizowano', `Zaksięgowano stratę podatkową. Twój podatek spadł o ${formatCurrency(basketSavings)}.`);
+        setHarvestBasket([]);
     };
 
     const formatCurrency = (val: number, curr = 'PLN') => {
-        try {
-            return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
-        } catch (e) {
-            return `${val.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} ${curr}`;
-        }
+        return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: curr, maximumFractionDigits: 0 }).format(val);
     };
 
-    const totalPotentialSavings = opportunities.reduce((acc, o) => acc + o.potentialTaxSavings, 0);
-    const totalUnrealizedLoss = opportunities.reduce((acc, o) => acc + o.unrealizedLoss, 0);
+    // Calculations
+    const basketLoss = opportunities
+        .filter(o => harvestBasket.includes(o.id))
+        .reduce((acc, o) => acc + o.unrealizedLoss, 0);
+    
+    const basketSavings = opportunities
+        .filter(o => harvestBasket.includes(o.id))
+        .reduce((acc, o) => acc + o.potentialTaxSavings, 0);
 
+    const projectedTax = Math.max(0, currentTaxLiability - basketSavings);
+
+    // Chart Data for Waterfall
     const chartData = [
-        { name: 'Podatek Brutto (Est.)', value: 15000, color: '#EF4444' }, // Mock current tax
-        { name: 'Harvesting (Strata)', value: -totalUnrealizedLoss, color: '#10B981' },
-        { name: 'Podatek Netto (Est.)', value: 15000 - (totalUnrealizedLoss * 0.19), color: '#3B82F6' } // Approx
+        { name: 'Obecny Podatek', value: currentTaxLiability, fill: '#EF4444' }, // Red
+        { name: 'Odzysk (Harvest)', value: -basketSavings, fill: '#10B981' }, // Green
+        { name: 'Podatek po Opt.', value: projectedTax, fill: '#3B82F6' } // Blue
     ];
 
     return (
@@ -49,117 +65,164 @@ export const TaxOptimizer: React.FC = () => {
             <header className="flex justify-between items-center border-b border-white/10 pb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Magnet className="text-indigo-400" /> Tax Optimizer (Auto-Hedging)
+                        <Magnet className="text-gold" /> Tax Alpha Terminal
                     </h2>
-                    <p className="text-slate-400 mt-1">
-                        Strategie Tax Loss Harvesting. Zredukuj podatek od zysków kapitałowych realizując straty.
+                    <p className="text-zinc-400 mt-1">
+                        Aktywne zarządzanie stratą (Tax Loss Harvesting). Wybierz pozycje do zamknięcia, aby obniżyć podatek.
                     </p>
+                </div>
+                <div className="flex gap-2">
+                    <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-mono text-zinc-300">
+                        ROK PODATKOWY: 2024
+                    </div>
                 </div>
             </header>
 
-            {/* Hero Stats */}
-            <div className="bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden border border-white/10">
-                <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div>
-                        <p className="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-2">Potencjalna Oszczędność Podatkowa</p>
-                        <h3 className="text-5xl font-bold tracking-tight text-green-400">{formatCurrency(totalPotentialSavings)}</h3>
-                        <p className="text-sm text-indigo-300 mt-2">Dostępna do końca roku podatkowego.</p>
-                    </div>
-                    <div className="flex flex-col justify-center border-l border-white/10 pl-8">
-                        <p className="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Do "wyciągnięcia" (Unrealized Loss)</p>
-                        <h3 className="text-2xl font-bold text-white">{formatCurrency(totalUnrealizedLoss)}</h3>
-                    </div>
-                    <div className="flex flex-col justify-center border-l border-white/10 pl-8">
-                        <button className="bg-white/10 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors flex items-center gap-2 shadow-lg border border-white/10">
-                            <RefreshCw size={18} /> Odśwież pozycje
-                        </button>
-                    </div>
-                </div>
-                {/* Background Pattern */}
-                <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Opportunities List */}
-                <div className="glass-card rounded-2xl overflow-hidden">
-                    <div className="p-6 border-b border-white/10 bg-slate-900/30">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* LEFT: Assets List */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex justify-between items-center">
                         <h3 className="font-bold text-white flex items-center gap-2">
-                            <TrendingDown className="text-slate-400" /> Pozycje Stratne (Harvesting Opportunities)
+                            <TrendingDown className="text-rose-400" /> Dostępne do realizacji (Unrealized Losses)
                         </h3>
+                        <span className="text-xs text-zinc-500 bg-white/5 px-2 py-1 rounded border border-white/5">
+                            {opportunities.length} pozycji
+                        </span>
                     </div>
-                    <div className="divide-y divide-white/5">
-                        {loading ? <div className="p-8 text-center"><Loader2 className="animate-spin text-indigo-500 mx-auto" /></div> : 
-                            opportunities.map(opp => (
-                                <div key={opp.id} className="p-6 hover:bg-white/5 transition-colors">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${opp.type === 'CRYPTO' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                                                {opp.type === 'CRYPTO' ? <Coins size={20} /> : <LineChart size={20} />}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-white">{opp.asset}</h4>
-                                                <p className="text-xs text-slate-400 font-mono">
-                                                    Kupno: {opp.purchasePrice} | Teraz: {opp.currentPrice}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="text-xs font-bold bg-green-500/20 text-green-400 px-2 py-1 rounded border border-green-500/30 uppercase">
-                                            {opp.strategy.replace('_', ' ')}
-                                        </span>
-                                    </div>
 
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <p className="text-xs text-slate-500 mb-1">Strata do realizacji</p>
-                                            <p className="font-bold text-red-400 text-lg">{formatCurrency(-opp.unrealizedLoss)}</p>
-                                        </div>
-                                        
-                                        <button 
-                                            onClick={() => handleSimulate(opp)}
-                                            disabled={simulating === opp.id}
-                                            className="bg-slate-800 text-white border border-slate-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-700 flex items-center gap-2 transition-all disabled:opacity-70"
-                                        >
-                                            {simulating === opp.id ? <Loader2 size={14} className="animate-spin" /> : <><ArrowRight size={14} /> Symuluj Sprzedaż</>}
-                                        </button>
-                                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        {loading ? <div className="p-12 text-center"><Loader2 className="animate-spin text-gold mx-auto" /></div> : 
+                            opportunities.map(opp => {
+                                const isSelected = harvestBasket.includes(opp.id);
+                                return (
+                                    <motion.div 
+                                        key={opp.id}
+                                        layout
+                                        onClick={() => toggleAssetInBasket(opp.id)}
+                                        className={`p-6 rounded-2xl border transition-all cursor-pointer group relative overflow-hidden ${
+                                            isSelected 
+                                            ? 'bg-indigo-600/10 border-indigo-500 shadow-[0_0_20px_-5px_rgba(79,70,229,0.3)]' 
+                                            : 'bg-[#0A0A0C] border-white/5 hover:border-white/20'
+                                        }`}
+                                    >
+                                        <div className="flex justify-between items-start relative z-10">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-xl border ${opp.type === 'CRYPTO' ? 'bg-orange-500/10 border-orange-500/20 text-orange-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'}`}>
+                                                    {opp.type === 'CRYPTO' ? <Coins size={20} /> : <LineChart size={20} />}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-white text-lg">{opp.asset}</h4>
+                                                    <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1">
+                                                        <span className="font-mono">Kupno: {opp.purchasePrice}</span>
+                                                        <ArrowRight size={10} />
+                                                        <span className="font-mono text-white">Teraz: {opp.currentPrice}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                    {opp.strategy === 'WASH_SALE_AVOIDANCE' && (
-                                        <div className="mt-4 bg-amber-500/10 border border-amber-500/20 p-2 rounded text-xs text-amber-400 flex items-center gap-2">
-                                            <AlertTriangle size={14} /> 
-                                            Uwaga: Wash Sale Rule (USA). Nie odkupuj przez 30 dni.
+                                            <div className="text-right">
+                                                <p className="text-xs text-zinc-500 uppercase font-bold mb-1">Potencjalna Strata</p>
+                                                <p className="font-bold text-rose-400 text-xl font-mono">{formatCurrency(-opp.unrealizedLoss)}</p>
+                                                <div className="flex items-center justify-end gap-1 mt-1 text-emerald-400 text-xs font-bold">
+                                                    <Magnet size={10} /> Oszczędzasz: {formatCurrency(opp.potentialTaxSavings)}
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
-                                </div>
-                            ))
+
+                                        {/* Selection Indicator */}
+                                        <div className={`absolute top-4 right-4 transition-all duration-300 ${isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                            <div className="bg-indigo-500 text-white p-1 rounded-full shadow-lg">
+                                                <CheckCircle2 size={16} />
+                                            </div>
+                                        </div>
+
+                                        {/* Strategy Badge */}
+                                        <div className="mt-4 flex items-center gap-2">
+                                            <span className="text-[10px] font-bold bg-white/5 text-zinc-400 px-2 py-1 rounded border border-white/5 uppercase tracking-wide">
+                                                {opp.strategy.replace('_', ' ')}
+                                            </span>
+                                            {opp.strategy === 'WASH_SALE_AVOIDANCE' && (
+                                                <span className="text-[10px] text-amber-500 flex items-center gap-1 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20 font-bold">
+                                                    <AlertTriangle size={10} /> 30-Day Lockout
+                                                </span>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
                         }
                     </div>
                 </div>
 
-                {/* Simulation Chart */}
-                <div className="glass-card p-6 rounded-2xl flex flex-col">
-                    <h3 className="font-bold text-white mb-6">Wpływ na Podatek (Symulacja Waterfall)</h3>
-                    <div className="flex-1 min-h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" fontSize={10} interval={0} stroke="#64748b" />
-                                <YAxis stroke="#64748b" />
-                                <Tooltip 
-                                    formatter={(val: number) => formatCurrency(val)} 
-                                    contentStyle={{backgroundColor: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', color: '#fff'}}
-                                    cursor={{fill: 'rgba(255,255,255,0.05)'}}
-                                />
-                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                    {chartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className="mt-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 text-sm text-blue-300 flex gap-3">
-                        <CheckCircle2 className="shrink-0" />
-                        <p>Zrealizowanie wszystkich strat pozwoliłoby obniżyć estymowany podatek o <strong>{((totalPotentialSavings / 15000) * 100).toFixed(1)}%</strong>.</p>
+                {/* RIGHT: Simulation Engine */}
+                <div className="lg:col-span-1">
+                    <div className="sticky top-6 space-y-6">
+                        
+                        {/* Waterfall Chart Card */}
+                        <div className="neo-card p-6 rounded-2xl bg-gradient-to-b from-[#0A0A0C] to-[#141419] border-t-4 border-t-indigo-500 shadow-xl">
+                            <h3 className="font-bold text-white mb-6 flex items-center gap-2">
+                                <Calculator size={18} className="text-zinc-400" /> Symulacja Podatkowa
+                            </h3>
+                            
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                        <XAxis dataKey="name" fontSize={10} tick={{fill: '#94a3b8'}} axisLine={false} tickLine={false} interval={0} />
+                                        <Tooltip 
+                                            cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                                            contentStyle={{backgroundColor: '#0A0A0C', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff'}}
+                                            formatter={(value: number) => formatCurrency(value)}
+                                        />
+                                        <ReferenceLine y={0} stroke="#333" />
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            <div className="mt-6 space-y-3 border-t border-white/5 pt-4">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-zinc-400">Wybrane pozycje:</span>
+                                    <span className="text-white font-bold">{harvestBasket.length}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-zinc-400">Realizowana strata:</span>
+                                    <span className="text-rose-400 font-mono font-bold">{formatCurrency(basketLoss)}</span>
+                                </div>
+                                <div className="flex justify-between text-lg bg-indigo-500/10 p-3 rounded-lg border border-indigo-500/20">
+                                    <span className="text-indigo-300 font-bold">Oszczędzasz:</span>
+                                    <span className="text-emerald-400 font-mono font-bold">{formatCurrency(basketSavings)}</span>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={handleExecuteHarvest}
+                                disabled={harvestBasket.length === 0}
+                                className="w-full bg-gold text-black py-4 rounded-xl font-bold mt-6 hover:bg-[#FCD34D] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <RefreshCw size={18} /> Wykonaj Transakcje
+                            </button>
+                            <p className="text-[10px] text-center text-zinc-500 mt-2">
+                                Automatycznie wystawi zlecenia sprzedaży na giełdach.
+                            </p>
+                        </div>
+
+                        {/* Education / Tip */}
+                        <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20 flex gap-3">
+                            <div className="shrink-0 mt-1 text-blue-400"><CheckCircle2 size={18} /></div>
+                            <div>
+                                <h4 className="text-blue-300 text-sm font-bold">Zasada FIFO</h4>
+                                <p className="text-xs text-blue-200/70 mt-1">
+                                    Nuffi automatycznie dobiera najdroższe partie (HIFO) w ramach symulacji, aby zmaksymalizować stratę podatkową.
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

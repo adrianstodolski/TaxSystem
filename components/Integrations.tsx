@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { NuffiService } from '../services/api';
 import { BankAccount, CryptoWallet, IntegrationStatus } from '../types';
-import { Plus, CheckCircle2, Building, Loader2, ShieldCheck, Lock, Wallet, ArrowRight } from 'lucide-react';
+import { Plus, CheckCircle2, Building, Loader2, ShieldCheck, Lock, Wallet, ArrowRight, Activity, Server, Globe, RefreshCw, Cpu, Wifi, ChevronLeft } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import { toast } from './ui/Toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const BANKS = [
   { id: 'mbank', name: 'mBank', color: 'from-red-600 to-red-900', logo: 'M' },
@@ -67,20 +68,33 @@ export const Integrations: React.FC = () => {
       setWeb3ModalOpen(false);
   };
 
+  // Telemetry Mock
+  const PingGraph = () => (
+      <div className="flex items-end gap-0.5 h-6 opacity-30">
+          {Array.from({length: 30}).map((_,i) => (
+              <div key={i} className="w-1 bg-emerald-500 rounded-t-sm" style={{height: `${Math.random() * 100}%`}}></div>
+          ))}
+      </div>
+  );
+
   const renderModalContent = () => {
     if (status === 'IDLE') {
       return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           {BANKS.map(bank => (
             <button
               key={bank.id}
               onClick={() => startConnection(bank.id)}
-              className="flex items-center gap-4 p-4 rounded-2xl border border-white/5 hover:border-gold/30 bg-white/5 hover:bg-white/10 transition-all group"
+              className="flex items-center gap-4 p-4 rounded-xl border border-white/5 hover:border-gold/30 bg-white/5 hover:bg-white/10 transition-all group"
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${bank.color} text-white flex items-center justify-center font-bold text-lg shadow-lg`}>
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${bank.color} text-white flex items-center justify-center font-bold text-lg shadow-lg`}>
                 {bank.name.substring(0, 1)}
               </div>
-              <span className="font-bold text-zinc-300 group-hover:text-white text-sm text-left">{bank.name}</span>
+              <div className="flex-1 text-left">
+                  <span className="font-bold text-zinc-200 block text-sm">{bank.name}</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider">PSD2 / Open Banking</span>
+              </div>
+              <ArrowRight size={16} className="text-zinc-500 group-hover:text-gold opacity-0 group-hover:opacity-100 transition-all" />
             </button>
           ))}
         </div>
@@ -90,60 +104,53 @@ export const Integrations: React.FC = () => {
     if (status === 'SUCCESS') {
       return (
         <div className="text-center py-8 animate-in fade-in zoom-in">
-          <div className="w-20 h-20 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
+          <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
             <CheckCircle2 size={40} />
           </div>
-          <h4 className="text-xl font-bold text-white">Pomyślnie połączono!</h4>
-          <p className="text-zinc-400 mt-2 mb-8 text-sm">Pobrano historię transakcji z ostatnich 12 miesięcy.</p>
-          <button onClick={handleCloseModal} className="w-full bg-gold text-black py-3 rounded-xl font-bold hover:bg-[#FCD34D] transition-colors">
-            Gotowe
+          <h4 className="text-xl font-bold text-white">Połączenie Bezpieczne</h4>
+          <p className="text-zinc-400 mt-2 mb-8 text-sm">Tunel szyfrowany ustanowiony. Pobrano historię.</p>
+          <button onClick={handleCloseModal} className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/20">
+            Zakończ
           </button>
         </div>
       );
     }
 
-    // Loading / Connecting States
+    // Terminal Style Loading
     const steps = [
-      { s: 'CONNECTING', label: 'Nawiązywanie bezpiecznego połączenia (TLS 1.3)...' },
-      { s: 'AUTHENTICATING', label: 'Oczekiwanie na autoryzację w aplikacji banku...' },
-      { s: 'FETCHING', label: 'Pobieranie historii rachunków i transakcji...' },
+      { s: 'CONNECTING', label: 'Inicjalizacja handshake TLS 1.3...' },
+      { s: 'AUTHENTICATING', label: 'Weryfikacja certyfikatu eIDAS...' },
+      { s: 'FETCHING', label: 'Synchronizacja rejestru (AIS/PIS)...' },
     ];
-
     const currentStepIndex = steps.findIndex(step => step.s === status);
 
     return (
-      <div className="py-8">
-        <div className="flex justify-center mb-10">
-            <div className="relative">
-                <div className="w-24 h-24 border-4 border-white/5 border-t-gold rounded-full animate-spin"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <Lock size={24} className="text-gold" />
-                </div>
-            </div>
-        </div>
-        
-        <div className="space-y-4 max-w-sm mx-auto">
+      <div className="py-6 font-mono">
+        <div className="bg-black border border-white/10 rounded-xl p-4 text-xs space-y-2 mb-6 h-48 overflow-hidden relative">
+            <div className="text-emerald-500">$ nuffi connect --provider={selectedBank}</div>
             {steps.map((step, idx) => (
-                <div key={step.s} className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] border font-bold ${
-                        idx < currentStepIndex 
-                            ? 'bg-emerald-500 border-emerald-500 text-black' 
-                            : idx === currentStepIndex 
-                                ? 'bg-gold border-gold text-black animate-pulse' 
-                                : 'bg-transparent border-white/20 text-zinc-600'
-                    }`}>
-                        {idx < currentStepIndex ? <CheckCircle2 size={12} /> : idx + 1}
-                    </div>
-                    <span className={`text-xs ${idx === currentStepIndex ? 'font-bold text-white' : 'text-zinc-500'}`}>
+                <div key={step.s} className={`flex items-center gap-2 ${idx > currentStepIndex ? 'opacity-30' : 'opacity-100'}`}>
+                    <span className={idx <= currentStepIndex ? 'text-green-500' : 'text-zinc-600'}>
+                        {idx < currentStepIndex ? '[OK]' : idx === currentStepIndex ? '[..]' : '[  ]'}
+                    </span>
+                    <span className={idx === currentStepIndex ? 'text-white animate-pulse' : 'text-zinc-400'}>
                         {step.label}
                     </span>
                 </div>
             ))}
+            <div className="absolute bottom-4 left-4 right-4 h-1 bg-white/10 rounded-full overflow-hidden">
+                <motion.div 
+                    className="h-full bg-gold"
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${((currentStepIndex + 1) / 3) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                ></motion.div>
+            </div>
         </div>
         
-        <div className="mt-8 bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg flex items-center gap-3 text-xs text-blue-400">
-            <ShieldCheck size={16} />
-            <p>Połączenie szyfrowane i zgodne ze standardem PSD2.</p>
+        <div className="flex justify-center text-zinc-500 text-[10px] items-center gap-2">
+            <Lock size={10} /> 
+            <span>End-to-End Encrypted Channel</span>
         </div>
       </div>
     );
@@ -154,109 +161,124 @@ export const Integrations: React.FC = () => {
       <header className="flex justify-between items-center border-b border-white/10 pb-6">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Building className="text-gold" /> Integracje
+            <Server className="text-gold" /> Nexus Connectivity
           </h2>
-          <p className="text-zinc-400 mt-1">Zarządzaj połączeniami bankowymi i giełdowymi.</p>
+          <p className="text-zinc-400 mt-1">Zarządzanie węzłami bankowymi i bramkami Web3.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+            <div className="hidden md:flex items-center gap-2 bg-[#0A0A0C] border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-emerald-400">
+                <Wifi size={12} /> GATEWAY ONLINE
+            </div>
+            <div className="hidden md:flex items-center gap-2 bg-[#0A0A0C] border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-blue-400">
+                <Activity size={12} /> 24ms LATENCY
+            </div>
         </div>
       </header>
 
       {/* Banking Section */}
       <section>
-        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-          Bankowość (Open Banking)
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex justify-between items-end mb-6">
+            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+              <Building size={14} /> Węzły Bankowe (Open Banking)
+            </h3>
+            <button 
+                onClick={() => setIsModalOpen(true)}
+                className="bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-white/10 transition-colors flex items-center gap-2"
+            >
+                <Plus size={14} /> Dodaj Węzeł
+            </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {loading ? (
-             [1, 2].map(i => <div key={i} className="h-48 bg-white/5 rounded-2xl animate-pulse" />)
+             [1, 2].map(i => <div key={i} className="h-32 bg-white/5 rounded-xl animate-pulse" />)
           ) : (
             <>
               {accounts.map(acc => (
-                <div key={acc.id} className={`neo-card p-6 rounded-2xl relative overflow-hidden group hover:border-gold/30 transition-all ${acc.colorTheme}`}>
-                  {/* Subtle Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-transparent pointer-events-none"></div>
+                <div key={acc.id} className="group relative bg-[#0F0F12] border border-white/10 rounded-xl overflow-hidden hover:border-gold/30 transition-all">
+                  {/* Status LED */}
+                  <div className="absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981] animate-pulse"></div>
                   
-                  <div className="relative z-10 flex flex-col justify-between h-full min-h-[180px]">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-white font-bold border border-white/20 text-lg shadow-lg">
-                                {acc.providerName.substring(0,1)}
-                            </div>
-                            <div>
-                                <p className="font-bold text-white text-sm">{acc.providerName}</p>
-                                <p className="text-xs text-white/60 font-mono mt-0.5">
-                                    •••• {acc.accountNumber.slice(-4)}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_10px_#34d399]"></div>
+                  <div className="p-5">
+                      <div className="flex items-center gap-4 mb-4">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-inner ${acc.colorTheme.replace('from-', 'bg-').split(' ')[0]}`}>
+                              {acc.providerName.substring(0,1)}
+                          </div>
+                          <div>
+                              <h4 className="font-bold text-white text-sm">{acc.providerName}</h4>
+                              <p className="text-[10px] text-zinc-500 font-mono tracking-wider">
+                                  *** {acc.accountNumber.slice(-4)}
+                              </p>
+                          </div>
                       </div>
                       
-                      <div className="pt-6 border-t border-white/10 mt-auto">
-                          <p className="text-white/60 text-[10px] uppercase font-bold mb-1">Saldo dostępne</p>
-                          <p className="text-3xl font-bold text-white font-mono tracking-tight">{acc.balance.toLocaleString()} <span className="text-lg">{acc.currency}</span></p>
+                      <div className="flex items-end justify-between border-t border-white/5 pt-3">
+                          <div>
+                              <p className="text-[9px] text-zinc-500 uppercase font-bold">API Status</p>
+                              <p className="text-emerald-400 text-xs font-bold">Connected</p>
+                          </div>
+                          <div className="text-right">
+                              <p className="text-[9px] text-zinc-500 uppercase font-bold">Sync</p>
+                              <p className="text-zinc-300 text-xs font-mono">1m ago</p>
+                          </div>
                       </div>
+                  </div>
+                  
+                  {/* Hover Actions Overlay */}
+                  <div className="absolute inset-0 bg-black/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <button className="p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white border border-white/10"><RefreshCw size={16}/></button>
+                      <button className="p-2 bg-white/10 rounded-lg hover:bg-white/20 text-white border border-white/10"><ArrowRight size={16}/></button>
                   </div>
                 </div>
               ))}
-              
-              {/* Add New Bank Button */}
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="border border-dashed border-white/10 bg-white/5 rounded-2xl flex flex-col items-center justify-center p-6 hover:border-gold/50 hover:bg-gold/5 transition-all text-zinc-500 hover:text-gold h-full min-h-[220px] group"
-              >
-                <div className="w-14 h-14 bg-black/40 rounded-full flex items-center justify-center mb-4 border border-white/5 group-hover:border-gold/30 transition-colors">
-                    <Plus size={24} />
-                </div>
-                <span className="font-bold text-sm">Połącz nowy bank</span>
-                <span className="text-xs mt-1 text-zinc-600">Obsługiwane przez SaltEdge</span>
-              </button>
             </>
           )}
         </div>
       </section>
 
       {/* Crypto Section */}
-      <section>
-        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 flex items-center gap-2 mt-10">
-          Web3 & Giełdy
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="mt-8">
+        <div className="flex justify-between items-end mb-6">
+            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+              <Cpu size={14} /> Węzły Blockchain (RPC)
+            </h3>
+            <button 
+                onClick={() => setWeb3ModalOpen(true)}
+                className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-indigo-600/20 transition-colors flex items-center gap-2"
+            >
+                <Plus size={14} /> Połącz Wallet
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {wallets.map(wallet => (
-            <div key={wallet.id} className="neo-card p-6 rounded-2xl relative overflow-hidden group hover:border-indigo-500/50 transition-all">
-                <div className="flex justify-between items-start mb-6">
-                    <div className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide flex items-center gap-2">
-                        <Wallet size={12} /> {wallet.provider}
+            <div key={wallet.id} className="group relative bg-[#0F0F12] border border-white/10 rounded-xl overflow-hidden hover:border-indigo-500/50 transition-all">
+                <div className="p-5">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 rounded text-[10px] font-bold uppercase flex items-center gap-2 w-fit">
+                            <Wallet size={10} /> {wallet.provider}
+                        </div>
+                        <div className="flex gap-1">
+                            <div className="w-1 h-3 bg-indigo-500 rounded-full"></div>
+                            <div className="w-1 h-3 bg-indigo-500/50 rounded-full"></div>
+                            <div className="w-1 h-3 bg-indigo-500/20 rounded-full"></div>
+                        </div>
                     </div>
-                    <CheckCircle2 size={18} className="text-emerald-500" />
-                </div>
-                
-                <p className="text-zinc-500 text-[10px] uppercase font-bold mb-1">Adres / Sieć</p>
-                <div className="font-mono text-white mb-6 text-xs bg-black/40 p-3 rounded-lg border border-white/5 truncate flex items-center justify-between group-hover:border-white/20 transition-colors">
-                    <span>{wallet.address.substring(0, 16)}...</span>
-                    <ArrowRight size={12} className="text-zinc-600" />
-                </div>
-                
-                <div className="flex items-end justify-between border-t border-white/10 pt-4">
-                    <div>
-                        <p className="text-zinc-500 text-[10px] uppercase font-bold mb-1">Aktywa</p>
-                        <p className="text-lg font-bold text-white">{wallet.assetCount} Tokenów</p>
+                    
+                    <div className="font-mono text-zinc-300 text-xs bg-black/40 p-2 rounded border border-white/5 truncate mb-3">
+                        {wallet.address}
                     </div>
-                    <span className="text-[10px] text-zinc-400 bg-white/5 px-2 py-1 rounded border border-white/5 uppercase font-bold">{wallet.chain}</span>
+                    
+                    <div className="flex items-center justify-between border-t border-white/5 pt-3">
+                        <div className="flex items-center gap-2">
+                            <Globe size={12} className="text-zinc-500" />
+                            <span className="text-xs text-white font-bold">{wallet.chain}</span>
+                        </div>
+                        <PingGraph />
+                    </div>
                 </div>
             </div>
           ))}
-
-          {/* Connect Web3 Wallet */}
-          <button 
-            onClick={() => setWeb3ModalOpen(true)}
-            className="border border-dashed border-white/10 bg-white/5 rounded-2xl flex flex-col items-center justify-center p-6 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-zinc-500 hover:text-indigo-400 h-full min-h-[220px] group"
-          >
-            <div className="w-14 h-14 bg-black/40 rounded-full flex items-center justify-center mb-4 border border-white/5 group-hover:border-indigo-500/30 transition-colors">
-                <Wallet size={24} />
-            </div>
-            <span className="font-bold text-sm">Podłącz Portfel Web3</span>
-            <span className="text-xs mt-1 text-zinc-600">MetaMask, Ledger, Trezor</span>
-          </button>
         </div>
       </section>
 
@@ -264,31 +286,33 @@ export const Integrations: React.FC = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
-        title={status === 'IDLE' ? "Wybierz bank" : "Łączenie z bankiem"}
+        title={status === 'IDLE' ? "Wybierz Bramkę Dostępową" : "Nawiązywanie Połączenia"}
       >
         {renderModalContent()}
       </Modal>
 
       {/* Web3 Modal */}
-      <Modal isOpen={web3ModalOpen} onClose={() => setWeb3ModalOpen(false)} title="Wybierz Portfel">
+      <Modal isOpen={web3ModalOpen} onClose={() => setWeb3ModalOpen(false)} title="Wybierz Sygnatariusza">
           <div className="space-y-3">
-              <button onClick={() => handleWeb3Connect('MetaMask')} className="w-full flex items-center gap-4 p-4 border border-white/10 bg-[#0F0F12] rounded-2xl hover:bg-orange-500/10 hover:border-orange-500/50 transition-colors group">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-orange-600 font-bold border border-white/10 group-hover:scale-110 transition-transform">M</div>
-                  <div className="text-left">
-                      <h4 className="font-bold text-white">MetaMask</h4>
-                      <p className="text-xs text-zinc-400">Browser Extension</p>
+              <button onClick={() => handleWeb3Connect('MetaMask')} className="w-full flex items-center gap-4 p-4 border border-white/10 bg-[#0F0F12] rounded-xl hover:bg-orange-500/10 hover:border-orange-500/50 transition-colors group">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-orange-600 font-bold border border-white/10 group-hover:scale-110 transition-transform">M</div>
+                  <div className="text-left flex-1">
+                      <h4 className="font-bold text-white text-sm">MetaMask</h4>
+                      <p className="text-[10px] text-zinc-400 uppercase tracking-wide">Browser Injection</p>
                   </div>
+                  <ChevronLeft className="rotate-180 text-zinc-600" size={16} />
               </button>
-              <button onClick={() => handleWeb3Connect('Ledger')} className="w-full flex items-center gap-4 p-4 border border-white/10 bg-[#0F0F12] rounded-2xl hover:bg-white/10 hover:border-white/30 transition-colors group">
-                  <div className="w-12 h-12 bg-black border border-white/20 rounded-xl flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform">L</div>
-                  <div className="text-left">
-                      <h4 className="font-bold text-white">Ledger</h4>
-                      <p className="text-xs text-zinc-400">Hardware Wallet (USB/BLE)</p>
+              <button onClick={() => handleWeb3Connect('Ledger')} className="w-full flex items-center gap-4 p-4 border border-white/10 bg-[#0F0F12] rounded-xl hover:bg-white/10 hover:border-white/30 transition-colors group">
+                  <div className="w-10 h-10 bg-black border border-white/20 rounded-lg flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform">L</div>
+                  <div className="text-left flex-1">
+                      <h4 className="font-bold text-white text-sm">Ledger</h4>
+                      <p className="text-[10px] text-zinc-400 uppercase tracking-wide">Hardware (USB/BLE)</p>
                   </div>
+                  <ChevronLeft className="rotate-180 text-zinc-600" size={16} />
               </button>
               {connectingWeb3 && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-gold py-4 font-bold animate-pulse">
-                      <Loader2 className="animate-spin" size={16} /> Podpisywanie wiadomości...
+                  <div className="flex items-center justify-center gap-2 text-sm text-gold py-4 font-bold animate-pulse font-mono">
+                      <Loader2 className="animate-spin" size={16} /> SIGNING MESSAGE...
                   </div>
               )}
           </div>
